@@ -2,10 +2,13 @@ import { useState, useRef, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
+  ListOrdered,
+  FolderKanban,
   Languages,
   Moon,
   Sun,
   LogOut,
+  Plus,
   Sparkles,
   Menu,
   ChevronDown,
@@ -14,22 +17,29 @@ import {
 import toast from 'react-hot-toast';
 import { useUiStore } from '@/store/ui-store';
 import { useCurrentUser, useLogout } from '@/features/auth/useAuth';
+import { Button } from '@/components/Button';
 import { useT } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
+import { QuickAddModal } from '@/features/transactions/QuickAddModal';
 import type { TransactionType } from '@/types/domain';
 
-/** Dashboard shell — quick add, extra nav routes, and alerts are added in later commits. */
 export const DashboardLayout = () => {
   const t = useT();
   const navigate = useNavigate();
   const { theme, language, toggleTheme, setLanguage } = useUiStore();
   const { data: user } = useCurrentUser();
   const logout = useLogout();
+  const [quickOpen, setQuickOpen] = useState(false);
+  const [quickType, setQuickType] = useState<TransactionType>('EXPENSE');
   const [navOpen, setNavOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
-  const navItems = [{ to: '/app', label: t('nav.dashboard'), icon: LayoutDashboard, end: true }];
+  const navItems = [
+    { to: '/app', label: t('nav.dashboard'), icon: LayoutDashboard, end: true },
+    { to: '/app/transactions', label: t('nav.transactions'), icon: ListOrdered, end: false },
+    { to: '/app/categories', label: t('nav.categories'), icon: FolderKanban, end: false },
+  ];
 
   const handleLogout = async () => {
     await logout.mutateAsync();
@@ -37,8 +47,9 @@ export const DashboardLayout = () => {
     navigate('/login', { replace: true });
   };
 
-  const openQuickAdd = (_initialType: TransactionType = 'EXPENSE') => {
-    /* wired when transactions UI lands */
+  const openQuickAdd = (initialType: TransactionType = 'EXPENSE') => {
+    setQuickType(initialType);
+    setQuickOpen(true);
   };
 
   const isRtl = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
@@ -146,6 +157,15 @@ export const DashboardLayout = () => {
             <div className="flex-1" />
 
             <div className="flex items-center gap-2">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => openQuickAdd('EXPENSE')}
+                className="hidden sm:inline-flex"
+              >
+                <Plus size={16} aria-hidden />
+                {t('transactions.quickAdd')}
+              </Button>
               <button
                 onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
                 className="h-9 w-9 rounded-lg bg-surface-high hover:bg-surface-highest flex items-center justify-center text-ink-muted hover:text-ink transition-colors focus-ring"
@@ -221,7 +241,21 @@ export const DashboardLayout = () => {
         <main id="main-content" className="flex-1 px-4 lg:px-8 py-4 lg:py-6">
           <Outlet context={{ openQuickAdd }} />
         </main>
+
+        <button
+          onClick={() => openQuickAdd('EXPENSE')}
+          className="sm:hidden fixed bottom-6 end-6 z-30 h-14 w-14 rounded-full bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-ambient flex items-center justify-center hover:brightness-110 transition-all focus-ring"
+          aria-label={t('transactions.quickAdd')}
+        >
+          <Plus size={24} aria-hidden />
+        </button>
       </div>
+
+      <QuickAddModal
+        open={quickOpen}
+        onClose={() => setQuickOpen(false)}
+        initialType={quickType}
+      />
     </div>
   );
 };

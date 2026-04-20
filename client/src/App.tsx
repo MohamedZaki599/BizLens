@@ -4,6 +4,8 @@ import { Toaster } from 'react-hot-toast';
 import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
 import { DashboardPage } from '@/pages/DashboardPage';
+import { TransactionsPage } from '@/pages/TransactionsPage';
+import { CategoriesPage } from '@/pages/CategoriesPage';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
 
@@ -47,6 +49,8 @@ export const App = () => (
           }
         >
           <Route index element={<DashboardPage />} />
+          <Route path="transactions" element={<TransactionsPage />} />
+          <Route path="categories" element={<CategoriesPage />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/app" replace />} />
