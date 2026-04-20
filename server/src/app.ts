@@ -7,6 +7,7 @@ import { env } from './config/env';
 import { errorHandler } from './middlewares/error-handler';
 import { notFoundHandler } from './middlewares/not-found';
 import authRoutes from './modules/auth/auth.routes';
+import categoryRoutes from './modules/categories/category.routes';
 import userRoutes from './modules/users/users.routes';
 
 export const createApp = () => {
@@ -35,6 +36,7 @@ export const createApp = () => {
 
   app.use('/api/v1/auth', authRoutes);
   app.use('/api/v1/users', userRoutes);
+  app.use('/api/v1/categories', categoryRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
