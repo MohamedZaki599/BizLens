@@ -4,6 +4,8 @@ import {
   LayoutDashboard,
   ListOrdered,
   FolderKanban,
+  CreditCard,
+  Upload,
   Languages,
   Moon,
   Sun,
@@ -21,6 +23,8 @@ import { Button } from '@/components/Button';
 import { useT } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { QuickAddModal } from '@/features/transactions/QuickAddModal';
+import { AlertCenter } from '@/features/alerts/AlertCenter';
+import { AlertToastWatcher } from '@/features/alerts/AlertToastWatcher';
 import type { TransactionType } from '@/types/domain';
 
 export const DashboardLayout = () => {
@@ -39,6 +43,8 @@ export const DashboardLayout = () => {
     { to: '/app', label: t('nav.dashboard'), icon: LayoutDashboard, end: true },
     { to: '/app/transactions', label: t('nav.transactions'), icon: ListOrdered, end: false },
     { to: '/app/categories', label: t('nav.categories'), icon: FolderKanban, end: false },
+    { to: '/app/subscriptions', label: t('nav.subscriptions'), icon: CreditCard, end: false },
+    { to: '/app/import', label: t('nav.import'), icon: Upload, end: false },
   ];
 
   const handleLogout = async () => {
@@ -54,6 +60,7 @@ export const DashboardLayout = () => {
 
   const isRtl = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
+  // Close profile dropdown on outside click.
   useEffect(() => {
     if (!profileOpen) return;
     const handler = (e: MouseEvent) => {
@@ -72,13 +79,8 @@ export const DashboardLayout = () => {
 
   const modeLabel = user?.userMode ? t(`user.mode.${user.userMode}`) : '';
   const initials = user?.name
-    ? user.name
-        .split(' ')
-        .map((w) => w[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
-    : (user?.email?.slice(0, 2).toUpperCase() ?? '?');
+    ? user.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+    : user?.email?.slice(0, 2).toUpperCase() ?? '?';
 
   return (
     <div className="min-h-screen bg-bg text-ink flex">
@@ -166,6 +168,7 @@ export const DashboardLayout = () => {
                 <Plus size={16} aria-hidden />
                 {t('transactions.quickAdd')}
               </Button>
+              <AlertCenter language={language} />
               <button
                 onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
                 className="h-9 w-9 rounded-lg bg-surface-high hover:bg-surface-highest flex items-center justify-center text-ink-muted hover:text-ink transition-colors focus-ring"
@@ -182,6 +185,7 @@ export const DashboardLayout = () => {
                 {theme === 'dark' ? <Sun size={16} aria-hidden /> : <Moon size={16} aria-hidden />}
               </button>
 
+              {/* User Identity Dropdown */}
               <div ref={profileRef} className="relative">
                 <button
                   onClick={() => setProfileOpen((o) => !o)}
@@ -256,6 +260,8 @@ export const DashboardLayout = () => {
         onClose={() => setQuickOpen(false)}
         initialType={quickType}
       />
+
+      <AlertToastWatcher />
     </div>
   );
 };

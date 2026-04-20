@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../config/prisma';
 import { HttpError } from '../../utils/http-error';
+import { evaluateInBackground } from '../../services/alert-engine/alert-engine';
 import type {
   CreateTransactionInput,
   ListTransactionsQuery,
@@ -8,6 +9,7 @@ import type {
 } from './transaction.schemas';
 
 const touchActivity = (userId: string): void => {
+  // Track user activity so the stale-data rule and re-engagement banners work.
   prisma.user
     .update({ where: { id: userId }, data: { lastActivityAt: new Date() } })
     .catch(() => undefined);
@@ -74,6 +76,7 @@ export const transactionService = {
       include,
     });
     touchActivity(userId);
+    evaluateInBackground(userId);
     return created;
   },
 
@@ -99,6 +102,7 @@ export const transactionService = {
       include,
     });
     touchActivity(userId);
+    evaluateInBackground(userId);
     return updated;
   },
 
@@ -106,6 +110,7 @@ export const transactionService = {
     const existing = await prisma.transaction.findFirst({ where: { id, userId } });
     if (!existing) throw HttpError.notFound('Transaction not found');
     await prisma.transaction.delete({ where: { id } });
+    evaluateInBackground(userId);
     return { ok: true };
   },
 };

@@ -6,6 +6,8 @@ import { RegisterPage } from '@/pages/RegisterPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { TransactionsPage } from '@/pages/TransactionsPage';
 import { CategoriesPage } from '@/pages/CategoriesPage';
+import { SubscriptionsPage } from '@/pages/SubscriptionsPage';
+import { ImportPage } from '@/pages/ImportPage';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
 
@@ -51,6 +53,8 @@ export const App = () => (
           <Route index element={<DashboardPage />} />
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="categories" element={<CategoriesPage />} />
+          <Route path="subscriptions" element={<SubscriptionsPage />} />
+          <Route path="import" element={<ImportPage />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/app" replace />} />

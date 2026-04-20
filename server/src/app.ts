@@ -11,6 +11,7 @@ import categoryRoutes from './modules/categories/category.routes';
 import transactionRoutes from './modules/transactions/transaction.routes';
 import dashboardRoutes from './modules/dashboard/dashboard.routes';
 import userRoutes from './modules/users/users.routes';
+import alertRoutes from './modules/alerts/alerts.routes';
 
 export const createApp = () => {
   const app = express();
@@ -41,6 +42,7 @@ export const createApp = () => {
   app.use('/api/v1/categories', categoryRoutes);
   app.use('/api/v1/transactions', transactionRoutes);
   app.use('/api/v1/dashboard', dashboardRoutes);
+  app.use('/api/v1/alerts', alertRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
