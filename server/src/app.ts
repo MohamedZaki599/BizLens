@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser';
 import { env } from './config/env';
 import { errorHandler } from './middlewares/error-handler';
 import { notFoundHandler } from './middlewares/not-found';
+import authRoutes from './modules/auth/auth.routes';
+import userRoutes from './modules/users/users.routes';
 
 export const createApp = () => {
   const app = express();
@@ -30,6 +32,9 @@ export const createApp = () => {
   }
 
   app.get('/health', (_req, res) => res.json({ ok: true, env: env.NODE_ENV }));
+
+  app.use('/api/v1/auth', authRoutes);
+  app.use('/api/v1/users', userRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
