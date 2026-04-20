@@ -9,6 +9,7 @@ import { notFoundHandler } from './middlewares/not-found';
 import authRoutes from './modules/auth/auth.routes';
 import categoryRoutes from './modules/categories/category.routes';
 import transactionRoutes from './modules/transactions/transaction.routes';
+import dashboardRoutes from './modules/dashboard/dashboard.routes';
 import userRoutes from './modules/users/users.routes';
 
 export const createApp = () => {
@@ -39,6 +40,7 @@ export const createApp = () => {
   app.use('/api/v1/users', userRoutes);
   app.use('/api/v1/categories', categoryRoutes);
   app.use('/api/v1/transactions', transactionRoutes);
+  app.use('/api/v1/dashboard', dashboardRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
