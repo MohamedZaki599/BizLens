@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design tokens ───────────────────────────────────────────────────────── */
+/* All colors as `R G B` triplets so Tailwind's `<alpha-value>` works.        */
+
+:root,
+[data-theme='light'] {
+  --color-primary: 26 31 46;            /* #1a1f2e */
+  --color-on-primary: 255 255 255;
+  --color-primary-container: 124 92 255; /* #7c5cff */
+  --color-secondary: 0 108 73;          /* #006c49 */
+  --color-danger: 147 0 10;             /* #93000a */
+
+  --color-bg: 247 249 251;              /* #f7f9fb */
+  --color-surface: 247 249 251;
+  --color-surface-lowest: 255 255 255;
+  --color-surface-low: 242 245 249;
+  --color-surface-high: 234 238 244;
+  --color-surface-highest: 224 230 239;
+
+  --color-ink: 18 22 33;
+  --color-ink-muted: 96 105 122;
+  --color-outline: 217 222 230;
+}
+
+[data-theme='dark'] {
+  --color-primary: 193 193 255;         /* #c1c1ff */
+  --color-on-primary: 17 19 23;
+  --color-primary-container: 67 76 137;
+  --color-secondary: 67 236 219;        /* #43ecdb */
+  --color-danger: 255 182 145;          /* #ffb691 */
+
+  --color-bg: 17 19 23;                 /* #111317 */
+  --color-surface: 17 19 23;
+  --color-surface-lowest: 22 25 31;
+  --color-surface-low: 28 32 39;
+  --color-surface-high: 36 41 50;
+  --color-surface-highest: 46 53 64;
+
+  --color-ink: 240 243 248;
+  --color-ink-muted: 153 162 178;
+  --color-outline: 56 63 76;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: rgb(var(--color-bg));
+  color: rgb(var(--color-ink));
+  font-family: 'Inter', system-ui, sans-serif;
+  letter-spacing: 0;
+}
+
+/* RTL adjustments — Arabic feels heavier; bump weights subtly. */
+html[dir='rtl'] body {
+  font-feature-settings: 'kern' 1;
+}
+
+/* ─── Reusable design primitives ──────────────────────────────────────────── */
+
+@layer components {
+  .glass-panel {
+    @apply bg-surface-lowest/80 backdrop-blur-xl border-t border-white/10;
+  }
+
+  .focus-ring {
+    @apply outline-none ring-0 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-bg;
+  }
+
+  .card {
+    @apply bg-surface-lowest rounded-2xl p-6 border border-outline/10 transition-shadow duration-300 ease-quintessential;
+  }
+
+  .stat-value {
+    @apply font-display text-3xl md:text-4xl font-semibold tracking-tight;
+  }
+
+  .stat-label {
+    @apply text-xs font-medium uppercase tracking-[0.12em] text-ink-muted;
+  }
+}
+
+/* Skeleton pulse */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgb(var(--color-surface-low)) 0%,
+    rgb(var(--color-surface-highest)) 50%,
+    rgb(var(--color-surface-low)) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* RTL: shift skeleton shimmer in the opposite direction. */
+html[dir='rtl'] .skeleton {
+  animation-direction: reverse;
+}
+
+/* Generic fade/slide-in (used by Modal, dropdowns, page transitions). */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+.animate-fade-in {
+  animation: fade-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mirror chevrons & directional icons in RTL when authors opt in via class. */
+html[dir='rtl'] .rtl\:rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Native date/color inputs need explicit color-scheme to look right in dark mode. */
+[data-theme='dark'] input[type='date'],
+[data-theme='dark'] input[type='color'],
+[data-theme='dark'] input[type='time'] {
+  color-scheme: dark;
+}
