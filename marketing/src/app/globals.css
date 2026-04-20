@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+[data-theme='light'] {
+  --color-primary: 26 31 46;
+  --color-primary-container: 124 92 255;
+  --color-on-primary: 255 255 255;
+  --color-secondary: 0 108 73;
+  --color-danger: 147 0 10;
+
+  --color-bg: 247 249 251;
+  --color-surface: 247 249 251;
+  --color-surface-lowest: 255 255 255;
+  --color-surface-low: 242 245 249;
+  --color-surface-high: 234 238 244;
+
+  --color-ink: 18 22 33;
+  --color-ink-muted: 96 105 122;
+  --color-outline: 217 222 230;
+}
+
+[data-theme='dark'] {
+  --color-primary: 193 193 255;
+  --color-primary-container: 67 76 137;
+  --color-on-primary: 17 19 23;
+  --color-secondary: 67 236 219;
+  --color-danger: 255 182 145;
+
+  --color-bg: 17 19 23;
+  --color-surface: 17 19 23;
+  --color-surface-lowest: 22 25 31;
+  --color-surface-low: 28 32 39;
+  --color-surface-high: 36 41 50;
+
+  --color-ink: 240 243 248;
+  --color-ink-muted: 153 162 178;
+  --color-outline: 56 63 76;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: rgb(var(--color-bg));
+  color: rgb(var(--color-ink));
+  font-family: 'Inter', system-ui, sans-serif;
+}
