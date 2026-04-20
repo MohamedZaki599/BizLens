@@ -3,6 +3,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
+import { DashboardPage } from '@/pages/DashboardPage';
+import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
 
 const queryClient = new QueryClient({
@@ -35,16 +37,18 @@ export const App = () => (
             </PublicOnlyRoute>
           }
         />
+
         <Route
           path="/app"
           element={
             <ProtectedRoute>
-              <div className="min-h-screen flex items-center justify-center bg-bg text-ink p-8">
-                <p className="text-sm text-ink-muted">Dashboard loading…</p>
-              </div>
+              <DashboardLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<DashboardPage />} />
+        </Route>
+
         <Route path="/" element={<Navigate to="/app" replace />} />
         <Route path="*" element={<Navigate to="/app" replace />} />
       </Routes>
