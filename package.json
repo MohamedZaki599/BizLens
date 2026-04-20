@@ -1,0 +1,24 @@
+{
+  "name": "bizlens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BizLens - Financial command center for small businesses, freelancers, and service providers.",
+  "workspaces": [
+    "server",
+    "client",
+    "marketing"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "dev:marketing": "npm run dev --workspace=marketing",
+    "build:server": "npm run build --workspace=server",
+    "build:client": "npm run build --workspace=client",
+    "build:marketing": "npm run build --workspace=marketing",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}
