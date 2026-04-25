@@ -4,8 +4,8 @@
   "private": true,
   "description": "BizLens - Financial command center for small businesses, freelancers, and service providers.",
   "workspaces": [
-    "server",
     "client",
+    "server",
     "marketing"
   ],
   "scripts": {

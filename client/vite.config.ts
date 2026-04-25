@@ -7,6 +7,9 @@ export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') },
   },
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+  },
   server: {
     port: 5173,
     host: true,
