@@ -2,12 +2,14 @@ import { TrendingUp, Target } from 'lucide-react';
 import { useForecast } from './useWidgets';
 import { useT } from '@/lib/i18n';
 import { Skeleton } from '@/components/Skeleton';
-import { formatCurrency, cn } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { useFormatCurrency } from '@/lib/format';
 
 import type { DashboardRange } from './dashboard.api';
 
 export const ForecastCard = ({ range }: { range?: DashboardRange }) => {
   const t = useT();
+  const formatCurrency = useFormatCurrency();
   const { data, isLoading } = useForecast(range);
 
   if (isLoading) {

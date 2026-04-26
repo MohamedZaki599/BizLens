@@ -3,8 +3,7 @@
 import { ArrowRight } from 'lucide-react';
 import { useUi } from '@/app/providers';
 import { t } from '@/lib/i18n';
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:5173';
+import { siteConfig } from '@/lib/site';
 
 export const CTA = () => {
   const { language } = useUi();
@@ -22,7 +21,7 @@ export const CTA = () => {
             {t(language, 'cta.section.body')}
           </p>
           <a
-            href={`${APP_URL}/register`}
+            href={siteConfig.links.register}
             className="relative mt-8 inline-flex items-center gap-2 h-12 px-6 rounded-xl bg-white text-primary font-semibold hover:bg-white/95 transition-all"
           >
             {t(language, 'cta.start')}

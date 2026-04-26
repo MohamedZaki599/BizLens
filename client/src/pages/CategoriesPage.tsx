@@ -11,6 +11,7 @@ import {
 } from '@/features/categories/useCategories';
 import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Input } from '@/components/Input';
 import { Combobox } from '@/components/Combobox';
 import { EmptyState } from '@/components/EmptyState';
@@ -36,12 +37,18 @@ const CategoryGroup = ({
   onDelete,
   pendingId,
   emptyText,
+  defaultLabel,
+  customLabel,
+  deleteLabel,
 }: {
   title: string;
   items: Category[];
   onDelete: (c: Category) => void;
   pendingId: string | null;
   emptyText: string;
+  defaultLabel: string;
+  customLabel: string;
+  deleteLabel: string;
 }) => (
   <div>
     <h2 className="stat-label mb-3">{title}</h2>
@@ -63,7 +70,7 @@ const CategoryGroup = ({
               <div className="min-w-0">
                 <p className="text-sm font-medium truncate">{c.name}</p>
                 <p className="text-xs text-ink-muted">
-                  {c.isDefault ? 'Default' : 'Custom'}
+                  {c.isDefault ? defaultLabel : customLabel}
                 </p>
               </div>
             </div>
@@ -71,7 +78,7 @@ const CategoryGroup = ({
               onClick={() => onDelete(c)}
               disabled={pendingId === c.id}
               className="p-2 rounded-lg text-ink-muted hover:text-danger hover:bg-danger/5 transition-all focus-ring opacity-100 sm:opacity-0 sm:group-hover:opacity-100 disabled:opacity-50"
-              aria-label={`Delete ${c.name}`}
+              aria-label={`${deleteLabel} ${c.name}`}
             >
               <Trash2 size={15} />
             </button>
@@ -89,6 +96,7 @@ export const CategoriesPage = () => {
   const remove = useDeleteCategory();
   const [open, setOpen] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<Category | null>(null);
 
   const {
     control,
@@ -116,12 +124,13 @@ export const CategoriesPage = () => {
     }
   };
 
-  const handleDelete = async (c: Category) => {
-    if (!confirm(`${t('categories.delete.confirm')} (${c.name})`)) return;
-    setPendingId(c.id);
+  const handleConfirmDelete = async () => {
+    if (!confirmTarget) return;
+    setPendingId(confirmTarget.id);
     try {
-      await remove.mutateAsync(c.id);
+      await remove.mutateAsync(confirmTarget.id);
       toast.success(t('toast.category.deleted'));
+      setConfirmTarget(null);
     } catch (err) {
       toast.error(extractErrorMessage(err, t('toast.error.generic')));
     } finally {
@@ -178,16 +187,22 @@ export const CategoriesPage = () => {
           <CategoryGroup
             title={t('categories.income')}
             items={income}
-            onDelete={handleDelete}
+            onDelete={setConfirmTarget}
             pendingId={pendingId}
             emptyText={t('categories.empty.income')}
+            defaultLabel={t('categories.default')}
+            customLabel={t('categories.custom')}
+            deleteLabel={t('common.delete')}
           />
           <CategoryGroup
             title={t('categories.expense')}
             items={expense}
-            onDelete={handleDelete}
+            onDelete={setConfirmTarget}
             pendingId={pendingId}
             emptyText={t('categories.empty.expense')}
+            defaultLabel={t('categories.default')}
+            customLabel={t('categories.custom')}
+            deleteLabel={t('common.delete')}
           />
         </div>
       )}
@@ -255,6 +270,16 @@ export const CategoriesPage = () => {
           </div>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        open={confirmTarget !== null}
+        title={`${t('categories.delete.title')} ${confirmTarget?.name ?? ''}`.trim()}
+        description={t('categories.delete.description')}
+        confirmLabel={t('common.delete')}
+        destructive
+        onCancel={() => setConfirmTarget(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };

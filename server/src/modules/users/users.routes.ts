@@ -14,6 +14,13 @@ const PreferencesSchema = z.object({
   language: z.enum(['en', 'ar']).optional(),
   userMode: UserModeEnum.optional(),
   name: z.string().min(1).max(80).optional(),
+  // ISO 4217 currency codes are 3 uppercase letters. We don't lock the
+  // value to a closed set so we don't have to ship a code change every
+  // time we add a region.
+  currency: z
+    .string()
+    .regex(/^[A-Z]{3}$/, 'Use a 3-letter ISO currency code')
+    .optional(),
 });
 
 router.patch(
@@ -32,6 +39,7 @@ router.patch(
         userMode: true,
         language: true,
         theme: true,
+        currency: true,
       },
     });
     res.json({ user: updated });

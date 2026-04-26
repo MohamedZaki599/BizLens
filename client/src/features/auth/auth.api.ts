@@ -25,7 +25,9 @@ export const authApi = {
   async logout(): Promise<void> {
     await api.post('/auth/logout');
   },
-  async updatePreferences(payload: Partial<Pick<User, 'theme' | 'language' | 'userMode' | 'name'>>): Promise<User> {
+  async updatePreferences(
+    payload: Partial<Pick<User, 'theme' | 'language' | 'userMode' | 'name' | 'currency'>>,
+  ): Promise<User> {
     const { data } = await api.patch<{ user: User }>('/users/preferences', payload);
     return data.user;
   },

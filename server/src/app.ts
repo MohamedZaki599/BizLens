@@ -4,8 +4,10 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { env } from './config/env';
+import { logger } from './config/logger';
 import { errorHandler } from './middlewares/error-handler';
 import { notFoundHandler } from './middlewares/not-found';
+import { requestId } from './middlewares/request-id';
 import authRoutes from './modules/auth/auth.routes';
 import categoryRoutes from './modules/categories/category.routes';
 import transactionRoutes from './modules/transactions/transaction.routes';
@@ -17,6 +19,7 @@ export const createApp = () => {
   const app = express();
 
   app.set('trust proxy', 1);
+  app.use(requestId);
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(
     cors({
@@ -26,13 +29,23 @@ export const createApp = () => {
         return callback(new Error(`CORS: origin ${origin} not allowed`));
       },
       credentials: true,
+      exposedHeaders: ['x-request-id'],
     }),
   );
-  app.use(express.json({ limit: '128kb' }));
+  app.use(express.json({ limit: '512kb' }));
   app.use(cookieParser());
 
   if (env.NODE_ENV !== 'test') {
-    app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+    morgan.token('id', (req) => (req as { id?: string }).id ?? '-');
+    const format =
+      env.NODE_ENV === 'production'
+        ? ':id :remote-addr :method :url :status :response-time ms'
+        : ':id :method :url :status :response-time ms';
+    app.use(
+      morgan(format, {
+        stream: { write: (line) => logger.info('http', { line: line.trim() }) },
+      }),
+    );
   }
 
   app.get('/health', (_req, res) => res.json({ ok: true, env: env.NODE_ENV }));

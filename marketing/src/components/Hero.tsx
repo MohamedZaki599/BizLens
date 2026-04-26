@@ -3,8 +3,7 @@
 import { AlertTriangle, ArrowRight, ArrowUpRight, Sparkles, TrendingUp } from 'lucide-react';
 import { useUi } from '@/app/providers';
 import { t } from '@/lib/i18n';
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:5173';
+import { siteConfig } from '@/lib/site';
 
 export const Hero = () => {
   const { language } = useUi();
@@ -32,14 +31,14 @@ export const Hero = () => {
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a
-              href={`${APP_URL}/register`}
+              href={siteConfig.links.register}
               className="h-12 px-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-medium hover:brightness-110 transition-all"
             >
               {t(language, 'cta.start')}
-              <ArrowRight size={16} />
+              <ArrowRight size={16} className="rtl:rotate-180" />
             </a>
             <a
-              href={`${APP_URL}/login`}
+              href={siteConfig.links.login}
               className="h-12 px-6 inline-flex items-center gap-2 rounded-xl bg-surface-high text-ink hover:bg-surface-low font-medium transition-all"
             >
               {t(language, 'cta.primary')}
@@ -88,38 +87,44 @@ export const Hero = () => {
                 <p className="text-[10px] uppercase tracking-[0.14em] text-ink-muted">
                   {t(language, 'hero.metric.income')}
                 </p>
-                <p className="font-display text-2xl font-semibold mt-1.5">$12,480</p>
+                <p className="font-display text-2xl font-semibold mt-1.5 tabular-nums">
+                  {t(language, 'hero.mock.incomeAmount')}
+                </p>
                 <p className="text-xs text-secondary mt-1 inline-flex items-center gap-1">
-                  <TrendingUp size={12} /> +18% MoM
+                  <TrendingUp size={12} aria-hidden /> {t(language, 'hero.mock.incomeChange')}
                 </p>
               </div>
               <div className="rounded-xl p-4 bg-surface-low">
                 <p className="text-[10px] uppercase tracking-[0.14em] text-ink-muted">
                   {t(language, 'hero.metric.profit')}
                 </p>
-                <p className="font-display text-2xl font-semibold mt-1.5">$7,920</p>
+                <p className="font-display text-2xl font-semibold mt-1.5 tabular-nums">
+                  {t(language, 'hero.mock.profitAmount')}
+                </p>
                 <p className="text-xs text-secondary mt-1 inline-flex items-center gap-1">
-                  <ArrowUpRight size={12} /> 63% margin
+                  <ArrowUpRight size={12} aria-hidden /> {t(language, 'hero.mock.profitMargin')}
                 </p>
               </div>
             </div>
 
             {/* Mini list */}
             <ul className="mt-4 space-y-2">
-              {[
-                ['Client retainer · Acme Co.', '+$2,400', 'pos'],
-                ['Software · Figma', '−$15', 'neg'],
-                ['Consulting · M.A.', '+$1,200', 'pos'],
-              ].map(([label, val, tone]) => (
+              {([
+                ['hero.mock.row1.label', 'hero.mock.row1.value', 'pos'],
+                ['hero.mock.row2.label', 'hero.mock.row2.value', 'neg'],
+                ['hero.mock.row3.label', 'hero.mock.row3.value', 'pos'],
+              ] as const).map(([labelKey, valueKey, tone]) => (
                 <li
-                  key={label}
+                  key={labelKey}
                   className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-surface-low"
                 >
-                  <span className="text-sm text-ink truncate">{label}</span>
+                  <span className="text-sm text-ink truncate">{t(language, labelKey)}</span>
                   <span
-                    className={`text-sm font-semibold ${tone === 'pos' ? 'text-secondary' : 'text-danger'}`}
+                    className={`text-sm font-semibold tabular-nums ${
+                      tone === 'pos' ? 'text-secondary' : 'text-danger'
+                    }`}
                   >
-                    {val}
+                    {t(language, valueKey)}
                   </span>
                 </li>
               ))}

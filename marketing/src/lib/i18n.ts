@@ -9,6 +9,8 @@ export const messages: Record<Language, Dict> = {
     'nav.problem': 'The problem',
     'nav.compare': 'Compare',
     'nav.signIn': 'Sign in',
+    'nav.openMenu': 'Open menu',
+    'nav.closeMenu': 'Close menu',
     'cta.start': 'Start free',
     'cta.primary': 'Open dashboard',
 
@@ -24,6 +26,16 @@ export const messages: Record<Language, Dict> = {
     'hero.alert.title': 'Critical alert',
     'hero.alert.body': 'Ads spending spiked 42% this week — review before it eats your margin.',
     'hero.proof': 'No spreadsheets. No setup. Set up in 60 seconds.',
+    'hero.mock.incomeAmount': '$12,480',
+    'hero.mock.incomeChange': '+18% MoM',
+    'hero.mock.profitAmount': '$7,920',
+    'hero.mock.profitMargin': '63% margin',
+    'hero.mock.row1.label': 'Client retainer · Acme Co.',
+    'hero.mock.row1.value': '+$2,400',
+    'hero.mock.row2.label': 'Software · Figma',
+    'hero.mock.row2.value': '−$15',
+    'hero.mock.row3.label': 'Consulting · M.A.',
+    'hero.mock.row3.value': '+$1,200',
 
     'problem.eyebrow': 'The painful truth',
     'problem.title': 'You’re losing money — and you don’t even know it.',
@@ -75,6 +87,10 @@ export const messages: Record<Language, Dict> = {
     'features.f6.body':
       'Pick your mode — Freelancer, E-commerce, or Service business — and the dashboard adapts.',
 
+    'compare.col.capability': 'Capability',
+    'compare.cell.yes': 'Yes',
+    'compare.cell.no': 'No',
+    'compare.cell.partial': 'Partial',
     'compare.title': 'BizLens vs. the alternatives',
     'compare.subtitle': 'Most tools record the past. BizLens helps you change the future.',
     'compare.col.you': 'BizLens',
@@ -94,13 +110,73 @@ export const messages: Record<Language, Dict> = {
     'why.body':
       'Traditional accounting tools were built for accountants. BizLens is built for the people actually running the business — so you spend less time deciphering numbers and more time growing.',
 
+    'pricing.title': 'Simple, honest pricing.',
+    'pricing.subtitle':
+      'Start free while we build. Founding-member rates lock in for life when paid plans launch.',
+    'pricing.popular': 'Most popular',
+    'pricing.free.name': 'Solo',
+    'pricing.free.price': '$0',
+    'pricing.free.cadence': 'Free forever for personal use',
+    'pricing.free.f1': 'Unlimited transactions',
+    'pricing.free.f2': 'Insight Engine + alerts',
+    'pricing.free.f3': 'CSV import',
+    'pricing.free.cta': 'Start free',
+    'pricing.pro.name': 'Pro',
+    'pricing.pro.price': '$9',
+    'pricing.pro.cadence': 'Per month — founder pricing',
+    'pricing.pro.f1': 'Everything in Solo',
+    'pricing.pro.f2': 'Forecast & money-leak detection',
+    'pricing.pro.f3': 'Email digests + alert deep links',
+    'pricing.pro.f4': 'Priority support',
+    'pricing.pro.cta': 'Join early access',
+    'pricing.team.name': 'Team',
+    'pricing.team.price': '$29',
+    'pricing.team.cadence': 'Per workspace, up to 5 seats',
+    'pricing.team.f1': 'Everything in Pro',
+    'pricing.team.f2': 'Multi-seat with role-based access',
+    'pricing.team.f3': 'Accountant export & monthly summaries',
+    'pricing.team.cta': 'Talk to us',
+
+    'faq.title': 'Frequently asked questions',
+    'faq.subtitle': 'Quick answers about how BizLens works.',
+    'faq.q1.q': 'Do I need an accountant to use BizLens?',
+    'faq.q1.a':
+      'No. BizLens is built for owner-operators. If you can read your bank statement, you can use it. Your accountant can still pull the data later.',
+    'faq.q2.q': 'Where does my data live?',
+    'faq.q2.a':
+      'Your data is encrypted in transit and at rest. We never sell or share it, and you can delete your account at any time.',
+    'faq.q3.q': 'Do you connect to my bank?',
+    'faq.q3.a':
+      'Today BizLens supports CSV import and quick manual entry. Direct bank connections are on the roadmap and will be opt-in.',
+    'faq.q4.q': 'Is BizLens free during early access?',
+    'faq.q4.a':
+      'Yes — every founding-member account stays free while we finalize Pro. When billing starts, you can decide if Pro is worth it.',
+    'faq.q5.q': 'Does it support Arabic and right-to-left layouts?',
+    'faq.q5.a':
+      'Yes. The product, marketing site, and PDF exports are bilingual and fully RTL-aware out of the box.',
+
     'cta.section.title': 'Stop guessing. Start knowing.',
     'cta.section.body':
       'Join early adopters using BizLens to spot money leaks before they drain the bank.',
     'cta.section.note': 'Free to start. No credit card. Set up in 60 seconds.',
 
+    'nav.pricing': 'Pricing',
+    'nav.faq': 'FAQ',
     'footer.rights': 'All rights reserved.',
     'footer.tagline': 'Financial clarity, instantly.',
+    'footer.privacy': 'Privacy',
+    'footer.terms': 'Terms',
+    'footer.contact': 'Contact',
+
+    'legal.privacy.title': 'Privacy Policy',
+    'legal.privacy.updated': 'Last updated: April 2026',
+    'legal.privacy.body':
+      'We collect only what is needed to run BizLens — your email, your transactions, and basic usage events. We never sell or share this data with third parties. You can export or delete everything from inside the app.',
+    'legal.terms.title': 'Terms of Service',
+    'legal.terms.updated': 'Last updated: April 2026',
+    'legal.terms.body':
+      'BizLens is provided "as is" while we are in early access. By using the service you agree not to attempt to disrupt it, share your account, or use it for anything illegal. We may update these terms when paid plans launch.',
+    'legal.back': 'Back to home',
   },
   ar: {
     'nav.features': 'المزايا',
@@ -108,6 +184,8 @@ export const messages: Record<Language, Dict> = {
     'nav.problem': 'المشكلة',
     'nav.compare': 'مقارنة',
     'nav.signIn': 'تسجيل الدخول',
+    'nav.openMenu': 'فتح القائمة',
+    'nav.closeMenu': 'إغلاق القائمة',
     'cta.start': 'ابدأ مجانًا',
     'cta.primary': 'فتح لوحة التحكم',
 
@@ -123,6 +201,16 @@ export const messages: Record<Language, Dict> = {
     'hero.alert.title': 'تنبيه حرج',
     'hero.alert.body': 'إنفاق الإعلانات قفز ٤٢٪ هذا الأسبوع — راجعه قبل أن يلتهم هامشك.',
     'hero.proof': 'بدون جداول. بدون إعدادات. جاهز في ٦٠ ثانية.',
+    'hero.mock.incomeAmount': '١٢٬٤٨٠ $',
+    'hero.mock.incomeChange': '+١٨٪ شهريًا',
+    'hero.mock.profitAmount': '٧٬٩٢٠ $',
+    'hero.mock.profitMargin': 'هامش ٦٣٪',
+    'hero.mock.row1.label': 'عقد عميل · Acme',
+    'hero.mock.row1.value': '+٢٬٤٠٠ $',
+    'hero.mock.row2.label': 'برامج · Figma',
+    'hero.mock.row2.value': '−١٥ $',
+    'hero.mock.row3.label': 'استشارات · م.أ.',
+    'hero.mock.row3.value': '+١٬٢٠٠ $',
 
     'problem.eyebrow': 'الحقيقة المؤلمة',
     'problem.title': 'أنت تخسر مالًا — ولا تدري حتى.',
@@ -174,6 +262,10 @@ export const messages: Record<Language, Dict> = {
     'features.f6.body':
       'اختر وضعك — مستقل، تجارة إلكترونية، أو شركة خدمات — وتتكيف اللوحة معك.',
 
+    'compare.col.capability': 'القدرة',
+    'compare.cell.yes': 'نعم',
+    'compare.cell.no': 'لا',
+    'compare.cell.partial': 'جزئي',
     'compare.title': 'بيزلنز مقابل البدائل',
     'compare.subtitle': 'معظم الأدوات تسجّل الماضي. بيزلنز يساعدك على تغيير المستقبل.',
     'compare.col.you': 'بيزلنز',
@@ -193,13 +285,73 @@ export const messages: Record<Language, Dict> = {
     'why.body':
       'أدوات المحاسبة التقليدية صُمّمت للمحاسبين. بيزلنز صُمّم للأشخاص الذين يديرون العمل فعليًا، لتقضي وقتًا أقل في فك رموز الأرقام، ووقتًا أكثر في النمو.',
 
+    'pricing.title': 'تسعير بسيط وصادق.',
+    'pricing.subtitle':
+      'ابدأ مجانًا أثناء بناء المنتج. أسعار العضو المؤسس تثبت مدى الحياة عند إطلاق الخطط المدفوعة.',
+    'pricing.popular': 'الأكثر شيوعًا',
+    'pricing.free.name': 'فردي',
+    'pricing.free.price': '٠ $',
+    'pricing.free.cadence': 'مجاني للأبد للاستخدام الشخصي',
+    'pricing.free.f1': 'معاملات غير محدودة',
+    'pricing.free.f2': 'محرك الرؤى والتنبيهات',
+    'pricing.free.f3': 'استيراد CSV',
+    'pricing.free.cta': 'ابدأ مجانًا',
+    'pricing.pro.name': 'برو',
+    'pricing.pro.price': '٩ $',
+    'pricing.pro.cadence': 'شهريًا — سعر المؤسسين',
+    'pricing.pro.f1': 'كل ما في الخطة الفردية',
+    'pricing.pro.f2': 'التوقعات وكشف التسريبات',
+    'pricing.pro.f3': 'ملخصات بالبريد ووصول مباشر',
+    'pricing.pro.f4': 'دعم بأولوية',
+    'pricing.pro.cta': 'انضم للوصول المبكر',
+    'pricing.team.name': 'فريق',
+    'pricing.team.price': '٢٩ $',
+    'pricing.team.cadence': 'لكل مساحة عمل، حتى ٥ مقاعد',
+    'pricing.team.f1': 'كل ما في خطة برو',
+    'pricing.team.f2': 'مقاعد متعددة مع صلاحيات حسب الدور',
+    'pricing.team.f3': 'تصدير للمحاسب وملخصات شهرية',
+    'pricing.team.cta': 'تواصل معنا',
+
+    'faq.title': 'الأسئلة الشائعة',
+    'faq.subtitle': 'إجابات سريعة عن طريقة عمل بيزلنز.',
+    'faq.q1.q': 'هل أحتاج محاسبًا لاستخدام بيزلنز؟',
+    'faq.q1.a':
+      'لا. بيزلنز مصمّم لأصحاب الأعمال أنفسهم. إن كنت تقرأ كشف حسابك البنكي، فأنت قادر على استخدامه. يمكن لمحاسبك سحب البيانات لاحقًا.',
+    'faq.q2.q': 'أين تُحفظ بياناتي؟',
+    'faq.q2.a':
+      'بياناتك مشفّرة أثناء النقل وفي التخزين. لا نبيعها ولا نشاركها، ويمكنك حذف حسابك في أي وقت.',
+    'faq.q3.q': 'هل تتصلون بحسابي البنكي؟',
+    'faq.q3.a':
+      'حاليًا يدعم بيزلنز استيراد CSV والإدخال السريع. الربط البنكي المباشر مدرج في خارطة الطريق وسيكون اختياريًا.',
+    'faq.q4.q': 'هل بيزلنز مجاني خلال الوصول المبكر؟',
+    'faq.q4.a':
+      'نعم — كل عضو مؤسس يبقى مجانيًا حتى ننهي خطة برو. عند بدء الفوترة، تقرر بنفسك ما إن كانت تستحق.',
+    'faq.q5.q': 'هل يدعم العربية وتصميم RTL؟',
+    'faq.q5.a':
+      'نعم. المنتج والموقع التسويقي وتقارير PDF مزدوجة اللغة وتدعم RTL منذ البداية.',
+
     'cta.section.title': 'كفى تخمينًا. حان وقت المعرفة.',
     'cta.section.body':
       'انضم إلى أوائل المستخدمين الذين يكتشفون تسريبات أموالهم قبل أن تستنزف البنك.',
     'cta.section.note': 'مجاني للبدء. بدون بطاقة. جاهز في ٦٠ ثانية.',
 
+    'nav.pricing': 'الأسعار',
+    'nav.faq': 'الأسئلة',
     'footer.rights': 'جميع الحقوق محفوظة.',
     'footer.tagline': 'وضوح مالي فوري.',
+    'footer.privacy': 'الخصوصية',
+    'footer.terms': 'الشروط',
+    'footer.contact': 'تواصل',
+
+    'legal.privacy.title': 'سياسة الخصوصية',
+    'legal.privacy.updated': 'آخر تحديث: أبريل ٢٠٢٦',
+    'legal.privacy.body':
+      'نجمع فقط ما نحتاج لتشغيل بيزلنز — بريدك الإلكتروني ومعاملاتك وبعض إحصاءات الاستخدام. لا نبيع هذه البيانات ولا نشاركها. يمكنك تصدير أو حذف كل شيء من داخل التطبيق.',
+    'legal.terms.title': 'شروط الاستخدام',
+    'legal.terms.updated': 'آخر تحديث: أبريل ٢٠٢٦',
+    'legal.terms.body':
+      'يُقدَّم بيزلنز "كما هو" أثناء الوصول المبكر. باستخدامك للخدمة، توافق على عدم محاولة تعطيلها أو مشاركة حسابك أو استخدامها لأي غرض غير قانوني. قد نحدّث هذه الشروط عند إطلاق الخطط المدفوعة.',
+    'legal.back': 'العودة للرئيسية',
   },
 };
 

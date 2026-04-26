@@ -10,6 +10,7 @@ export interface User {
   userMode: UserMode;
   language: Language;
   theme: Theme;
+  currency: string;
   createdAt?: string;
 }
 

@@ -1,5 +1,6 @@
 import { TrendingDown, TrendingUp, Minus, type LucideIcon } from 'lucide-react';
-import { cn, formatCurrency } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { useFormatCurrency } from '@/lib/format';
 import { Skeleton } from '@/components/Skeleton';
 import { useT } from '@/lib/i18n';
 import type { ChangeResult } from '@/types/domain';
@@ -80,8 +81,10 @@ export const StatCard = ({
   caption,
   loading,
   change,
-  format = formatCurrency,
+  format,
 }: StatCardProps) => {
+  const formatMoney = useFormatCurrency();
+  const fmt = format ?? formatMoney;
   // Expense-style cards have positiveIsGood=false (rising spend = bad).
   const positiveIsGood = tone !== 'negative';
 
@@ -99,7 +102,7 @@ export const StatCard = ({
       {loading ? (
         <Skeleton className="h-9 w-32" />
       ) : (
-        <div className={cn('stat-value tabular-nums', toneText[tone])}>{format(value)}</div>
+        <div className={cn('stat-value tabular-nums', toneText[tone])}>{fmt(value)}</div>
       )}
       <div className="flex items-center justify-between gap-2 min-h-[20px]">
         {change ? <TrendChip change={change} positiveIsGood={positiveIsGood} /> : <span />}

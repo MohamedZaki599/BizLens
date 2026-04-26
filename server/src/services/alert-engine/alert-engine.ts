@@ -16,6 +16,7 @@ import {
   subWeeks,
 } from 'date-fns';
 import { prisma } from '../../config/prisma';
+import { logger } from '../../config/logger';
 import {
   formatMoney,
   formatPctChange,
@@ -528,8 +529,10 @@ export const alertEngine = {
  * so a failing rule never blocks user-visible work.
  */
 export const evaluateInBackground = (userId: string): void => {
-  alertEngine.evaluate(userId).catch((err) => {
-    // eslint-disable-next-line no-console
-    console.error('[alert-engine] evaluation failed', err);
+  alertEngine.evaluate(userId).catch((err: unknown) => {
+    logger.error('alert-engine-failed', {
+      userId,
+      message: err instanceof Error ? err.message : String(err),
+    });
   });
 };

@@ -7,7 +7,10 @@ import { DashboardPage } from '@/pages/DashboardPage';
 import { TransactionsPage } from '@/pages/TransactionsPage';
 import { CategoriesPage } from '@/pages/CategoriesPage';
 import { SubscriptionsPage } from '@/pages/SubscriptionsPage';
+import { BudgetsPage } from '@/pages/BudgetsPage';
 import { ImportPage } from '@/pages/ImportPage';
+import { SettingsPage } from '@/pages/SettingsPage';
+import { AssistantPage } from '@/pages/AssistantPage';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
 
@@ -54,7 +57,10 @@ export const App = () => (
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="subscriptions" element={<SubscriptionsPage />} />
+          <Route path="budgets" element={<BudgetsPage />} />
+          <Route path="assistant" element={<AssistantPage />} />
           <Route path="import" element={<ImportPage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/app" replace />} />

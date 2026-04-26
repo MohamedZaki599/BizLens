@@ -2,12 +2,20 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Language, Theme } from '@/types/domain';
 
+/**
+ * Currency code persisted alongside theme/language. We keep the type loose
+ * (any ISO 4217 code) but expose a curated default list elsewhere.
+ */
+export type Currency = string;
+
 interface UiState {
   theme: Theme;
   language: Language;
+  currency: Currency;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
   setLanguage: (lang: Language) => void;
+  setCurrency: (currency: Currency) => void;
 }
 
 export const useUiStore = create<UiState>()(
@@ -15,6 +23,7 @@ export const useUiStore = create<UiState>()(
     (set, get) => ({
       theme: 'light',
       language: 'en',
+      currency: 'USD',
       setTheme: (theme) => {
         set({ theme });
         applyTheme(theme);
@@ -28,6 +37,7 @@ export const useUiStore = create<UiState>()(
         set({ language });
         applyLanguage(language);
       },
+      setCurrency: (currency) => set({ currency }),
     }),
     {
       name: 'bizlens-ui',

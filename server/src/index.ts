@@ -1,20 +1,21 @@
 import { createApp } from './app';
 import { env } from './config/env';
+import { logger } from './config/logger';
 
 const app = createApp();
 
 const server = app.listen(env.PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`[bizlens-api] listening on http://localhost:${env.PORT} (${env.NODE_ENV})`);
+  logger.info('server-listening', {
+    url: `http://localhost:${env.PORT}`,
+    env: env.NODE_ENV,
+  });
 });
 
 const shutdown = (signal: NodeJS.Signals) => {
-  // eslint-disable-next-line no-console
-  console.log(`[bizlens-api] received ${signal}, shutting down gracefully…`);
+  logger.info('server-shutdown', { signal });
   server.close((err) => {
     if (err) {
-      // eslint-disable-next-line no-console
-      console.error(err);
+      logger.error('server-shutdown-error', { message: err.message });
       process.exit(1);
     }
     process.exit(0);
@@ -23,3 +24,13 @@ const shutdown = (signal: NodeJS.Signals) => {
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
+
+process.on('unhandledRejection', (reason) => {
+  logger.error('unhandled-rejection', {
+    reason: reason instanceof Error ? reason.message : String(reason),
+  });
+});
+
+process.on('uncaughtException', (err) => {
+  logger.error('uncaught-exception', { message: err.message, stack: err.stack });
+});

@@ -467,11 +467,12 @@ export const insightEngine = {
    * The frontend treats `insights[0]` as the primary insight and renders the
    * rest as secondary cards.
    *
-   * `from`/`to` are currently accepted for future range-scoped insights but
-   * individual generators still use their own time windows (month, week) to
-   * ensure comparison logic remains meaningful.
+   * Insights are intentionally pinned to fixed comparison windows
+   * (this-month vs last-month, this-week vs last-week, 3-month baseline) so
+   * comparisons stay meaningful regardless of the dashboard's selected range.
+   * The `/insights` route therefore does not forward a `range` parameter.
    */
-  async generate(userId: string, _from?: Date | null, _to?: Date | null): Promise<Insight[]> {
+  async generate(userId: string): Promise<Insight[]> {
     const candidates = await Promise.all([
       spendingAnomaly(userId),
       profitTrend(userId),

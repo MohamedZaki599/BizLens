@@ -18,6 +18,7 @@ model User {
   userMode     UserMode @default(FREELANCER)
   language     String   @default("en")
   theme        String   @default("light")
+  currency     String   @default("USD")
 
   lastActivityAt      DateTime?
   notificationsSeenAt DateTime?

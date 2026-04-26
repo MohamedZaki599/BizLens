@@ -24,7 +24,8 @@ import { ExpenseDonutChart } from '@/features/dashboard/ExpenseDonutChart';
 import { NotificationBanner } from '@/features/alerts/NotificationBanner';
 import { MODE_CONFIG } from '@/features/dashboard/mode-config';
 import { useT } from '@/lib/i18n';
-import { cn, formatCurrency } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { useFormatCurrency } from '@/lib/format';
 import { useTransactions } from '@/features/transactions/useTransactions';
 import { useCurrentUser } from '@/features/auth/useAuth';
 import { Skeleton } from '@/components/Skeleton';
@@ -43,6 +44,7 @@ const STAT_ICON: Record<string, LucideIcon> = {
 export const DashboardPage = () => {
   const t = useT();
   const navigate = useNavigate();
+  const formatCurrency = useFormatCurrency();
   const { openQuickAdd } = useOutletContext<{
     openQuickAdd: (initialType?: TransactionType) => void;
   }>();

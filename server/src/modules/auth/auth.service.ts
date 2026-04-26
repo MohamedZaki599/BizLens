@@ -11,6 +11,7 @@ const SAFE_USER_FIELDS = {
   userMode: true,
   language: true,
   theme: true,
+  currency: true,
   createdAt: true,
 } as const;
 
@@ -58,6 +59,7 @@ export const authService = {
       userMode: user.userMode,
       language: user.language,
       theme: user.theme,
+      currency: user.currency,
       createdAt: user.createdAt,
     };
   },

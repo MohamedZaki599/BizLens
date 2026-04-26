@@ -2,7 +2,8 @@ import { ArrowDownRight, ArrowUpRight, CalendarDays, Wallet } from 'lucide-react
 import { useWeeklySummary } from './useWidgets';
 import { useT } from '@/lib/i18n';
 import { Skeleton } from '@/components/Skeleton';
-import { formatCurrency, cn } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { useFormatCurrency } from '@/lib/format';
 import { formatPctChange } from '@/lib/safe-math';
 
 const Row = ({
@@ -11,12 +12,14 @@ const Row = ({
   pct,
   hasComparison,
   positiveIsGood,
+  formatCurrency,
 }: {
   label: string;
   value: number;
   pct: number;
   hasComparison: boolean;
   positiveIsGood: boolean;
+  formatCurrency: (value: number) => string;
 }) => {
   const tone = !hasComparison
     ? 'neutral'
@@ -46,6 +49,7 @@ const Row = ({
 
 export const WeeklySummaryCard = () => {
   const t = useT();
+  const formatCurrency = useFormatCurrency();
   const { data, isLoading } = useWeeklySummary();
 
   if (isLoading) {
@@ -83,6 +87,7 @@ export const WeeklySummaryCard = () => {
           pct={data.changes.income.pct}
           hasComparison={data.changes.income.hasComparison}
           positiveIsGood
+          formatCurrency={formatCurrency}
         />
         <Row
           label={t('dashboard.totalExpense')}
@@ -90,6 +95,7 @@ export const WeeklySummaryCard = () => {
           pct={data.changes.expense.pct}
           hasComparison={data.changes.expense.hasComparison}
           positiveIsGood={false}
+          formatCurrency={formatCurrency}
         />
         <Row
           label={t('dashboard.netProfit')}
@@ -97,6 +103,7 @@ export const WeeklySummaryCard = () => {
           pct={data.changes.profit.pct}
           hasComparison={data.changes.profit.hasComparison}
           positiveIsGood
+          formatCurrency={formatCurrency}
         />
       </div>
 

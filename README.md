@@ -51,6 +51,74 @@ BizLens **closes the loop**: data → insight → **action**.
 - **Filtering** (type, category, date range) and quick-add flows  
 - **Categories** as first-class structure (defaults, colors, types) so reporting stays trustworthy  
 
+### Settings, budgets & assistant *(new)*
+
+- **Settings page** — manage profile, theme, language, currency, and business mode in one place  
+- **Locale-aware currency formatting** — every figure follows the user's preferred currency and locale, no more hardcoded `en-US`/`USD`  
+- **Category budgets** — monthly caps with progress, over-budget chips, and **suggested caps** based on a 3-month padded average  
+- **Decision Assistant** — plain-language digest answering *"what changed this week"*, *"where did profit drop"*, and *"what should I review first"*, each with a deep-link to the right transaction filter  
+- **Smarter CSV import** — strict row validation, **duplicate detection** (per `category × amount × day`), and a clear post-import summary  
+
+---
+
+## ✅ Improvement plan delivered
+
+Every to-do in the BizLens Improvement Plan has been shipped. The work spans correctness, security, UX, marketing polish, testing, and new product surfaces:
+
+### 1. Stabilize correctness & product logic
+- CSV import now invalidates **transactions, dashboard, and alerts** in one shot, so imported rows appear everywhere immediately.  
+- Centralized React Query keys in `client/src/lib/query-keys.ts` — no more `DASHBOARD_KEY` leaking out of the transactions feature.  
+- `PublicOnlyRoute` shows a real loading state instead of a blank flash.  
+- Theme/language/currency are applied consistently after **register and login** (parity).  
+- CSV dates and rows are validated client- and server-side before any DB write.  
+- Budget endpoint replaced with **one grouped query per user / month** instead of N full-month aggregates.  
+- Insight engine is honest about its windows — fixed comparison ranges, with a documented reason the API ignores `range`.  
+
+### 2. Hardened server: security, reliability, maintainability
+- **Prisma versions aligned** — `prisma` and `@prisma/client` both on `5.22`, with a workspace-aware `postinstall` symlink so `prisma generate` works under npm workspaces.  
+- Auth hardened: cookie TTL aligned with `JWT_EXPIRES_IN`, **rate limiting** on login/register, JWT no longer round-tripped in the JSON body when the httpOnly cookie suffices.  
+- **Prisma error mapping** — foreign-key, unique-constraint, and not-found errors return clean 400/404 responses instead of generic 500s.  
+- Dashboard route file split into focused service modules: `dashboard.service.ts`, `assistant.service.ts`, `subscriptions.service.ts`, `budgets.service.ts`, `import.service.ts`, `dashboard.range.ts`.  
+- **Structured logger + request IDs** — every log line carries a `requestId` so production traces are correlatable.  
+
+### 3. Polished appearance & UX
+- New **Settings page** (`/app/settings`) — profile, theme, language, currency, user mode.  
+- New **Budgets page** (`/app/budgets`) — caps, progress bars, suggested budgets.  
+- New **Decision Assistant page** (`/app/assistant`) — prioritized notes with deep-link actions.  
+- `formatCurrency` is now a hook (`useFormatCurrency`) that respects `language + currency` preferences.  
+- `window.confirm` replaced with a custom **`ConfirmDialog`** for a cohesive, accessible delete flow.  
+- i18n coverage extended — toasts, mobile nav labels, marketing hero mock data, comparison table, FAQ, pricing, and legal pages all bilingual.  
+- Empty states with `EmptyState` everywhere it counts — dashboard, transactions, budgets, alerts, import.  
+
+### 4. Upgraded marketing site
+- Mobile **slide-in nav drawer** with overlay and section links.  
+- SEO upgraded — `metadataBase`, OG image, Twitter card, icons, locale alternates, plus `robots.ts` and `sitemap.ts`.  
+- Switched from external Google Font `<link>` tags to **`next/font`** (Inter + Manrope).  
+- Marketing sections kept **server-rendered**; only theme/language controls are client islands.  
+- Centralized `siteConfig` (`marketing/src/lib/site.ts`) replaces every scattered `NEXT_PUBLIC_APP_URL` reference.  
+- New trust pages — **Pricing**, **FAQ**, **Privacy**, **Terms** — all i18n-driven.  
+
+### 5. Automated tests
+- 50+ focused tests under `node:test` + `tsx`, covering:  
+  - `safe-math` utilities (`toSafeNumber`, `percentChange`, `shareOf`, `formatMoney`)  
+  - JWT token parsing (`auth.tokens`)  
+  - Date-range resolution (`dashboard.range`)  
+  - Rate-limiter middleware (`rate-limit`)  
+  - Centralized error handler (`error-handler`)  
+  - Validate middleware
+  - Auth, transaction, import, and budget Zod schemas  
+
+  Run with `npm test` from the repo root.
+
+### 6. New product features
+- **Settings & preferences** — profile, language, theme, currency, business mode.  
+- **Budget management** — caps, progress, over-budget detection, **suggested caps** padded ~10% above a 3-month average and rounded to friendly increments.  
+- **Subscription manager** — heuristic recurring detection, monthly + annual cost summary, category attribution.  
+- **Smarter CSV import** — duplicate detection on `(userId, categoryId, amount, day)`, opt-out toggle, structured `imported` / `duplicatesSkipped` response.  
+- **Actionable alerts** — severity chips, dedup, deep-links into filtered transactions, snooze/dismiss flows.  
+- **Cash-flow forecast** — projected month-end profit, expense pace vs. last month, narrative summary.  
+- **Decision Assistant** — prioritized plain-language notes (profit trend, biggest swing, forecast, subscriptions, stale-data, weekly pulse) with deep-link actions.  
+
 ---
 
 ## 🧪 Demo preview
@@ -68,13 +136,14 @@ BizLens **closes the loop**: data → insight → **action**.
 | Layer | Technology |
 |--------|------------|
 | **Frontend** | React 18, Vite, TypeScript, Tailwind CSS |
-| **Backend** | Node.js, Express, TypeScript, Prisma |
+| **Backend** | Node.js, Express, TypeScript, Prisma `5.22` |
 | **Database** | PostgreSQL |
-| **Server state** | TanStack React Query |
-| **Global UI state** | Zustand (theme, locale, etc.) |
-| **Marketing** | Next.js (App Router), Tailwind |
+| **Server state** | TanStack React Query (centralized `QK` keys) |
+| **Global UI state** | Zustand (theme, locale, currency) |
+| **Marketing** | Next.js (App Router), Tailwind, `next/font` |
+| **Testing** | `node:test` + `tsx` (no extra runtime) |
 
-Auth: **JWT + HTTP-only cookies**. Validation: **Zod**. API: versioned REST (`/api/v1/...`).
+Auth: **JWT + HTTP-only cookies** with rate-limited login/register. Validation: **Zod**. Logging: **structured logger with request IDs**. API: versioned REST (`/api/v1/...`).
 
 ---
 
@@ -131,6 +200,15 @@ npm run dev:marketing   # Landing site
 | App | http://localhost:5173 |
 | Marketing | http://localhost:3000 |
 
+### Test
+
+```bash
+npm test                # runs every workspace's test script
+npm run test --workspace=server
+```
+
+The server suite uses Node's native `node:test` with `tsx` — no extra test framework, no DB required.
+
 ### Build
 
 ```bash
@@ -155,10 +233,11 @@ Built to read as **shipping judgment**, not homework.
 
 ## 🚧 Future improvements
 
-- **Smart budgets** — deeper caps, pacing, and scenario planning tied to alerts  
-- **Subscription manager** — renewal intelligence, benchmarks, and save/cancel prompts  
 - **Notifications** — email digests, mobile push, and routing for critical signals  
-- **CSV / bank import** — mapping memory, duplicate detection, reconciliation workflows  
+- **Bank-feed import** — direct connectors, mapping memory, undo / reconciliation flows on top of the existing duplicate detection  
+- **Team / client mode** — accountant invites, role-based access, exportable monthly summaries  
+- **Scenario planning** — “what if I cut category X by 20%?” against the existing forecast  
+- **Marketing growth** — comparison pages, freelancer templates, and Arabic-SEO landing pages  
 
 ---
 

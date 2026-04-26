@@ -83,6 +83,8 @@ const en: Dict = {
   'transactions.add.title': 'Add a transaction',
   'transactions.add.subtitle': 'Logged in seconds — searchable forever.',
   'transactions.delete.confirm': 'Delete this transaction?',
+  'transactions.delete.description':
+    "This action can't be undone. The transaction will be permanently removed from your records.",
   'transactions.allCategories': 'All categories',
   'transactions.filteredBy': 'Filtered by',
 
@@ -103,6 +105,8 @@ const en: Dict = {
   'categories.empty.income': 'No income categories yet.',
   'categories.empty.expense': 'No expense categories yet.',
   'categories.delete.confirm': 'Delete this category?',
+  'categories.default': 'Default',
+  'categories.custom': 'Custom',
   'categories.income': 'Income categories',
   'categories.expense': 'Expense categories',
 
@@ -111,14 +115,18 @@ const en: Dict = {
   'toast.transaction.updated': 'Transaction updated',
   'toast.category.added': 'Category created',
   'toast.category.deleted': 'Category deleted',
+  'toast.budget.saved': 'Budget saved',
+  'toast.budget.deleted': 'Budget removed',
   'toast.error.generic': 'Something went wrong, please try again.',
   'toast.signedIn': 'Signed in',
   'toast.signedOut': 'You have been signed out',
 
   'common.cancel': 'Cancel',
+  'common.confirm': 'Confirm',
   'common.save': 'Save',
   'common.saving': 'Saving…',
   'common.delete': 'Delete',
+  'common.close': 'Close',
   'common.add': 'Add',
   'common.adding': 'Adding…',
   'common.loading': 'Loading…',
@@ -171,6 +179,7 @@ const en: Dict = {
   'nav.subscriptions': 'Subscriptions',
   'nav.budgets': 'Budgets',
   'nav.import': 'Import',
+  'nav.assistant': 'Assistant',
 
   'subscriptions.title': 'Subscriptions',
   'subscriptions.subtitle': 'Recurring expenses detected automatically.',
@@ -181,6 +190,18 @@ const en: Dict = {
   'subscriptions.cancelHint': 'Consider cancelling if unused',
   'subscriptions.perMonth': '/mo',
   'subscriptions.perYear': '/yr',
+
+  'assistant.title': 'Decision Assistant',
+  'assistant.subtitle':
+    'Plain-language summaries of what changed, what to look at first, and where to act.',
+  'assistant.headline': "What you should know",
+  'assistant.empty.title': 'Nothing to summarize yet',
+  'assistant.empty.subtitle':
+    'Add a few transactions and the assistant will surface what matters most.',
+  'assistant.priority.high': 'Worth your attention',
+  'assistant.priority.normal': 'Heads up',
+  'assistant.refresh': 'Refresh',
+  'assistant.generatedAt': 'Updated {time}',
 
   'budgets.title': 'Category Budgets',
   'budgets.subtitle': 'Set monthly caps per expense category.',
@@ -205,10 +226,66 @@ const en: Dict = {
   'import.success': '{count} transactions imported successfully',
   'import.empty': 'No valid rows found in your CSV.',
   'import.submit': 'Import {count} transactions',
+  'import.skipped': '{skipped} of {total} rows were skipped (invalid amount, date, or missing category).',
+  'import.skipDuplicates.label': 'Skip duplicates',
+  'import.skipDuplicates.help':
+    'Skip rows that already exist with the same category, amount, and day.',
+  'import.duplicates': '{count} duplicate rows were skipped.',
 
   'notifications.permission': 'Enable browser notifications for critical alerts.',
   'notifications.enable': 'Enable',
   'notifications.enabled': 'Notifications enabled',
+
+  'categories.delete.title': 'Delete this category?',
+  'categories.delete.description':
+    'Categories with transactions cannot be deleted. Move or delete its transactions first.',
+
+  'settings.title': 'Settings',
+  'settings.subtitle': 'Manage your profile and preferences.',
+  'settings.profile': 'Profile',
+  'settings.profile.subtitle': 'How your account is identified.',
+  'settings.profile.name': 'Display name',
+  'settings.profile.email': 'Email',
+  'settings.profile.userMode': 'I run a',
+  'settings.profile.save': 'Save profile',
+  'settings.profile.saved': 'Profile updated',
+  'settings.appearance': 'Appearance',
+  'settings.appearance.subtitle': 'Personalize how BizLens looks and reads.',
+  'settings.theme': 'Theme',
+  'settings.theme.light': 'Light',
+  'settings.theme.dark': 'Dark',
+  'settings.language': 'Language',
+  'settings.language.en': 'English',
+  'settings.language.ar': 'العربية',
+  'settings.currency': 'Currency',
+  'settings.currency.helper': 'Used to format every amount across the app.',
+  'settings.danger': 'Account',
+  'settings.danger.signOut': 'Sign out of this device',
+
+  'dashboard.empty.title': 'Your dashboard will come alive here.',
+  'dashboard.empty.subtitle':
+    'Log a few transactions and BizLens will reveal trends, leaks, and forecasts automatically.',
+  'dashboard.empty.cta': 'Add your first transaction',
+
+  'budgets.empty.title': 'Set your first budget',
+  'budgets.empty.subtitle':
+    'Pick an expense category and we\'ll track it against your monthly cap automatically.',
+  'budgets.empty.cta': 'Set a budget',
+  'budgets.totalCap': 'Total monthly cap',
+  'budgets.totalUsed': 'Used so far',
+  'budgets.overBudgetCount': '{count} over budget',
+  'budgets.delete.title': 'Remove budget for',
+  'budgets.delete.description': "We'll stop tracking this category against a cap, but we won't change any transactions.",
+  'budgets.suggested': 'Suggested cap based on the last 3 months',
+  'budgets.add.subtitle': 'Pick an expense category and a monthly cap.',
+  'budgets.amountPlaceholder': '0.00',
+  'budgets.noCategoryAvailable':
+    'Every expense category already has a budget. Edit existing ones to update caps.',
+  'budgets.suggestions.title': 'Suggested budgets',
+  'budgets.suggestions.subtitle':
+    'Caps padded ~10% above your 3-month average — tweak before saving.',
+  'budgets.suggestions.add': 'Add suggestion',
+  'budgets.suggestions.average': 'Avg {amount}/mo',
 };
 
 const ar: Dict = {
@@ -291,6 +368,8 @@ const ar: Dict = {
   'transactions.add.title': 'إضافة معاملة',
   'transactions.add.subtitle': 'تُسجَّل في ثوانٍ — قابلة للبحث للأبد.',
   'transactions.delete.confirm': 'حذف هذه المعاملة؟',
+  'transactions.delete.description':
+    'لا يمكن التراجع عن هذا الإجراء. سيتم حذف المعاملة من سجلاتك بشكل نهائي.',
   'transactions.allCategories': 'جميع الفئات',
   'transactions.filteredBy': 'مُصفّى بـ',
 
@@ -311,6 +390,8 @@ const ar: Dict = {
   'categories.empty.income': 'لا توجد فئات دخل بعد.',
   'categories.empty.expense': 'لا توجد فئات مصروفات بعد.',
   'categories.delete.confirm': 'حذف هذه الفئة؟',
+  'categories.default': 'افتراضية',
+  'categories.custom': 'مخصصة',
   'categories.income': 'فئات الدخل',
   'categories.expense': 'فئات المصروفات',
 
@@ -319,14 +400,18 @@ const ar: Dict = {
   'toast.transaction.updated': 'تم تحديث المعاملة',
   'toast.category.added': 'تم إنشاء الفئة',
   'toast.category.deleted': 'تم حذف الفئة',
+  'toast.budget.saved': 'تم حفظ الميزانية',
+  'toast.budget.deleted': 'تمت إزالة الميزانية',
   'toast.error.generic': 'حدث خطأ، يرجى المحاولة مرة أخرى.',
   'toast.signedIn': 'تم تسجيل الدخول',
   'toast.signedOut': 'تم تسجيل خروجك',
 
   'common.cancel': 'إلغاء',
+  'common.confirm': 'تأكيد',
   'common.save': 'حفظ',
   'common.saving': 'يحفظ…',
   'common.delete': 'حذف',
+  'common.close': 'إغلاق',
   'common.add': 'إضافة',
   'common.adding': 'يضيف…',
   'common.loading': 'جارٍ التحميل…',
@@ -379,6 +464,7 @@ const ar: Dict = {
   'nav.subscriptions': 'الاشتراكات',
   'nav.budgets': 'الميزانيات',
   'nav.import': 'استيراد',
+  'nav.assistant': 'المساعد',
 
   'subscriptions.title': 'الاشتراكات',
   'subscriptions.subtitle': 'المصاريف المتكررة المكتشفة تلقائيًا.',
@@ -389,6 +475,18 @@ const ar: Dict = {
   'subscriptions.cancelHint': 'فكّر بالإلغاء إذا لم تستخدمه',
   'subscriptions.perMonth': '/شهر',
   'subscriptions.perYear': '/سنة',
+
+  'assistant.title': 'المساعد الذكي',
+  'assistant.subtitle':
+    'ملخصات بلغة بسيطة لما تغيّر وما يستحق المراجعة أولًا وأين يجب التحرك.',
+  'assistant.headline': 'ما يجب أن تعرفه',
+  'assistant.empty.title': 'لا شيء للتلخيص بعد',
+  'assistant.empty.subtitle':
+    'أضف بعض المعاملات وسيُبرز المساعد ما يهم أكثر.',
+  'assistant.priority.high': 'يستحق انتباهك',
+  'assistant.priority.normal': 'تنويه',
+  'assistant.refresh': 'تحديث',
+  'assistant.generatedAt': 'آخر تحديث {time}',
 
   'budgets.title': 'ميزانيات الفئات',
   'budgets.subtitle': 'حدد سقفًا شهريًا لكل فئة مصروفات.',
@@ -413,10 +511,66 @@ const ar: Dict = {
   'import.success': 'تم استيراد {count} معاملة بنجاح',
   'import.empty': 'لم يتم العثور على صفوف صالحة في ملف CSV.',
   'import.submit': 'استيراد {count} معاملة',
+  'import.skipped': 'تم تخطي {skipped} من {total} صفوف (مبلغ أو تاريخ غير صالح أو فئة مفقودة).',
+  'import.skipDuplicates.label': 'تخطي التكرارات',
+  'import.skipDuplicates.help':
+    'تخطي الصفوف الموجودة مسبقًا بنفس الفئة والمبلغ واليوم.',
+  'import.duplicates': 'تم تخطي {count} صفوف مكررة.',
 
   'notifications.permission': 'فعّل إشعارات المتصفح للتنبيهات الحرجة.',
   'notifications.enable': 'تفعيل',
   'notifications.enabled': 'الإشعارات مفعّلة',
+
+  'categories.delete.title': 'حذف هذه الفئة؟',
+  'categories.delete.description':
+    'لا يمكن حذف فئة بها معاملات. انقل أو احذف معاملاتها أولاً.',
+
+  'settings.title': 'الإعدادات',
+  'settings.subtitle': 'إدارة ملفك الشخصي وتفضيلاتك.',
+  'settings.profile': 'الملف الشخصي',
+  'settings.profile.subtitle': 'كيف يُعرَّف حسابك.',
+  'settings.profile.name': 'اسم العرض',
+  'settings.profile.email': 'البريد الإلكتروني',
+  'settings.profile.userMode': 'نشاطي هو',
+  'settings.profile.save': 'حفظ الملف',
+  'settings.profile.saved': 'تم تحديث الملف الشخصي',
+  'settings.appearance': 'المظهر',
+  'settings.appearance.subtitle': 'خصّص شكل وقراءة بيزلنز.',
+  'settings.theme': 'السمة',
+  'settings.theme.light': 'فاتح',
+  'settings.theme.dark': 'داكن',
+  'settings.language': 'اللغة',
+  'settings.language.en': 'الإنجليزية',
+  'settings.language.ar': 'العربية',
+  'settings.currency': 'العملة',
+  'settings.currency.helper': 'تُستخدم لتنسيق كل المبالغ في التطبيق.',
+  'settings.danger': 'الحساب',
+  'settings.danger.signOut': 'تسجيل الخروج من هذا الجهاز',
+
+  'dashboard.empty.title': 'ستنبض لوحة التحكم هنا.',
+  'dashboard.empty.subtitle':
+    'سجّل بضع معاملات وسيكشف بيزلنز الاتجاهات والتسريبات والتوقعات تلقائيًا.',
+  'dashboard.empty.cta': 'أضف أول معاملة',
+
+  'budgets.empty.title': 'حدّد أول ميزانية',
+  'budgets.empty.subtitle':
+    'اختر فئة مصروفات وسنتابعها مقابل سقفك الشهري تلقائيًا.',
+  'budgets.empty.cta': 'إضافة ميزانية',
+  'budgets.totalCap': 'إجمالي السقف الشهري',
+  'budgets.totalUsed': 'المستخدم حتى الآن',
+  'budgets.overBudgetCount': '{count} تجاوزت الميزانية',
+  'budgets.delete.title': 'إزالة ميزانية',
+  'budgets.delete.description': 'سنوقف تتبع هذه الفئة مقابل السقف، لكن لن نغيّر أي معاملة.',
+  'budgets.suggested': 'سقف مقترح بناءً على آخر ٣ أشهر',
+  'budgets.add.subtitle': 'اختر فئة مصروفات وحدّد سقفًا شهريًا.',
+  'budgets.amountPlaceholder': '٠٫٠٠',
+  'budgets.noCategoryAvailable':
+    'كل فئات المصروفات لديها ميزانية بالفعل. عدّل الميزانيات الحالية لتغيير السقف.',
+  'budgets.suggestions.title': 'ميزانيات مقترحة',
+  'budgets.suggestions.subtitle':
+    'سقوف بزيادة 10% تقريبًا فوق متوسط آخر ٣ أشهر — يمكنك تعديلها قبل الحفظ.',
+  'budgets.suggestions.add': 'إضافة الاقتراح',
+  'budgets.suggestions.average': 'متوسط {amount}/شهر',
 };
 
 const dictionaries: Record<Language, Dict> = { en, ar };

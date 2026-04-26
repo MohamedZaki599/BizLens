@@ -2,11 +2,12 @@ import { CreditCard, RefreshCw, Inbox, ArrowUpDown } from 'lucide-react';
 import { useSubscriptions } from '@/features/dashboard/useWidgets';
 import { useT, useTi } from '@/lib/i18n';
 import { Skeleton } from '@/components/Skeleton';
-import { formatCurrency, cn } from '@/lib/utils';
+import { useFormatCurrency } from '@/lib/format';
 
 export const SubscriptionsPage = () => {
   const t = useT();
   const ti = useTi();
+  const formatCurrency = useFormatCurrency();
   const { data, isLoading } = useSubscriptions();
 
   return (

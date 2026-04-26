@@ -16,6 +16,7 @@
     "build:client": "npm run build --workspace=client",
     "build:marketing": "npm run build --workspace=marketing",
     "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\""
   },
   "devDependencies": {

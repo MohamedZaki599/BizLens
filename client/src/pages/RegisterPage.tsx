@@ -37,10 +37,10 @@ export const RegisterPage = () => {
   const onSubmit = async (data: FormData) => {
     try {
       await reg.mutateAsync(data);
-      toast.success('Account created. Welcome!');
+      toast.success(t('toast.signedIn'));
       navigate('/app', { replace: true });
     } catch (err) {
-      toast.error(extractErrorMessage(err));
+      toast.error(extractErrorMessage(err, t('toast.error.generic')));
     }
   };
 

@@ -10,14 +10,16 @@ export const authController = {
     const user = await authService.register(req.body);
     const token = signAccessToken({ sub: user.id, email: user.email });
     res.cookie(AUTH_COOKIE_NAME, token, cookieOptions());
-    res.status(201).json({ user, token });
+    // Token deliberately omitted from the response body: the httpOnly cookie
+    // is the source of truth and exposing the JWT to JS would defeat that.
+    res.status(201).json({ user });
   }),
 
   login: asyncHandler(async (req: Request<unknown, unknown, LoginInput>, res: Response) => {
     const user = await authService.login(req.body);
     const token = signAccessToken({ sub: user.id, email: user.email });
     res.cookie(AUTH_COOKIE_NAME, token, cookieOptions());
-    res.json({ user, token });
+    res.json({ user });
   }),
 
   me: asyncHandler(async (req: Request, res: Response) => {

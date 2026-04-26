@@ -41,6 +41,55 @@ export interface BudgetItem {
   exceeded: boolean;
 }
 
+export interface SuggestedBudget {
+  category: { id: string; name: string; color: string | null };
+  averageMonthly: number;
+  suggested: number;
+  monthsObserved: number;
+}
+
+export interface ImportResult {
+  imported: number;
+  duplicatesSkipped: number;
+  duplicateRows: Array<{
+    amount: number;
+    type: 'INCOME' | 'EXPENSE';
+    date: string;
+    categoryId: string;
+    description: string | null;
+  }>;
+}
+
+export type AssistantTone = 'positive' | 'neutral' | 'warning' | 'negative';
+export type AssistantPriority = 'high' | 'normal';
+
+export interface AssistantNote {
+  id: string;
+  kind:
+    | 'weekly-pulse'
+    | 'profit-trend'
+    | 'expense-driver'
+    | 'subscriptions'
+    | 'stale-data'
+    | 'forecast';
+  title: string;
+  message: string;
+  metric?: string;
+  tone: AssistantTone;
+  priority: AssistantPriority;
+  action?: {
+    label: string;
+    type: 'filter' | 'navigate';
+    payload: Record<string, string>;
+  };
+}
+
+export interface AssistantDigest {
+  generatedAt: string;
+  headline: string;
+  notes: AssistantNote[];
+}
+
 export const widgetsApi = {
   async forecast(range?: DashboardRange): Promise<Forecast> {
     const { data } = await api.get<Forecast>('/dashboard/forecast', { params: { range } });
@@ -74,14 +123,34 @@ export const widgetsApi = {
     const { data } = await api.get('/dashboard/budgets');
     return data;
   },
+  async budgetSuggestions(): Promise<{ suggestions: SuggestedBudget[] }> {
+    const { data } = await api.get('/dashboard/budgets/suggestions');
+    return data;
+  },
   async createBudget(categoryId: string, amount: number): Promise<void> {
     await api.post('/dashboard/budgets', { categoryId, amount });
   },
   async deleteBudget(id: string): Promise<void> {
     await api.delete(`/dashboard/budgets/${id}`);
   },
-  async importTransactions(transactions: Array<{ amount: number; type: 'INCOME' | 'EXPENSE'; date: string; description?: string; categoryId: string }>): Promise<{ imported: number }> {
-    const { data } = await api.post('/dashboard/import', { transactions });
+  async importTransactions(
+    transactions: Array<{
+      amount: number;
+      type: 'INCOME' | 'EXPENSE';
+      date: string;
+      description?: string;
+      categoryId: string;
+    }>,
+    options: { skipDuplicates?: boolean } = {},
+  ): Promise<ImportResult> {
+    const { data } = await api.post('/dashboard/import', {
+      transactions,
+      ...(options.skipDuplicates !== undefined ? { skipDuplicates: options.skipDuplicates } : {}),
+    });
+    return data;
+  },
+  async assistant(): Promise<AssistantDigest> {
+    const { data } = await api.get<AssistantDigest>('/dashboard/assistant');
     return data;
   },
 };

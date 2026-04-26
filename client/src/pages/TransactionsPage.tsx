@@ -16,8 +16,10 @@ import { Skeleton } from '@/components/Skeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { Button } from '@/components/Button';
 import { Combobox } from '@/components/Combobox';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useT } from '@/lib/i18n';
-import { cn, formatCurrency } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { useFormatCurrency } from '@/lib/format';
 import { extractErrorMessage } from '@/lib/api';
 import type { TransactionType } from '@/types/domain';
 
@@ -25,6 +27,7 @@ type Filter = TransactionType | 'ALL';
 
 export const TransactionsPage = () => {
   const t = useT();
+  const formatCurrency = useFormatCurrency();
   const { openQuickAdd } = useOutletContext<{
     openQuickAdd: (initialType?: TransactionType) => void;
   }>();
@@ -35,6 +38,7 @@ export const TransactionsPage = () => {
 
   const [filter, setFilter] = useState<Filter>(initialType);
   const [categoryId, setCategoryId] = useState<string | null>(initialCategory);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const params = useMemo(() => {
@@ -63,12 +67,14 @@ export const TransactionsPage = () => {
 
   const activeCategory = categories.find((c) => c.id === categoryId);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm(t('transactions.delete.confirm'))) return;
+  const handleConfirmDelete = async () => {
+    if (!confirmDeleteId) return;
+    const id = confirmDeleteId;
     setPendingDeleteId(id);
     try {
       await del.mutateAsync(id);
       toast.success(t('toast.transaction.deleted'));
+      setConfirmDeleteId(null);
     } catch (err) {
       toast.error(extractErrorMessage(err, t('toast.error.generic')));
     } finally {
@@ -222,7 +228,7 @@ export const TransactionsPage = () => {
                     {formatCurrency(Number(tx.amount))}
                   </span>
                   <button
-                    onClick={() => handleDelete(tx.id)}
+                    onClick={() => setConfirmDeleteId(tx.id)}
                     disabled={pendingDeleteId === tx.id}
                     className="p-2 rounded-lg text-ink-muted hover:text-danger hover:bg-danger/5 transition-all focus-ring opacity-100 sm:opacity-0 sm:group-hover:opacity-100 disabled:opacity-50"
                     aria-label={t('common.delete')}
@@ -235,6 +241,16 @@ export const TransactionsPage = () => {
           </ul>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmDeleteId !== null}
+        title={t('transactions.delete.confirm')}
+        description={t('transactions.delete.description')}
+        confirmLabel={t('common.delete')}
+        destructive
+        onCancel={() => setConfirmDeleteId(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };

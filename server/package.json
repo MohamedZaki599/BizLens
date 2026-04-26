@@ -9,11 +9,14 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "lint": "eslint \"src/**/*.ts\"",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:push": "prisma db push",
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
+    "prisma:link": "node scripts/link-prisma-client.cjs",
+    "prisma:generate": "npm run prisma:link && prisma generate",
+    "prisma:migrate": "npm run prisma:link && prisma migrate dev",
+    "prisma:push": "npm run prisma:link && prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:seed:rich": "tsx prisma/seed-rich-data.ts"
+    "db:seed:rich": "tsx prisma/seed-rich-data.ts",
+    "postinstall": "node scripts/link-prisma-client.cjs"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

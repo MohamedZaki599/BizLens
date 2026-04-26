@@ -15,7 +15,10 @@ import {
   Menu,
   ChevronDown,
   User as UserIcon,
+  Settings as SettingsIcon,
+  Wallet,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useUiStore } from '@/store/ui-store';
 import { useCurrentUser, useLogout } from '@/features/auth/useAuth';
@@ -41,10 +44,13 @@ export const DashboardLayout = () => {
 
   const navItems = [
     { to: '/app', label: t('nav.dashboard'), icon: LayoutDashboard, end: true },
+    { to: '/app/assistant', label: t('nav.assistant'), icon: Sparkles, end: false },
     { to: '/app/transactions', label: t('nav.transactions'), icon: ListOrdered, end: false },
     { to: '/app/categories', label: t('nav.categories'), icon: FolderKanban, end: false },
+    { to: '/app/budgets', label: t('nav.budgets'), icon: Wallet, end: false },
     { to: '/app/subscriptions', label: t('nav.subscriptions'), icon: CreditCard, end: false },
     { to: '/app/import', label: t('nav.import'), icon: Upload, end: false },
+    { to: '/app/settings', label: t('nav.settings'), icon: SettingsIcon, end: false },
   ];
 
   const handleLogout = async () => {
@@ -223,6 +229,15 @@ export const DashboardLayout = () => {
                       </div>
                     </div>
                     <div className="p-1">
+                      <Link
+                        to="/app/settings"
+                        role="menuitem"
+                        onClick={() => setProfileOpen(false)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-ink-muted hover:text-ink hover:bg-surface-high transition-colors focus-ring"
+                      >
+                        <SettingsIcon size={16} strokeWidth={1.5} aria-hidden />
+                        {t('nav.settings')}
+                      </Link>
                       <button
                         role="menuitem"
                         onClick={() => {

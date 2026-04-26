@@ -1,7 +1,8 @@
 import { ArrowRight } from 'lucide-react';
 import type { CategoryBreakdown } from '@/types/domain';
 import { Skeleton } from '@/components/Skeleton';
-import { cn, formatCurrency } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { useFormatCurrency } from '@/lib/format';
 
 interface BreakdownCardProps {
   title: string;
@@ -28,6 +29,7 @@ export const BreakdownCard = ({
   onView,
   viewLabel = 'View',
 }: BreakdownCardProps) => {
+  const formatCurrency = useFormatCurrency();
   return (
     <div className="card flex flex-col gap-4">
       <div className="flex items-center justify-between">

@@ -1,14 +1,16 @@
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
+import type { TooltipContentProps } from 'recharts';
 import { useExpenseComposition } from './useWidgets';
 import { useT } from '@/lib/i18n';
 import { Skeleton } from '@/components/Skeleton';
-import { formatCurrency } from '@/lib/utils';
+import { useFormatCurrency } from '@/lib/format';
 import type { DashboardRange } from './dashboard.api';
 
 const FALLBACK_COLORS = ['#7c5cff', '#ef4444', '#f59e0b', '#3b82f6', '#22c55e', '#a855f7', '#06b6d4', '#84cc16'];
 
 export const ExpenseDonutChart = ({ range }: { range?: DashboardRange }) => {
   const t = useT();
+  const formatCurrency = useFormatCurrency();
   const { data, isLoading } = useExpenseComposition(range);
 
   if (isLoading) {
@@ -44,13 +46,16 @@ export const ExpenseDonutChart = ({ range }: { range?: DashboardRange }) => {
               ))}
             </Pie>
             <Tooltip
-              content={({ active, payload }: { active?: boolean; payload?: Array<{ name?: string; value?: number; payload?: { share?: number } }> }) => {
+              content={({ active, payload }: TooltipContentProps) => {
                 if (!active || !payload?.length) return null;
-                const d = payload[0];
+                const entry = payload[0];
+                const inner = entry.payload as { share?: number } | undefined;
                 return (
                   <div className="rounded-xl bg-surface-lowest border border-outline/30 shadow-ambient p-3 text-xs">
-                    <p className="font-medium text-ink">{d.name}</p>
-                    <p className="text-ink-muted">{formatCurrency(d.value ?? 0)} ({d.payload?.share ?? 0}%)</p>
+                    <p className="font-medium text-ink">{String(entry.name ?? '')}</p>
+                    <p className="text-ink-muted">
+                      {formatCurrency(Number(entry.value ?? 0))} ({inner?.share ?? 0}%)
+                    </p>
                   </div>
                 );
               }}

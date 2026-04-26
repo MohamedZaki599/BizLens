@@ -7,13 +7,15 @@ import {
   CartesianGrid,
   Tooltip,
 } from 'recharts';
+import type { TooltipContentProps } from 'recharts';
 import { useExpenseTrend } from './useWidgets';
 import { useT } from '@/lib/i18n';
 import { Skeleton } from '@/components/Skeleton';
-import { formatCurrency } from '@/lib/utils';
+import { useFormatCurrency } from '@/lib/format';
 
 export const ExpenseTrendChart = () => {
   const t = useT();
+  const formatCurrency = useFormatCurrency();
   const { data, isLoading } = useExpenseTrend();
 
   if (isLoading) {
@@ -62,14 +64,15 @@ export const ExpenseTrendChart = () => {
             width={44}
           />
           <Tooltip
-            content={({ active, payload, label }: { active?: boolean; payload?: Array<{ dataKey?: string; color?: string; value?: number }>; label?: string }) => {
+            content={({ active, payload, label }: TooltipContentProps) => {
               if (!active || !payload?.length) return null;
               return (
                 <div className="rounded-xl bg-surface-lowest border border-outline/30 shadow-ambient p-3 text-xs">
-                  <p className="font-medium text-ink mb-1">{label}</p>
+                  <p className="font-medium text-ink mb-1">{String(label ?? '')}</p>
                   {payload.map((p) => (
-                    <p key={p.dataKey} style={{ color: p.color }}>
-                      {p.dataKey === 'income' ? t('charts.income') : t('charts.expense')}: {formatCurrency(p.value ?? 0)}
+                    <p key={String(p.dataKey)} style={{ color: p.color }}>
+                      {p.dataKey === 'income' ? t('charts.income') : t('charts.expense')}:{' '}
+                      {formatCurrency(Number(p.value ?? 0))}
                     </p>
                   ))}
                 </div>

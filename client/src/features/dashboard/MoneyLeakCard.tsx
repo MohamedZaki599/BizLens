@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useMoneyLeak } from './useWidgets';
 import { useT } from '@/lib/i18n';
 import { Skeleton } from '@/components/Skeleton';
-import { formatCurrency } from '@/lib/utils';
+import { useFormatCurrency } from '@/lib/format';
 
 import type { DashboardRange } from './dashboard.api';
 
 export const MoneyLeakCard = ({ range }: { range?: DashboardRange }) => {
   const t = useT();
   const navigate = useNavigate();
+  const formatCurrency = useFormatCurrency();
   const { data, isLoading } = useMoneyLeak(range);
 
   if (isLoading) {
