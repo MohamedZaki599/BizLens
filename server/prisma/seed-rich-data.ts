@@ -16,11 +16,12 @@
  *   demo+business@bizlens.app      / Demo123!
  */
 
+import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import { addDays, startOfDay, subDays, subMonths } from 'date-fns';
-import { Prisma, PrismaClient, type UserMode } from '@prisma/client';
+import { Prisma, type UserMode } from '@prisma/client';
+import { prisma } from '../src/config/prisma';
 
-const prisma = new PrismaClient();
 
 // ─── Deterministic randomness ─────────────────────────────────────────────
 

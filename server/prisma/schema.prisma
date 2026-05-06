@@ -2,7 +2,8 @@
 // Source-of-truth for all financial data models.
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {

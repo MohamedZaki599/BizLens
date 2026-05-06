@@ -12,3 +12,4 @@ coverage/
 .vscode/
 .idea/
 *.tsbuildinfo
+project-audit/BIZLENS_FULL_AUDIT_REPORT.md

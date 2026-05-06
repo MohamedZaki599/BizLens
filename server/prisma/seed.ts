@@ -2,11 +2,11 @@
  * Optional dev seed: creates a demo user with seeded categories and a few
  * sample transactions. Idempotent — safe to run multiple times.
  */
+import 'dotenv/config';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../src/config/prisma';
 import { DEFAULT_CATEGORIES } from '../src/modules/categories/category.defaults';
 
-const prisma = new PrismaClient();
 
 const DEMO_EMAIL = 'demo@bizlens.app';
 const DEMO_PASSWORD = 'demopass123';

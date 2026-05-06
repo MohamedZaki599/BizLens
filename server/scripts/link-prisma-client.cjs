@@ -16,50 +16,50 @@ const path = require('node:path');
 
 const here = path.resolve(__dirname, '..');
 const localPrismaDir = path.join(here, 'node_modules', '@prisma');
-const localTarget = path.join(localPrismaDir, 'client');
 
 const candidates = [
   // npm workspaces typically hoist to the repo root.
-  path.resolve(here, '..', 'node_modules', '@prisma', 'client'),
+  path.resolve(here, '..', 'node_modules', '@prisma'),
 ];
 
 const tryLink = () => {
-  // If the package already resolves locally as a regular install, do nothing.
-  if (
-    fs.existsSync(localTarget) &&
-    fs.existsSync(path.join(localTarget, 'package.json')) &&
-    !fs.lstatSync(localTarget).isSymbolicLink()
-  ) {
-    return;
+  const prismaScopeSource = path.resolve(here, '..', 'node_modules', '@prisma');
+  const dotPrismaSource = path.resolve(here, '..', 'node_modules', '.prisma');
+
+  const nodeModulesDir = path.join(here, 'node_modules');
+  if (!fs.existsSync(nodeModulesDir)) {
+    fs.mkdirSync(nodeModulesDir, { recursive: true });
   }
 
-  const source = candidates.find((p) =>
-    fs.existsSync(path.join(p, 'package.json')),
-  );
-
-  if (!source) {
-    console.warn(
-      '[link-prisma-client] @prisma/client not found at the workspace root; skipping link.',
-    );
-    return;
-  }
-
-  fs.mkdirSync(localPrismaDir, { recursive: true });
-
-  // Remove an existing broken symlink before recreating it.
-  try {
-    const stat = fs.lstatSync(localTarget);
-    if (stat.isSymbolicLink() || stat.isFile()) {
-      fs.unlinkSync(localTarget);
-    } else if (stat.isDirectory()) {
-      fs.rmSync(localTarget, { recursive: true });
+  const link = (source, targetName) => {
+    const target = path.join(nodeModulesDir, targetName);
+    if (!fs.existsSync(source)) {
+      console.warn(`[link-prisma-client] ${source} not found; skipping link.`);
+      return;
     }
-  } catch (_err) {
-    // path didn't exist → nothing to clean up.
+
+    try {
+      const stat = fs.lstatSync(target);
+      if (stat.isSymbolicLink() || stat.isFile()) {
+        fs.unlinkSync(target);
+      } else if (stat.isDirectory()) {
+        fs.rmSync(target, { recursive: true });
+      }
+    } catch (_err) {
+      // doesn't exist
+    }
+
+    fs.symlinkSync(source, target, 'dir');
+    console.log(`[link-prisma-client] linked ${source} → ${target}`);
+  };
+
+  const prismaDir = path.join(nodeModulesDir, '@prisma');
+  if (!fs.existsSync(prismaDir)) {
+    fs.mkdirSync(prismaDir, { recursive: true });
   }
 
-  fs.symlinkSync(source, localTarget, 'dir');
-  console.log(`[link-prisma-client] linked ${source} → ${localTarget}`);
+  link(path.join(prismaScopeSource, 'client'), path.join('@prisma', 'client'));
+  link(dotPrismaSource, '.prisma');
 };
 
 try {
