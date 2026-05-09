@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Sparkles, MessageCircle } from 'lucide-react';
 import { useT } from '@/lib/i18n';
+import { useAssistantStore } from '../store/assistant-store';
 import { cn } from '@/lib/utils';
 
 interface AssistantPromptSuggestionsProps {
@@ -22,6 +23,12 @@ export const AssistantPromptSuggestions = ({
   className,
 }: AssistantPromptSuggestionsProps) => {
   const t = useT();
+  const openAssistant = useAssistantStore((s) => s.openAssistant);
+
+  const handleSelect = (prompt: string) => {
+    onSelect?.(prompt);
+    openAssistant(prompt);
+  };
 
   return (
     <motion.div
@@ -46,7 +53,7 @@ export const AssistantPromptSuggestions = ({
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.08 * i, duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-            onClick={() => onSelect?.(t(key))}
+            onClick={() => handleSelect(t(key))}
             className={cn(
               'inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl',
               'bg-surface-lowest border border-outline/15',

@@ -1,7 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useOnboardingStore } from '../store/onboarding-store';
+import { useT } from '@/lib/i18n';
 import { WelcomeScreen } from './WelcomeScreen';
 import { BusinessContextSetup } from './BusinessContextSetup';
 import { SignalPreparationState } from './SignalPreparationState';
@@ -10,12 +11,9 @@ import type { OperationalGoal, DataSource } from '../store/onboarding-store';
 
 /**
  * OnboardingFlow — full-screen orchestrator for the onboarding experience.
- *
- * Renders the appropriate stage component and manages transitions.
- * Once onboarding is complete, the parent route will stop rendering
- * this component and show the dashboard instead.
  */
 export const OnboardingFlow = () => {
+  const t = useT();
   const navigate = useNavigate();
   const stage = useOnboardingStore((s) => s.stage);
   const setStage = useOnboardingStore((s) => s.setStage);
@@ -40,16 +38,17 @@ export const OnboardingFlow = () => {
   }, [setStage]);
 
   const handlePreparationReady = useCallback(() => {
+    completeMilestone('first_signal');
     setStage('first-signal');
-  }, [setStage]);
+  }, [setStage, completeMilestone]);
 
   const handleFirstSignalContinue = useCallback(() => {
     completeOnboarding();
-    completeMilestone('data_connected');
+    completeMilestone('data_connected'); // Mark data as "connected" since they finished the setup sequence
     navigate('/app', { replace: true });
   }, [completeOnboarding, completeMilestone, navigate]);
 
-  const MOCK_SIGNAL = {
+  const mockSignal = useMemo(() => ({
     key: 'first-spending-anomaly',
     title: t('onboarding.firstSignal.mock.title'),
     explanation: t('onboarding.firstSignal.mock.desc'),
@@ -60,7 +59,7 @@ export const OnboardingFlow = () => {
       label: t('onboarding.firstSignal.mock.action'),
       route: '/app/signals/first-spending-anomaly',
     },
-  };
+  }), [t]);
 
   return (
     <AnimatePresence mode="wait">
@@ -80,7 +79,7 @@ export const OnboardingFlow = () => {
       {stage === 'first-signal' && (
         <FirstSignalReveal
           key="reveal"
-          signal={MOCK_SIGNAL}
+          signal={mockSignal}
           onContinue={handleFirstSignalContinue}
         />
       )}

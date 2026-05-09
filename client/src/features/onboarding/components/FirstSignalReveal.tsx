@@ -124,9 +124,7 @@ export const FirstSignalReveal = ({ signal, onContinue }: FirstSignalRevealProps
 
               {/* Contextual Assistant Support */}
               <div className="mt-6 pt-5 border-t border-outline/15">
-                <AssistantPromptSuggestions 
-                  onSelect={(p) => console.log('First signal assistant:', p)}
-                />
+                <AssistantPromptSuggestions />
               </div>
             </>
           ) : (

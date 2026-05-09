@@ -8,7 +8,7 @@ import { SignalSeverityBadge } from './SignalSeverityBadge';
 import { SignalLifecycleBadge } from './SignalLifecycleBadge';
 import { SignalTrendSparkline } from './SignalTrendSparkline';
 import { useT, useLocale } from '@/lib/i18n';
-import { AssistantPromptSuggestions } from '@/features/onboarding';
+import { AssistantPromptSuggestions, useOnboardingStore } from '@/features/onboarding';
 
 export const SignalWorkspacePanel = () => {
   const t = useT();
@@ -16,6 +16,13 @@ export const SignalWorkspacePanel = () => {
   const { isOpen, activeSignalKey, closeWorkspace } = useSignalWorkspace();
   const { data: signal, isLoading } = useSignalByKeyQuery(activeSignalKey || '');
   const { mutate: updateStatus } = useUpdateSignalStatusMutation();
+  const completeMilestone = useOnboardingStore((s) => s.completeMilestone);
+
+  useEffect(() => {
+    if (isOpen && activeSignalKey) {
+      completeMilestone('signal_reviewed');
+    }
+  }, [isOpen, activeSignalKey, completeMilestone]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -30,6 +37,7 @@ export const SignalWorkspacePanel = () => {
   const handleUpdateStatus = (status: 'REVIEWED' | 'INVESTIGATING' | 'SNOOZED' | 'RESOLVED') => {
     if (activeSignalKey) {
       updateStatus({ key: activeSignalKey, payload: { status } });
+      completeMilestone('first_action');
       if (status === 'RESOLVED') closeWorkspace();
     }
   };

@@ -95,7 +95,7 @@ export const DashboardPage = () => {
       {hasNoData ? (
         <NoDataEmpty 
           onAddTransaction={() => openQuickAdd('EXPENSE')}
-          onImport={() => {/* navigate to import */}}
+          onImport={() => navigate('/app/import')}
         />
       ) : (
         <>

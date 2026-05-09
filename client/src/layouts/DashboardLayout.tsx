@@ -28,12 +28,14 @@ import { cn } from '@/lib/utils';
 import { QuickAddModal } from '@/features/transactions/QuickAddModal';
 import { AlertCenter } from '@/features/alerts/AlertCenter';
 import { AlertToastWatcher } from '@/features/alerts/AlertToastWatcher';
+import { AssistantDrawer, useAssistantStore } from '@/features/onboarding';
 import type { TransactionType } from '@/types/domain';
 
 export const DashboardLayout = () => {
   const t = useT();
   const navigate = useNavigate();
   const { theme, language, toggleTheme, setLanguage } = useUiStore();
+  const { openAssistant } = useAssistantStore();
   const { data: user } = useCurrentUser();
   const logout = useLogout();
   const [quickOpen, setQuickOpen] = useState(false);
@@ -121,25 +123,35 @@ export const DashboardLayout = () => {
         </div>
 
         <nav aria-label={t('nav.dashboard')} className="flex-1 space-y-1">
-          {navItems.map(({ to, label, icon: Icon, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              onClick={() => setNavOpen(false)}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-quintessential focus-ring',
-                  isActive
-                    ? 'bg-surface-lowest text-ink shadow-ambient'
-                    : 'text-ink-muted hover:text-ink hover:bg-surface-lowest/60',
-                )
-              }
-            >
-              <Icon size={18} strokeWidth={1.5} aria-hidden />
-              {label}
-            </NavLink>
-          ))}
+          {navItems.map(({ to, label, icon: Icon, end }) => {
+            const isAssistant = to === '/app/assistant';
+            
+            return (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                onClick={(e) => {
+                  if (isAssistant) {
+                    e.preventDefault();
+                    openAssistant();
+                  }
+                  setNavOpen(false);
+                }}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-quintessential focus-ring',
+                    isActive && !isAssistant
+                      ? 'bg-surface-lowest text-ink shadow-ambient'
+                      : 'text-ink-muted hover:text-ink hover:bg-surface-lowest/60',
+                  )
+                }
+              >
+                <Icon size={18} strokeWidth={1.5} aria-hidden />
+                {label}
+              </NavLink>
+            );
+          })}
         </nav>
       </aside>
 
@@ -277,6 +289,7 @@ export const DashboardLayout = () => {
       />
 
       <AlertToastWatcher />
+      <AssistantDrawer />
     </div>
   );
 };

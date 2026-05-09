@@ -1,7 +1,5 @@
-// ─── Flow ─────────────────────────────────────────────────────────────────
+// ─── Onboarding ───────────────────────────────────────────────────────────
 export { OnboardingFlow } from './components/OnboardingFlow';
-
-// ─── Activation ───────────────────────────────────────────────────────────
 export { ActivationChecklist } from './components/ActivationChecklist';
 export { ActivationProgressTracker } from './components/ActivationProgressTracker';
 
@@ -15,24 +13,12 @@ export {
   NoTrendsEmpty,
 } from './components/EmptyStatePanel';
 
-// ─── Signal ───────────────────────────────────────────────────────────────
-export { SignalSpotlightCard } from './components/SignalSpotlightCard';
-
 // ─── Guidance & Assistant ─────────────────────────────────────────────────
 export { AssistantPromptSuggestions } from './components/AssistantPromptSuggestions';
+export { AssistantDrawer } from './components/AssistantDrawer';
+export { useAssistantStore } from './store/assistant-store';
 export { OperationalGuidanceCard } from './components/OperationalGuidanceCard';
 
 // ─── Store ────────────────────────────────────────────────────────────────
-export {
-  useOnboardingStore,
-  useNeedsOnboarding,
-  useActivationProgress,
-} from './store/onboarding-store';
-
-export type {
-  OnboardingStage,
-  ActivationMilestone,
-  OperationalGoal,
-  DataSource,
-  BusinessContext,
-} from './store/onboarding-store';
+export { useOnboardingStore } from './store/onboarding-store';
+export type { OnboardingStage, MilestoneKey } from './store/onboarding-store';

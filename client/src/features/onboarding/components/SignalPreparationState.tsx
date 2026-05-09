@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, BarChart3, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useT } from '@/lib/i18n';
+import { useRecomputeSignalsMutation } from '@/features/signals/hooks/useSignalsQuery';
 import { cn } from '@/lib/utils';
 
 interface SignalPreparationStateProps {
@@ -19,6 +20,12 @@ export const SignalPreparationState = ({ onReady }: SignalPreparationStateProps)
   const t = useT();
   const [stageIdx, setStageIdx] = useState(0);
   const [progress, setProgress] = useState(0);
+  const { mutate: recompute } = useRecomputeSignalsMutation();
+
+  useEffect(() => {
+    // Trigger real computation in background
+    recompute();
+  }, [recompute]);
 
   useEffect(() => {
     const totalMs = STAGES.reduce((a, s) => a + s.durationMs, 0);

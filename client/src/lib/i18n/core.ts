@@ -205,6 +205,10 @@ const en: Dict = {
   'assistant.priority.normal': 'Heads up',
   'assistant.refresh': 'Refresh',
   'assistant.generatedAt': 'Updated {time}',
+  'assistant.status.online': 'AI Assistant Online',
+  'assistant.clear': 'Clear history',
+  'assistant.input.placeholder': 'Ask your assistant anything...',
+  'assistant.disclaimer': 'BizLens AI can make mistakes. Please verify important financial decisions.',
 
   'budgets.title': 'Category Budgets',
   'budgets.subtitle': 'Set monthly caps per expense category.',
@@ -494,6 +498,10 @@ const ar: Dict = {
   'assistant.priority.normal': 'تنويه',
   'assistant.refresh': 'تحديث',
   'assistant.generatedAt': 'آخر تحديث {time}',
+  'assistant.status.online': 'المساعد الذكي متصل',
+  'assistant.clear': 'مسح السجل',
+  'assistant.input.placeholder': 'اسأل مساعدك أي شيء...',
+  'assistant.disclaimer': 'قد يخطئ ذكاء بيزلنز الاصطناعي. يرجى التحقق من القرارات المالية الهامة.',
 
   'budgets.title': 'ميزانيات الفئات',
   'budgets.subtitle': 'حدد سقفًا شهريًا لكل فئة مصروفات.',
