@@ -2,14 +2,26 @@ node_modules/
 dist/
 build/
 .next/
-.env
-.env.local
-.env.production
-*.log
-.DS_Store
 .turbo/
 coverage/
 .vscode/
 .idea/
+*.log
+.DS_Store
 *.tsbuildinfo
-project-audit/BIZLENS_FULL_AUDIT_REPORT.md
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Tooling
+.claude
+.gemini
+artifacts/
+brain/
+scratch/
+
+# OS files
+Thumbs.db
+desktop.ini
