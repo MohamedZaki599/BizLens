@@ -13,6 +13,7 @@ import { SettingsPage } from '@/pages/SettingsPage';
 import { AssistantPage } from '@/pages/AssistantPage';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
+import { OnboardingFlow } from '@/features/onboarding';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,7 +27,7 @@ const queryClient = new QueryClient({
 
 export const App = () => (
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route
           path="/login"
@@ -42,6 +43,15 @@ export const App = () => (
             <PublicOnlyRoute>
               <RegisterPage />
             </PublicOnlyRoute>
+          }
+        />
+
+        <Route
+          path="/onboarding"
+          element={
+            <ProtectedRoute>
+              <OnboardingFlow />
+            </ProtectedRoute>
           }
         />
 
