@@ -1,0 +1,17 @@
+node_modules
+dist
+build
+.next
+.env
+.env.*
+!.env.example
+*.log
+.git
+.github
+.vscode
+.idea
+.claude
+client
+marketing
+coverage
+*.md

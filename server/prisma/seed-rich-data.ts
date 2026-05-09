@@ -19,8 +19,7 @@
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import { addDays, startOfDay, subDays, subMonths } from 'date-fns';
-import { Prisma, type UserMode } from '@prisma/client';
-import { prisma } from '../src/config/prisma';
+import { Prisma, type UserMode, prisma } from '@bizlens/database';
 
 
 // ─── Deterministic randomness ─────────────────────────────────────────────

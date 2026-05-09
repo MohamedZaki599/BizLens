@@ -1,6 +1,5 @@
-import { Prisma } from '@prisma/client';
 import { format, startOfMonth, subMonths } from 'date-fns';
-import { prisma } from '../../config/prisma';
+import { prisma } from '@bizlens/database';
 import { toSafeNumber } from '../../utils/safe-math';
 
 /**
@@ -47,7 +46,7 @@ export const detectSubscriptions = async (userId: string) => {
   const buckets = new Map<string, Bucket>();
 
   for (const t of txns) {
-    const amt = toSafeNumber(t.amount as unknown as Prisma.Decimal);
+    const amt = toSafeNumber(t.amount);
     if (amt < MIN_AMOUNT) continue;
     const bucket = Math.round(amt * 20) / 20;
     const key = `${t.categoryId}:${bucket}:${(t.description ?? '').toLowerCase().trim()}`;

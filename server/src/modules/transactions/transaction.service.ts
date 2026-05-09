@@ -1,5 +1,4 @@
-import { Prisma } from '@prisma/client';
-import { prisma } from '../../config/prisma';
+import { Prisma, prisma } from '@bizlens/database';
 import { HttpError } from '../../utils/http-error';
 import { evaluateInBackground } from '../../services/alert-engine/alert-engine';
 import type {

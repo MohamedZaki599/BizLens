@@ -1,4 +1,4 @@
-import type { TransactionType, UserMode } from '@prisma/client';
+import type { TransactionType, UserMode } from '@bizlens/database';
 
 export interface DefaultCategorySeed {
   name: string;

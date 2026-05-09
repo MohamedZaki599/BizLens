@@ -1,7 +1,6 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, prisma } from '@bizlens/database';
 import { z } from 'zod';
 import { endOfMonth, startOfMonth, subMonths } from 'date-fns';
-import { prisma } from '../../config/prisma';
 import { HttpError } from '../../utils/http-error';
 import { toSafeNumber } from '../../utils/safe-math';
 

@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { Upload, FileSpreadsheet, CheckCircle, AlertCircle } from 'lucide-react';
 import Papa from 'papaparse';
 import toast from 'react-hot-toast';
-import { useImportTransactions } from '@/features/dashboard/useWidgets';
+import { useImportTransactions } from '@/features/dashboard/hooks/useDashboardMutations';
 import { useCategories } from '@/features/categories/useCategories';
 import { useT, useTi } from '@/lib/i18n';
 import { Button } from '@/components/Button';

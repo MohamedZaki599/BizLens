@@ -1,5 +1,5 @@
 import { CreditCard, RefreshCw, Inbox, ArrowUpDown } from 'lucide-react';
-import { useSubscriptions } from '@/features/dashboard/useWidgets';
+import { useSubscriptions } from '@/features/dashboard/hooks/useDashboardQuery';
 import { useT, useTi } from '@/lib/i18n';
 import { Skeleton } from '@/components/Skeleton';
 import { useFormatCurrency } from '@/lib/format';

@@ -7,7 +7,7 @@ import {
   subMonths,
   subWeeks,
 } from 'date-fns';
-import { prisma } from '../../config/prisma';
+import { prisma } from '@bizlens/database';
 import {
   formatMoney,
   formatPctChange,

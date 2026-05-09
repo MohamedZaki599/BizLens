@@ -1,6 +1,7 @@
-import { createApp } from './app';
 import { env } from './config/env';
+import { createApp } from './app';
 import { logger } from './config/logger';
+import { disconnect } from '@bizlens/database';
 
 const app = createApp();
 
@@ -13,13 +14,18 @@ const server = app.listen(env.PORT, () => {
 
 const shutdown = (signal: NodeJS.Signals) => {
   logger.info('server-shutdown', { signal });
-  server.close((err) => {
+  server.close(async (err) => {
     if (err) {
       logger.error('server-shutdown-error', { message: err.message });
-      process.exit(1);
     }
-    process.exit(0);
+    await disconnect();
+    process.exit(err ? 1 : 0);
   });
+
+  setTimeout(() => {
+    logger.error('server-shutdown-timeout', { signal });
+    process.exit(1);
+  }, 10_000).unref();
 };
 
 process.on('SIGINT', shutdown);

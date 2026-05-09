@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@bizlens/database';
 
 /**
  * Decimal-/null-/NaN-/Infinity-safe number coercion.

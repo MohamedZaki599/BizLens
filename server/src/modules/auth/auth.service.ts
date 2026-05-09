@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { prisma } from '../../config/prisma';
+import { prisma } from '@bizlens/database';
 import { HttpError } from '../../utils/http-error';
 import { DEFAULT_CATEGORIES } from '../categories/category.defaults';
 import type { LoginInput, RegisterInput } from './auth.schemas';

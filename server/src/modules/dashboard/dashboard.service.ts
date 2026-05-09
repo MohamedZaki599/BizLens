@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, prisma } from '@bizlens/database';
 import {
   endOfMonth,
   endOfWeek,
@@ -8,7 +8,6 @@ import {
   subMonths,
   subWeeks,
 } from 'date-fns';
-import { prisma } from '../../config/prisma';
 import {
   formatMoney,
   percentChange,

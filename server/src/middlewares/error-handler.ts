@@ -1,6 +1,6 @@
 import type { ErrorRequestHandler } from 'express';
 import { ZodError } from 'zod';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@bizlens/database';
 import { HttpError } from '../utils/http-error';
 import { env } from '../config/env';
 import { logger } from '../config/logger';

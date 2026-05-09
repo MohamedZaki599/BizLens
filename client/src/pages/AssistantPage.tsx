@@ -10,8 +10,8 @@ import {
   TrendingDown,
   type LucideIcon,
 } from 'lucide-react';
-import { useAssistantDigest } from '@/features/dashboard/useWidgets';
-import type { AssistantNote, AssistantTone } from '@/features/dashboard/widgets.api';
+import { useAssistantDigest } from '@/features/dashboard/hooks/useDashboardQuery';
+import type { AssistantNote, AssistantTone } from '@/features/dashboard/api/widgets.api';
 import { Button } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { Skeleton } from '@/components/Skeleton';

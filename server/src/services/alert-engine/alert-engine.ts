@@ -1,9 +1,9 @@
 import {
   AlertSeverity,
   AlertType,
-  Prisma,
   type Alert,
-} from '@prisma/client';
+  prisma,
+} from '@bizlens/database';
 import {
   differenceInCalendarDays,
   endOfMonth,
@@ -15,7 +15,6 @@ import {
   subMonths,
   subWeeks,
 } from 'date-fns';
-import { prisma } from '../../config/prisma';
 import { logger } from '../../config/logger';
 import {
   formatMoney,
@@ -365,7 +364,7 @@ const ruleRecurringDetected = async (userId: string, now: Date): Promise<DraftAl
   // Group by (categoryId, rounded amount bucket).
   const buckets = new Map<string, { name: string; categoryId: string; months: Set<string>; amount: number }>();
   for (const t of txns) {
-    const amt = toSafeNumber(t.amount as unknown as Prisma.Decimal);
+    const amt = toSafeNumber(t.amount);
     if (amt < 5) continue;
     // Bucket amounts into ~5% bins.
     const bucket = Math.round(amt / Math.max(1, amt * 0.05));

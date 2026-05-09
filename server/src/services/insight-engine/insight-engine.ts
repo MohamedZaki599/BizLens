@@ -6,8 +6,8 @@ import {
   subMonths,
   subWeeks,
 } from 'date-fns';
-import type { Prisma } from '@prisma/client';
-import { prisma } from '../../config/prisma';
+import type { Prisma } from '@bizlens/database';
+import { prisma } from '@bizlens/database';
 import {
   formatMoney,
   formatPctChange,

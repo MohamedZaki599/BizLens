@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { prisma } from '../../config/prisma';
+import { prisma } from '@bizlens/database';
 import { requireAuth } from '../../middlewares/auth';
 import { validate } from '../../middlewares/validate';
 import { asyncHandler } from '../../utils/async-handler';

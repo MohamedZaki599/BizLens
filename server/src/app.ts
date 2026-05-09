@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { env } from './config/env';
+import { pool } from '@bizlens/database';
 import { logger } from './config/logger';
 import { errorHandler } from './middlewares/error-handler';
 import { notFoundHandler } from './middlewares/not-found';
@@ -14,9 +15,13 @@ import transactionRoutes from './modules/transactions/transaction.routes';
 import dashboardRoutes from './modules/dashboard/dashboard.routes';
 import userRoutes from './modules/users/users.routes';
 import alertRoutes from './modules/alerts/alerts.routes';
+import { initIntelligence } from './intelligence';
 
 export const createApp = () => {
   const app = express();
+
+  // Initialize intelligence event handlers
+  initIntelligence();
 
   app.set('trust proxy', 1);
   app.use(requestId);
@@ -48,7 +53,36 @@ export const createApp = () => {
     );
   }
 
-  app.get('/health', (_req, res) => res.json({ ok: true, env: env.NODE_ENV }));
+  app.get('/health', async (_req, res) => {
+    const start = Date.now();
+    try {
+      await pool.query('SELECT 1');
+      res.json({
+        status: 'ok',
+        env: env.NODE_ENV,
+        uptime: process.uptime(),
+        db: {
+          connected: true,
+          latencyMs: Date.now() - start,
+          pool: {
+            total: pool.totalCount,
+            idle: pool.idleCount,
+            waiting: pool.waitingCount,
+          },
+        },
+      });
+    } catch (err) {
+      res.status(503).json({
+        status: 'degraded',
+        env: env.NODE_ENV,
+        uptime: process.uptime(),
+        db: {
+          connected: false,
+          error: err instanceof Error ? err.message : 'Unknown error',
+        },
+      });
+    }
+  });
 
   app.use('/api/v1/auth', authRoutes);
   app.use('/api/v1/users', userRoutes);

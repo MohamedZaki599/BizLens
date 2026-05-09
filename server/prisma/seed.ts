@@ -4,7 +4,7 @@
  */
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
-import { prisma } from '../src/config/prisma';
+import { prisma } from '@bizlens/database';
 import { DEFAULT_CATEGORIES } from '../src/modules/categories/category.defaults';
 
 

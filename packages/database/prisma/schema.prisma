@@ -1,0 +1,209 @@
+// BizLens database schema
+// Source-of-truth for all financial data models.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  userMode     UserMode @default(FREELANCER)
+  language     String   @default("en")
+  theme        String   @default("light")
+  currency     String   @default("USD")
+
+  lastActivityAt      DateTime?
+  notificationsSeenAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions Transaction[]
+  categories   Category[]
+  alerts       Alert[]
+  budgets      Budget[]
+}
+
+/// Monthly budget cap per expense category.
+model Budget {
+  id         String  @id @default(uuid())
+  userId     String
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  amount     Decimal  @db.Decimal(12, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, categoryId])
+  @@index([userId])
+}
+
+model Category {
+  id        String          @id @default(uuid())
+  name      String
+  type      TransactionType
+  isDefault Boolean         @default(false)
+  color     String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
+  budgets      Budget[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, userId, type])
+  @@index([userId])
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  amount      Decimal         @db.Decimal(12, 2)
+  type        TransactionType
+  date        DateTime
+  description String?
+
+  userId     String
+  categoryId String
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([date])
+  @@index([userId])
+  @@index([userId, date])
+}
+
+/// A persisted, user-scoped alert produced by the Alert Engine.
+/// `dedupeKey` is a stable hash that prevents the same rule from spamming
+/// the user with duplicate alerts within the same evaluation window.
+model Alert {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type      AlertType
+  severity  AlertSeverity @default(INFO)
+  title     String
+  message   String        @db.Text
+  /// JSON-encoded action payload: { label, type, payload: { ... } }.
+  actionJson String?      @db.Text
+  /// Stable identifier for dedup within an evaluation window (e.g.
+  /// "spend-spike:cat-id:2026-04-w16"). Uniqueness is per-user.
+  dedupeKey String
+
+  isRead     Boolean   @default(false)
+  isDismissed Boolean  @default(false)
+  /// When the alert becomes irrelevant (auto-hidden in the UI).
+  expiresAt  DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, isRead, isDismissed])
+  @@index([userId, createdAt])
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum UserMode {
+  FREELANCER
+  ECOMMERCE
+  SERVICE_BUSINESS
+}
+
+enum AlertType {
+  SPEND_SPIKE_CATEGORY
+  EXPENSES_EXCEED_INCOME
+  PROFIT_DROP
+  CATEGORY_CONCENTRATION
+  WEEKLY_SPEND_INCREASE
+  STALE_DATA
+  RECURRING_DETECTED
+  FORECAST_OVERSPEND
+  WEEKLY_SUMMARY
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+// ─── Intelligence / Signal Engine ─────────────────────────────────────────
+
+/// A computed financial signal persisted by the Signal Engine.
+/// Each (userId, key) pair is unique — updated on every recomputation.
+model FinancialSignal {
+  id          String          @id @default(uuid())
+  userId      String
+  key         String                                   /// e.g. 'PROFIT_MARGIN'
+  value       Float
+  severity    SignalSeverity  @default(NONE)
+  trend       SignalTrend     @default(UNKNOWN)
+  confidence  Float           @default(1.0)
+  metadata    Json            @default("{}")
+  ttlCategory String          @default("dashboard")   /// 'dashboard' | 'alert' | 'analytical'
+  generatedAt DateTime        @default(now())
+  expiresAt   DateTime?
+
+  @@unique([userId, key])
+  @@index([userId])
+  @@index([userId, generatedAt])
+}
+
+/// Full snapshot of all signals at a point in time — kept for 30 days.
+model SignalSnapshot {
+  id        String   @id @default(uuid())
+  userId    String
+  signals   Json                                       /// Full FinancialSignal[] array
+  computeMs Int                                        /// Computation duration in ms
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+/// Configurable thresholds for signal severity and alert generation.
+/// Supports: system defaults → business-type presets → (future) user overrides.
+model IntelligenceThreshold {
+  id          String    @id @default(uuid())
+  key         String                                   /// e.g. 'SPEND_SPIKE_WARNING_PCT'
+  value       Float
+  userMode    UserMode?                                /// null = applies to all business types
+  description String?
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([key, userMode])
+  @@index([userMode])
+}
+
+enum SignalSeverity {
+  NONE
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum SignalTrend {
+  UP
+  DOWN
+  FLAT
+  UNKNOWN
+}

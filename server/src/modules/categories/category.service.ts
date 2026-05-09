@@ -1,5 +1,5 @@
-import type { TransactionType } from '@prisma/client';
-import { prisma } from '../../config/prisma';
+import type { TransactionType } from '@bizlens/database';
+import { prisma } from '@bizlens/database';
 import { HttpError } from '../../utils/http-error';
 
 interface CreateInput {

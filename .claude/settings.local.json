@@ -1,0 +1,15 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://agentrouter.org/",
+    "ANTHROPIC_API_KEY": "sk-RHrzuC5pXosxKGQJyu2aSppjS8PHkA5aq4cY5BNNaROaHhQ0",
+    "ANTHROPIC_MODEL": "claude-opus-4-6"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npx tsc *)",
+      "Bash(npx prisma *)",
+      "Bash(npm install *)"
+    ]
+  }
+}

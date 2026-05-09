@@ -1,7 +1,6 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, prisma } from '@bizlens/database';
 import { endOfDay, startOfDay } from 'date-fns';
 import { z } from 'zod';
-import { prisma } from '../../config/prisma';
 import { HttpError } from '../../utils/http-error';
 
 /** Hard cap to keep a single import bounded in memory. */

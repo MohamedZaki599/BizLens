@@ -4,12 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { Plus, Trash2, Wallet, AlertTriangle } from 'lucide-react';
-import {
-  useBudgets,
-  useBudgetSuggestions,
-  useCreateBudget,
-  useDeleteBudget,
-} from '@/features/dashboard/useWidgets';
+import { useBudgets, useBudgetSuggestions } from '@/features/dashboard/hooks/useDashboardQuery';
+import { useCreateBudget, useDeleteBudget } from '@/features/dashboard/hooks/useDashboardMutations';
 import { useCategories } from '@/features/categories/useCategories';
 import { Button } from '@/components/Button';
 import { Modal } from '@/components/Modal';
@@ -22,7 +18,7 @@ import { useT, useTi } from '@/lib/i18n';
 import { useFormatCurrency } from '@/lib/format';
 import { extractErrorMessage } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import type { BudgetItem } from '@/features/dashboard/widgets.api';
+import type { BudgetItem } from '@/features/dashboard/api/widgets.api';
 
 const Schema = z.object({
   categoryId: z.string().uuid(),
