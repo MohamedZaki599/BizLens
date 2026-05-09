@@ -1,0 +1,612 @@
+import type { Language } from '@/types/domain';
+import { useUiStore } from '@/store/ui-store';
+import { financialTermsEn, financialTermsAr } from './terminology/financial';
+import { signalMessagesEn, signalMessagesAr } from './messages/signals';
+import { onboardingEn, onboardingAr } from './messages/onboarding';
+
+type Dict = Record<string, string>;
+
+const en: Dict = {
+  'app.name': 'BizLens',
+  'app.tagline': 'Financial clarity, instantly.',
+
+  'nav.dashboard': 'Dashboard',
+  'nav.transactions': 'Transactions',
+  'nav.categories': 'Categories',
+  'nav.settings': 'Settings',
+  'nav.signOut': 'Sign out',
+
+  'auth.login.title': 'Welcome back',
+  'auth.login.subtitle': 'Sign in to your BizLens account.',
+  'auth.login.submit': 'Sign in',
+  'auth.login.toRegister': "Don't have an account?",
+  'auth.login.toRegisterCta': 'Create one',
+
+  'auth.register.title': 'Start your clarity',
+  'auth.register.subtitle': 'Create your BizLens account in seconds.',
+  'auth.register.submit': 'Create account',
+  'auth.register.toLogin': 'Already have an account?',
+  'auth.register.toLoginCta': 'Sign in',
+  'auth.register.userMode': 'I am a',
+  'auth.register.modes.FREELANCER': 'Freelancer',
+  'auth.register.modes.ECOMMERCE': 'E-commerce store',
+  'auth.register.modes.SERVICE_BUSINESS': 'Service business',
+
+  'fields.name': 'Name',
+  'fields.email': 'Email',
+  'fields.password': 'Password',
+  'fields.amount': 'Amount',
+  'fields.date': 'Date',
+  'fields.category': 'Category',
+  'fields.description': 'Description',
+  'fields.description.placeholder': 'What was this for? (optional)',
+  'fields.type': 'Type',
+  'fields.color': 'Color',
+  'type.INCOME': 'Income',
+  'type.EXPENSE': 'Expense',
+
+  'dashboard.title': 'Dashboard',
+  'dashboard.subtitle': 'Your financial pulse — at a glance.',
+  'dashboard.greeting': 'Hi',
+  'dashboard.totalIncome': 'Total income',
+  'dashboard.totalExpense': 'Total expenses',
+  'dashboard.netProfit': 'Net profit',
+  'dashboard.margin': 'Margin',
+  'dashboard.txnCount': 'Transactions',
+  'dashboard.noInsights': 'Log a few transactions to unlock insights.',
+  'dashboard.insights.label': 'Smart insight',
+  'dashboard.range.label': 'Time range',
+  'dashboard.range.this_month': 'This month',
+  'dashboard.range.last_month': 'Last month',
+  'dashboard.range.last_30_days': 'Last 30 days',
+  'dashboard.range.all': 'All time',
+  'dashboard.biggestExpense': 'Biggest expense',
+  'dashboard.biggestIncome': 'Top income source',
+  'dashboard.breakdown.empty': 'Not enough data for this period yet.',
+  'dashboard.recent': 'Recent activity',
+  'dashboard.recent.empty': 'No recent transactions.',
+
+  'mode.freelancer.headline': "here's your income & cash flow snapshot.",
+  'mode.freelancer.tip':
+    'Tip: Log invoices as INCOME the day they\'re paid to keep your cash-flow chart accurate.',
+  'mode.ecommerce.headline': "here's how your spend is shaping margins.",
+  'mode.ecommerce.tip':
+    'Tip: Tag ads, fulfillment, and shipping into separate categories to spot margin leaks.',
+  'mode.business.headline': "here's how your business is performing.",
+  'mode.business.tip':
+    'Tip: Compare profit changes month-over-month to catch operational drift early.',
+
+  'transactions.title': 'Transactions',
+  'transactions.subtitle': 'Every dollar in and out.',
+  'transactions.empty.title': 'No transactions yet',
+  'transactions.empty.subtitle': 'Use Quick Add to log your first transaction.',
+  'transactions.empty.filtered': 'No transactions match the current filters.',
+  'transactions.empty.cta': 'Add your first transaction',
+  'transactions.quickAdd': 'Quick Add',
+  'transactions.add.title': 'Add a transaction',
+  'transactions.add.subtitle': 'Logged in seconds — searchable forever.',
+  'transactions.delete.confirm': 'Delete this transaction?',
+  'transactions.delete.description':
+    "This action can't be undone. The transaction will be permanently removed from your records.",
+  'transactions.allCategories': 'All categories',
+  'transactions.filteredBy': 'Filtered by',
+
+  'quickAdd.selectCategory': 'Select a category',
+  'quickAdd.searchCategory': 'Search categories…',
+  'quickAdd.noMatches': 'No categories match your search.',
+  'quickAdd.noCategories': 'Create a category first',
+  'quickAdd.lastUsed': 'Last used',
+
+  'categories.title': 'Categories',
+  'categories.subtitle': 'Organize income and expenses.',
+  'categories.add': 'Add category',
+  'categories.add.subtitle': 'Categories help group your transactions.',
+  'categories.namePlaceholder': 'e.g. Marketing, Subscriptions',
+  'categories.empty.title': 'No categories yet',
+  'categories.empty.subtitle': 'Create your first category to start tracking.',
+  'categories.empty.cta': 'Create category',
+  'categories.empty.income': 'No income categories yet.',
+  'categories.empty.expense': 'No expense categories yet.',
+  'categories.delete.confirm': 'Delete this category?',
+  'categories.default': 'Default',
+  'categories.custom': 'Custom',
+  'categories.income': 'Income categories',
+  'categories.expense': 'Expense categories',
+
+  'toast.transaction.added': 'Transaction added successfully',
+  'toast.transaction.deleted': 'Transaction deleted',
+  'toast.transaction.updated': 'Transaction updated',
+  'toast.category.added': 'Category created',
+  'toast.category.deleted': 'Category deleted',
+  'toast.budget.saved': 'Budget saved',
+  'toast.budget.deleted': 'Budget removed',
+  'toast.error.generic': 'Something went wrong, please try again.',
+  'toast.signedIn': 'Signed in',
+  'toast.signedOut': 'You have been signed out',
+
+  'common.cancel': 'Cancel',
+  'common.confirm': 'Confirm',
+  'common.save': 'Save',
+  'common.saving': 'Saving…',
+  'common.delete': 'Delete',
+  'common.close': 'Close',
+  'common.add': 'Add',
+  'common.adding': 'Adding…',
+  'common.loading': 'Loading…',
+  'common.error': 'Something went wrong.',
+  'common.search': 'Search…',
+  'common.view': 'View',
+  'common.all': 'All',
+  'common.clearFilters': 'Clear filters',
+
+  'alerts.label': 'Alerts',
+  'alerts.unread': 'unread',
+  'alerts.markAll': 'Mark all read',
+  'alerts.markRead': 'Mark read',
+  'alerts.dismiss': 'Dismiss',
+  'alerts.empty.title': "You're all caught up",
+  'alerts.empty.subtitle': 'New alerts will land here as your data changes.',
+
+  'widgets.leak.title': 'Biggest money leak',
+  'widgets.leak.severity': 'Money out',
+  'widgets.leak.empty': 'No unusual category spend detected — your budget is balanced.',
+  'widgets.leak.extra': 'Extra this month',
+  'widgets.leak.annualized': 'If it sticks, /yr',
+  'widgets.leak.cta': 'Inspect transactions',
+
+  'widgets.forecast.title': 'Month-end forecast',
+  'widgets.forecast.income': 'Income',
+  'widgets.forecast.expense': 'Expense',
+  'widgets.forecast.profit': 'Profit',
+  'widgets.forecast.daysLeft': 'days left in the month',
+
+  'widgets.week.title': 'This week',
+  'widgets.week.netForWeek': 'net',
+  'widgets.week.transactions': 'transactions',
+
+  'reminder.stale.title': "It's been {days} days since your last transaction.",
+  'reminder.stale.subtitle': 'Update your data to keep insights and forecasts accurate.',
+  'reminder.stale.cta': 'Add now',
+
+  'insight.severity.info': 'Insight',
+  'insight.severity.success': 'Good news',
+  'insight.severity.warning': 'Watch out',
+  'insight.severity.critical': 'Action needed',
+  'stat.noPriorData': 'No prior data',
+
+  'user.profile': 'Profile',
+  'user.mode.FREELANCER': 'Freelancer',
+  'user.mode.ECOMMERCE': 'E-commerce',
+  'user.mode.SERVICE_BUSINESS': 'Service Business',
+
+  'nav.subscriptions': 'Subscriptions',
+  'nav.budgets': 'Budgets',
+  'nav.import': 'Import',
+  'nav.assistant': 'Assistant',
+
+  'subscriptions.title': 'Subscriptions',
+  'subscriptions.subtitle': 'Recurring expenses detected automatically.',
+  'subscriptions.empty': 'No recurring expenses detected yet. Keep logging and we\'ll find them.',
+  'subscriptions.totalMonthly': 'Total monthly',
+  'subscriptions.totalAnnual': 'Total annual',
+  'subscriptions.months': '{count} months',
+  'subscriptions.cancelHint': 'Consider cancelling if unused',
+  'subscriptions.perMonth': '/mo',
+  'subscriptions.perYear': '/yr',
+
+  'assistant.title': 'Decision Assistant',
+  'assistant.subtitle':
+    'Plain-language summaries of what changed, what to look at first, and where to act.',
+  'assistant.headline': "What you should know",
+  'assistant.empty.title': 'Nothing to summarize yet',
+  'assistant.empty.subtitle':
+    'Add a few transactions and the assistant will surface what matters most.',
+  'assistant.priority.high': 'Worth your attention',
+  'assistant.priority.normal': 'Heads up',
+  'assistant.refresh': 'Refresh',
+  'assistant.generatedAt': 'Updated {time}',
+
+  'budgets.title': 'Category Budgets',
+  'budgets.subtitle': 'Set monthly caps per expense category.',
+  'budgets.empty': 'No budgets set yet. Add one to start tracking spend limits.',
+  'budgets.add': 'Set budget',
+  'budgets.used': '{pct}% used',
+  'budgets.remaining': '{amount} remaining',
+  'budgets.exceeded': 'Over budget!',
+  'budgets.amount': 'Monthly budget',
+
+  'charts.trend.title': '12-month trend',
+  'charts.composition.title': 'Expense breakdown',
+  'charts.income': 'Income',
+  'charts.expense': 'Expense',
+
+  'import.title': 'Import transactions',
+  'import.subtitle': 'Upload a CSV file to bulk-import transactions.',
+  'import.upload': 'Choose CSV file',
+  'import.preview': 'Preview ({count} rows)',
+  'import.mapColumns': 'Map your CSV columns',
+  'import.importing': 'Importing…',
+  'import.success': '{count} transactions imported successfully',
+  'import.empty': 'No valid rows found in your CSV.',
+  'import.submit': 'Import {count} transactions',
+  'import.skipped': '{skipped} of {total} rows were skipped (invalid amount, date, or missing category).',
+  'import.skipDuplicates.label': 'Skip duplicates',
+  'import.skipDuplicates.help':
+    'Skip rows that already exist with the same category, amount, and day.',
+  'import.duplicates': '{count} duplicate rows were skipped.',
+
+  'notifications.permission': 'Enable browser notifications for critical alerts.',
+  'notifications.enable': 'Enable',
+  'notifications.enabled': 'Notifications enabled',
+
+  'categories.delete.title': 'Delete this category?',
+  'categories.delete.description':
+    'Categories with transactions cannot be deleted. Move or delete its transactions first.',
+
+  'settings.title': 'Settings',
+  'settings.subtitle': 'Manage your profile and preferences.',
+  'settings.profile': 'Profile',
+  'settings.profile.subtitle': 'How your account is identified.',
+  'settings.profile.name': 'Display name',
+  'settings.profile.email': 'Email',
+  'settings.profile.userMode': 'I run a',
+  'settings.profile.save': 'Save profile',
+  'settings.profile.saved': 'Profile updated',
+  'settings.appearance': 'Appearance',
+  'settings.appearance.subtitle': 'Personalize how BizLens looks and reads.',
+  'settings.theme': 'Theme',
+  'settings.theme.light': 'Light',
+  'settings.theme.dark': 'Dark',
+  'settings.language': 'Language',
+  'settings.language.en': 'English',
+  'settings.language.ar': 'العربية',
+  'settings.currency': 'Currency',
+  'settings.currency.helper': 'Used to format every amount across the app.',
+  'settings.danger': 'Account',
+  'settings.danger.signOut': 'Sign out of this device',
+
+  'dashboard.empty.title': 'Your dashboard will come alive here.',
+  'dashboard.empty.subtitle':
+    'Log a few transactions and BizLens will reveal trends, leaks, and forecasts automatically.',
+  'dashboard.empty.cta': 'Add your first transaction',
+
+  'budgets.empty.title': 'Set your first budget',
+  'budgets.empty.subtitle':
+    'Pick an expense category and we\'ll track it against your monthly cap automatically.',
+  'budgets.empty.cta': 'Set a budget',
+  'budgets.totalCap': 'Total monthly cap',
+  'budgets.totalUsed': 'Used so far',
+  'budgets.overBudgetCount': '{count} over budget',
+  'budgets.delete.title': 'Remove budget for',
+  'budgets.delete.description': "We'll stop tracking this category against a cap, but we won't change any transactions.",
+  'budgets.suggested': 'Suggested cap based on the last 3 months',
+  'budgets.add.subtitle': 'Pick an expense category and a monthly cap.',
+  'budgets.amountPlaceholder': '0.00',
+  'budgets.noCategoryAvailable':
+    'Every expense category already has a budget. Edit existing ones to update caps.',
+  'budgets.suggestions.title': 'Suggested budgets',
+  'budgets.suggestions.subtitle':
+    'Caps padded ~10% above your 3-month average — tweak before saving.',
+  'budgets.suggestions.add': 'Add suggestion',
+  'budgets.suggestions.average': 'Avg {amount}/mo',
+  'dashboard.historicalTrends': 'Historical Trends',
+  ...financialTermsEn,
+  ...signalMessagesEn,
+  ...onboardingEn,
+};
+
+const ar: Dict = {
+  'app.name': 'بيزلنز',
+  'app.tagline': 'وضوح مالي فوري.',
+
+  'nav.dashboard': 'لوحة التحكم',
+  'nav.transactions': 'المعاملات',
+  'nav.categories': 'الفئات',
+  'nav.settings': 'الإعدادات',
+  'nav.signOut': 'تسجيل الخروج',
+
+  'auth.login.title': 'مرحبًا بعودتك',
+  'auth.login.subtitle': 'سجّل الدخول إلى حسابك.',
+  'auth.login.submit': 'تسجيل الدخول',
+  'auth.login.toRegister': 'ليس لديك حساب؟',
+  'auth.login.toRegisterCta': 'أنشئ حسابًا',
+
+  'auth.register.title': 'ابدأ رحلتك',
+  'auth.register.subtitle': 'أنشئ حسابك في ثوانٍ.',
+  'auth.register.submit': 'إنشاء حساب',
+  'auth.register.toLogin': 'لديك حساب بالفعل؟',
+  'auth.register.toLoginCta': 'تسجيل الدخول',
+  'auth.register.userMode': 'أنا',
+  'auth.register.modes.FREELANCER': 'مستقل',
+  'auth.register.modes.ECOMMERCE': 'متجر إلكتروني',
+  'auth.register.modes.SERVICE_BUSINESS': 'شركة خدمات',
+
+  'fields.name': 'الاسم',
+  'fields.email': 'البريد الإلكتروني',
+  'fields.password': 'كلمة المرور',
+  'fields.amount': 'المبلغ',
+  'fields.date': 'التاريخ',
+  'fields.category': 'الفئة',
+  'fields.description': 'الوصف',
+  'fields.description.placeholder': 'لماذا هذه المعاملة؟ (اختياري)',
+  'fields.type': 'النوع',
+  'fields.color': 'اللون',
+  'type.INCOME': 'دخل',
+  'type.EXPENSE': 'مصروف',
+
+  'dashboard.title': 'لوحة التحكم',
+  'dashboard.subtitle': 'نبض أعمالك المالية في لمحة.',
+  'dashboard.greeting': 'مرحبًا',
+  'dashboard.totalIncome': 'إجمالي الدخل',
+  'dashboard.totalExpense': 'إجمالي المصروفات',
+  'dashboard.netProfit': 'صافي الربح',
+  'dashboard.margin': 'الهامش',
+  'dashboard.txnCount': 'المعاملات',
+  'dashboard.noInsights': 'سجّل بعض المعاملات لفتح الرؤى.',
+  'dashboard.insights.label': 'رؤية ذكية',
+  'dashboard.range.label': 'النطاق الزمني',
+  'dashboard.range.this_month': 'هذا الشهر',
+  'dashboard.range.last_month': 'الشهر الماضي',
+  'dashboard.range.last_30_days': 'آخر ٣٠ يومًا',
+  'dashboard.range.all': 'كل الوقت',
+  'dashboard.biggestExpense': 'أكبر مصروف',
+  'dashboard.biggestIncome': 'أعلى مصدر دخل',
+  'dashboard.breakdown.empty': 'لا توجد بيانات كافية لهذه الفترة بعد.',
+  'dashboard.recent': 'النشاط الأخير',
+  'dashboard.recent.empty': 'لا توجد معاملات حديثة.',
+
+  'mode.freelancer.headline': 'هذه لقطة سريعة عن دخلك وتدفقك النقدي.',
+  'mode.freelancer.tip':
+    'نصيحة: سجّل الفواتير كدخل في يوم استلامها لإبقاء تدفقك النقدي دقيقًا.',
+  'mode.ecommerce.headline': 'هكذا يشكّل إنفاقك هوامش الربح.',
+  'mode.ecommerce.tip':
+    'نصيحة: افصل الإعلانات والشحن والتعبئة إلى فئات لكشف تسريبات الهامش.',
+  'mode.business.headline': 'هذا أداء عملك حتى الآن.',
+  'mode.business.tip':
+    'نصيحة: قارن الأرباح شهريًا لاكتشاف الانحراف التشغيلي مبكرًا.',
+
+  'transactions.title': 'المعاملات',
+  'transactions.subtitle': 'كل دولار يدخل ويخرج.',
+  'transactions.empty.title': 'لا توجد معاملات بعد',
+  'transactions.empty.subtitle': 'استخدم الإضافة السريعة لتسجيل أول معاملة.',
+  'transactions.empty.filtered': 'لا توجد معاملات تطابق المرشحات الحالية.',
+  'transactions.empty.cta': 'أضف أول معاملة',
+  'transactions.quickAdd': 'إضافة سريعة',
+  'transactions.add.title': 'إضافة معاملة',
+  'transactions.add.subtitle': 'تُسجَّل في ثوانٍ — قابلة للبحث للأبد.',
+  'transactions.delete.confirm': 'حذف هذه المعاملة؟',
+  'transactions.delete.description':
+    'لا يمكن التراجع عن هذا الإجراء. سيتم حذف المعاملة من سجلاتك بشكل نهائي.',
+  'transactions.allCategories': 'جميع الفئات',
+  'transactions.filteredBy': 'مُصفّى بـ',
+
+  'quickAdd.selectCategory': 'اختر فئة',
+  'quickAdd.searchCategory': 'ابحث في الفئات…',
+  'quickAdd.noMatches': 'لا توجد فئات مطابقة.',
+  'quickAdd.noCategories': 'أنشئ فئة أولًا',
+  'quickAdd.lastUsed': 'آخر استخدام',
+
+  'categories.title': 'الفئات',
+  'categories.subtitle': 'نظّم الدخل والمصروفات.',
+  'categories.add': 'إضافة فئة',
+  'categories.add.subtitle': 'الفئات تساعد على تجميع معاملاتك.',
+  'categories.namePlaceholder': 'مثال: تسويق، اشتراكات',
+  'categories.empty.title': 'لا توجد فئات بعد',
+  'categories.empty.subtitle': 'أنشئ أول فئة للبدء بالتتبع.',
+  'categories.empty.cta': 'إنشاء فئة',
+  'categories.empty.income': 'لا توجد فئات دخل بعد.',
+  'categories.empty.expense': 'لا توجد فئات مصروفات بعد.',
+  'categories.delete.confirm': 'حذف هذه الفئة؟',
+  'categories.default': 'افتراضية',
+  'categories.custom': 'مخصصة',
+  'categories.income': 'فئات الدخل',
+  'categories.expense': 'فئات المصروفات',
+
+  'toast.transaction.added': 'تمت إضافة المعاملة',
+  'toast.transaction.deleted': 'تم حذف المعاملة',
+  'toast.transaction.updated': 'تم تحديث المعاملة',
+  'toast.category.added': 'تم إنشاء الفئة',
+  'toast.category.deleted': 'تم حذف الفئة',
+  'toast.budget.saved': 'تم حفظ الميزانية',
+  'toast.budget.deleted': 'تمت إزالة الميزانية',
+  'toast.error.generic': 'حدث خطأ، يرجى المحاولة مرة أخرى.',
+  'toast.signedIn': 'تم تسجيل الدخول',
+  'toast.signedOut': 'تم تسجيل خروجك',
+
+  'common.cancel': 'إلغاء',
+  'common.confirm': 'تأكيد',
+  'common.save': 'حفظ',
+  'common.saving': 'يحفظ…',
+  'common.delete': 'حذف',
+  'common.close': 'إغلاق',
+  'common.add': 'إضافة',
+  'common.adding': 'يضيف…',
+  'common.loading': 'جارٍ التحميل…',
+  'common.error': 'حدث خطأ ما.',
+  'common.search': 'بحث…',
+  'common.view': 'عرض',
+  'common.all': 'الكل',
+  'common.clearFilters': 'مسح المرشحات',
+
+  'alerts.label': 'التنبيهات',
+  'alerts.unread': 'غير مقروءة',
+  'alerts.markAll': 'تعليم الكل كمقروء',
+  'alerts.markRead': 'تعليم كمقروء',
+  'alerts.dismiss': 'إغلاق',
+  'alerts.empty.title': 'لا توجد تنبيهات جديدة',
+  'alerts.empty.subtitle': 'ستظهر التنبيهات هنا مع تغير بياناتك.',
+
+  'widgets.leak.title': 'أكبر تسريب مالي',
+  'widgets.leak.severity': 'إنفاق زائد',
+  'widgets.leak.empty': 'لم يُكتشف إنفاق غير عادي في أي فئة — ميزانيتك متوازنة.',
+  'widgets.leak.extra': 'الزيادة هذا الشهر',
+  'widgets.leak.annualized': 'إن استمر، سنويًا',
+  'widgets.leak.cta': 'مراجعة المعاملات',
+
+  'widgets.forecast.title': 'توقع نهاية الشهر',
+  'widgets.forecast.income': 'الدخل',
+  'widgets.forecast.expense': 'المصروف',
+  'widgets.forecast.profit': 'الربح',
+  'widgets.forecast.daysLeft': 'يومًا متبقيًا في الشهر',
+
+  'widgets.week.title': 'هذا الأسبوع',
+  'widgets.week.netForWeek': 'صافي',
+  'widgets.week.transactions': 'معاملات',
+
+  'reminder.stale.title': 'مرّ {days} أيام منذ آخر معاملة سجّلتها.',
+  'reminder.stale.subtitle': 'حدّث بياناتك لتبقى الرؤى والتوقعات دقيقة.',
+  'reminder.stale.cta': 'أضف الآن',
+
+  'insight.severity.info': 'رؤية',
+  'insight.severity.success': 'خبر جيد',
+  'insight.severity.warning': 'تنبيه',
+  'insight.severity.critical': 'إجراء مطلوب',
+  'stat.noPriorData': 'لا توجد بيانات سابقة',
+
+  'user.profile': 'الملف الشخصي',
+  'user.mode.FREELANCER': 'مستقل',
+  'user.mode.ECOMMERCE': 'تجارة إلكترونية',
+  'user.mode.SERVICE_BUSINESS': 'شركة خدمات',
+
+  'nav.subscriptions': 'الاشتراكات',
+  'nav.budgets': 'الميزانيات',
+  'nav.import': 'استيراد',
+  'nav.assistant': 'المساعد',
+
+  'subscriptions.title': 'الاشتراكات',
+  'subscriptions.subtitle': 'المصاريف المتكررة المكتشفة تلقائيًا.',
+  'subscriptions.empty': 'لم يتم اكتشاف مصاريف متكررة بعد. استمر بالتسجيل وسنجدها.',
+  'subscriptions.totalMonthly': 'الإجمالي الشهري',
+  'subscriptions.totalAnnual': 'الإجمالي السنوي',
+  'subscriptions.months': '{count} أشهر',
+  'subscriptions.cancelHint': 'فكّر بالإلغاء إذا لم تستخدمه',
+  'subscriptions.perMonth': '/شهر',
+  'subscriptions.perYear': '/سنة',
+
+  'assistant.title': 'المساعد الذكي',
+  'assistant.subtitle':
+    'ملخصات بلغة بسيطة لما تغيّر وما يستحق المراجعة أولًا وأين يجب التحرك.',
+  'assistant.headline': 'ما يجب أن تعرفه',
+  'assistant.empty.title': 'لا شيء للتلخيص بعد',
+  'assistant.empty.subtitle':
+    'أضف بعض المعاملات وسيُبرز المساعد ما يهم أكثر.',
+  'assistant.priority.high': 'يستحق انتباهك',
+  'assistant.priority.normal': 'تنويه',
+  'assistant.refresh': 'تحديث',
+  'assistant.generatedAt': 'آخر تحديث {time}',
+
+  'budgets.title': 'ميزانيات الفئات',
+  'budgets.subtitle': 'حدد سقفًا شهريًا لكل فئة مصروفات.',
+  'budgets.empty': 'لم تحدد ميزانيات بعد. أضف واحدة لتتبع حدود الإنفاق.',
+  'budgets.add': 'تحديد ميزانية',
+  'budgets.used': '{pct}% مستخدم',
+  'budgets.remaining': '{amount} متبقي',
+  'budgets.exceeded': 'تجاوزت الميزانية!',
+  'budgets.amount': 'الميزانية الشهرية',
+
+  'charts.trend.title': 'الاتجاه خلال ١٢ شهرًا',
+  'charts.composition.title': 'توزيع المصاريف',
+  'charts.income': 'الدخل',
+  'charts.expense': 'المصروف',
+
+  'import.title': 'استيراد المعاملات',
+  'import.subtitle': 'ارفع ملف CSV لاستيراد المعاملات بالجملة.',
+  'import.upload': 'اختر ملف CSV',
+  'import.preview': 'معاينة ({count} صف)',
+  'import.mapColumns': 'طابق أعمدة CSV الخاصة بك',
+  'import.importing': 'جارٍ الاستيراد…',
+  'import.success': 'تم استيراد {count} معاملة بنجاح',
+  'import.empty': 'لم يتم العثور على صفوف صالحة في ملف CSV.',
+  'import.submit': 'استيراد {count} معاملة',
+  'import.skipped': 'تم تخطي {skipped} من {total} صفوف (مبلغ أو تاريخ غير صالح أو فئة مفقودة).',
+  'import.skipDuplicates.label': 'تخطي التكرارات',
+  'import.skipDuplicates.help':
+    'تخطي الصفوف الموجودة مسبقًا بنفس الفئة والمبلغ واليوم.',
+  'import.duplicates': 'تم تخطي {count} صفوف مكررة.',
+
+  'notifications.permission': 'فعّل إشعارات المتصفح للتنبيهات الحرجة.',
+  'notifications.enable': 'تفعيل',
+  'notifications.enabled': 'الإشعارات مفعّلة',
+
+  'categories.delete.title': 'حذف هذه الفئة؟',
+  'categories.delete.description':
+    'لا يمكن حذف فئة بها معاملات. انقل أو احذف معاملاتها أولاً.',
+
+  'settings.title': 'الإعدادات',
+  'settings.subtitle': 'إدارة ملفك الشخصي وتفضيلاتك.',
+  'settings.profile': 'الملف الشخصي',
+  'settings.profile.subtitle': 'كيف يُعرَّف حسابك.',
+  'settings.profile.name': 'اسم العرض',
+  'settings.profile.email': 'البريد الإلكتروني',
+  'settings.profile.userMode': 'نشاطي هو',
+  'settings.profile.save': 'حفظ الملف',
+  'settings.profile.saved': 'تم تحديث الملف الشخصي',
+  'settings.appearance': 'المظهر',
+  'settings.appearance.subtitle': 'خصّص شكل وقراءة بيزلنز.',
+  'settings.theme': 'السمة',
+  'settings.theme.light': 'فاتح',
+  'settings.theme.dark': 'داكن',
+  'settings.language': 'اللغة',
+  'settings.language.en': 'الإنجليزية',
+  'settings.language.ar': 'العربية',
+  'settings.currency': 'العملة',
+  'settings.currency.helper': 'تُستخدم لتنسيق كل المبالغ في التطبيق.',
+  'settings.danger': 'الحساب',
+  'settings.danger.signOut': 'تسجيل الخروج من هذا الجهاز',
+
+  'dashboard.empty.title': 'ستنبض لوحة التحكم هنا.',
+  'dashboard.empty.subtitle':
+    'سجّل بضع معاملات وسيكشف بيزلنز الاتجاهات والتسريبات والتوقعات تلقائيًا.',
+  'dashboard.empty.cta': 'أضف أول معاملة',
+
+  'budgets.empty.title': 'حدّد أول ميزانية',
+  'budgets.empty.subtitle':
+    'اختر فئة مصروفات وسنتابعها مقابل سقفك الشهري تلقائيًا.',
+  'budgets.empty.cta': 'إضافة ميزانية',
+  'budgets.totalCap': 'إجمالي السقف الشهري',
+  'budgets.totalUsed': 'المستخدم حتى الآن',
+  'budgets.overBudgetCount': '{count} تجاوزت الميزانية',
+  'budgets.delete.title': 'إزالة ميزانية',
+  'budgets.delete.description': 'سنوقف تتبع هذه الفئة مقابل السقف، لكن لن نغيّر أي معاملة.',
+  'budgets.suggested': 'سقف مقترح بناءً على آخر ٣ أشهر',
+  'budgets.add.subtitle': 'اختر فئة مصروفات وحدّد سقفًا شهريًا.',
+  'budgets.amountPlaceholder': '٠٫٠٠',
+  'budgets.noCategoryAvailable':
+    'كل فئات المصروفات لديها ميزانية بالفعل. عدّل الميزانيات الحالية لتغيير السقف.',
+  'budgets.suggestions.title': 'ميزانيات مقترحة',
+  'budgets.suggestions.subtitle':
+    'سقوف بزيادة 10% تقريبًا فوق متوسط آخر ٣ أشهر — يمكنك تعديلها قبل الحفظ.',
+  'budgets.suggestions.add': 'إضافة الاقتراح',
+  'budgets.suggestions.average': 'متوسط {amount}/شهر',
+  'dashboard.historicalTrends': 'الاتجاهات التاريخية',
+  ...financialTermsAr,
+  ...signalMessagesAr,
+  ...onboardingAr,
+};
+
+const dictionaries: Record<Language, Dict> = { en, ar };
+
+export const t = (key: string, lang?: Language): string => {
+  const language = lang ?? useUiStore.getState().language;
+  return dictionaries[language][key] ?? dictionaries.en[key] ?? key;
+};
+
+/** Interpolate `{key}` placeholders in translation strings. */
+export const ti = (key: string, vars: Record<string, string | number>, lang?: Language): string => {
+  let str = t(key, lang);
+  for (const [k, v] of Object.entries(vars)) {
+    str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
+  }
+  return str;
+};
+
+/** React hook variant — re-renders when language changes. */
+export const useT = () => {
+  const language = useUiStore((s) => s.language);
+  return (key: string) => t(key, language);
+};
+
+export const useTi = () => {
+  const language = useUiStore((s) => s.language);
+  return (key: string, vars: Record<string, string | number>) => ti(key, vars, language);
+};
