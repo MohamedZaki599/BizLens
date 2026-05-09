@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Sparkles, Shield, Zap } from 'lucide-react';
 import { useT } from '@/lib/i18n';
 import { useUiStore } from '@/store/ui-store';
@@ -8,12 +8,12 @@ interface WelcomeScreenProps {
   onContinue: () => void;
 }
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: 0.15 + i * 0.12, duration: 0.6, ease: [0.23, 1, 0.32, 1] },
+    transition: { delay: 0.15 + i * 0.12, duration: 0.6, ease: [0.23, 1, 0.32, 1] as any },
   }),
 };
 
