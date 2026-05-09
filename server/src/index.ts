@@ -12,24 +12,9 @@ const server = app.listen(env.PORT, () => {
   });
 });
 
-const shutdown = (signal: NodeJS.Signals) => {
-  logger.info('server-shutdown', { signal });
-  server.close(async (err) => {
-    if (err) {
-      logger.error('server-shutdown-error', { message: err.message });
-    }
-    await disconnect();
-    process.exit(err ? 1 : 0);
-  });
+import { setupGracefulShutdown } from './core/shutdown';
 
-  setTimeout(() => {
-    logger.error('server-shutdown-timeout', { signal });
-    process.exit(1);
-  }, 10_000).unref();
-};
-
-process.on('SIGINT', shutdown);
-process.on('SIGTERM', shutdown);
+setupGracefulShutdown(server);
 
 process.on('unhandledRejection', (reason) => {
   logger.error('unhandled-rejection', {

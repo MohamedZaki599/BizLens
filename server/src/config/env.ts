@@ -19,7 +19,7 @@ const EnvSchema = z.object({
     .transform((v) => v === 'true'),
   CORS_ORIGINS: z
     .string()
-    .default('http://localhost:5173,http://localhost:3000')
+    .default('http://localhost:5173,http://localhost:5174,http://localhost:3000')
     .transform((s) => s.split(',').map((o) => o.trim()).filter(Boolean)),
   LOG_SLOW_QUERIES: z
     .string()

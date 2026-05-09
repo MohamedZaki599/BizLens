@@ -43,10 +43,32 @@ const createPool = (): Pool => {
 
 const createPrisma = (pool: Pool): PrismaClient => {
   const adapter = new PrismaPg(pool);
-  return new PrismaClient({
+  const client = new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
   });
+
+  // Slow-query instrumentation
+  return client.$extends({
+    query: {
+      async $allOperations({ operation, model, args, query }) {
+        const start = performance.now();
+        const result = await query(args);
+        const duration = Math.round(performance.now() - start);
+
+        if (duration > 500) {
+          console.warn(JSON.stringify({ 
+            level: 'warn', 
+            time: new Date().toISOString(), 
+            msg: `Slow Query: ${model || 'Unknown'}.${operation}`, 
+            durationMs: duration 
+          }));
+        }
+
+        return result;
+      },
+    },
+  }) as PrismaClient; // Cast to retain standard type for exports
 };
 
 export const pool = globalForPrisma.__pool ?? createPool();

@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { Modal } from './Modal';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogBody,
+  DialogFooter,
+} from '@/components/shared/ui/dialog';
 import { Button } from './Button';
 import { useT } from '@/lib/i18n';
 
@@ -17,9 +25,10 @@ interface ConfirmDialogProps {
 }
 
 /**
- * Branded confirmation dialog. Replaces `window.confirm` so destructive
- * actions match the rest of the UI, support i18n + RTL, and remain
- * accessible (focus trap, ESC, returns focus to trigger via `Modal`).
+ * Branded confirmation dialog built on the Radix Dialog primitives.
+ *
+ * Accessibility is handled by Radix: focus trap, ESC close, scroll lock,
+ * aria-labelledby/describedby, and focus restoration are all automatic.
  */
 export const ConfirmDialog = ({
   open,
@@ -43,48 +52,54 @@ export const ConfirmDialog = ({
       setPending(true);
       await onConfirm();
     } finally {
-      // The dialog usually unmounts on success; reset here for the rare
-      // case where the parent keeps it open after a failure.
       setPending(false);
     }
   };
 
   return (
-    <Modal
+    <Dialog
       open={open}
-      onClose={pending ? () => undefined : onCancel}
-      title={title}
-      description={description}
-      className="max-w-md"
+      onOpenChange={(isOpen) => {
+        if (!isOpen && !pending) onCancel();
+      }}
     >
-      <div className="flex items-start gap-3">
-        <span
-          aria-hidden
-          className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
-            destructive ? 'bg-danger/10 text-danger' : 'bg-surface-high text-ink-muted'
-          }`}
-        >
-          <AlertTriangle size={18} />
-        </span>
-        <div className="flex-1 min-w-0">
-          {description && (
-            <p className="text-sm text-ink-muted leading-relaxed">{description}</p>
-          )}
-        </div>
-      </div>
+      <DialogContent size="sm" hideClose>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
+        </DialogHeader>
 
-      <div className="flex justify-end gap-2 mt-6">
-        <Button variant="secondary" onClick={onCancel} disabled={pending}>
-          {cancelLabel ?? t('common.cancel')}
-        </Button>
-        <Button
-          variant={destructive ? 'danger' : 'primary'}
-          onClick={handleConfirm}
-          loading={pending}
-        >
-          {confirmLabel ?? t('common.confirm')}
-        </Button>
-      </div>
-    </Modal>
+        <DialogBody>
+          <div className="flex items-start gap-3">
+            <span
+              aria-hidden
+              className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
+                destructive ? 'bg-danger/10 text-danger' : 'bg-surface-high text-ink-muted'
+              }`}
+            >
+              <AlertTriangle size={18} />
+            </span>
+            <div className="flex-1 min-w-0">
+              {description && (
+                <p className="text-sm text-ink-muted leading-relaxed">{description}</p>
+              )}
+            </div>
+          </div>
+        </DialogBody>
+
+        <DialogFooter>
+          <Button variant="secondary" onClick={onCancel} disabled={pending}>
+            {cancelLabel ?? t('common.cancel')}
+          </Button>
+          <Button
+            variant={destructive ? 'danger' : 'primary'}
+            onClick={handleConfirm}
+            loading={pending}
+          >
+            {confirmLabel ?? t('common.confirm')}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

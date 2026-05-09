@@ -58,13 +58,38 @@ body,
 body {
   background-color: rgb(var(--color-bg));
   color: rgb(var(--color-ink));
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', 'IBM Plex Sans Arabic', system-ui, sans-serif;
   letter-spacing: 0;
 }
 
-/* RTL adjustments — Arabic feels heavier; bump weights subtly. */
+/* ─── Arabic / RTL typography ────────────────────────────────────────────── */
+/* Arabic feels visually heavier than Latin at the same weight, so we shift  */
+/* the body to a lighter weight and use optimised Arabic font families.      */
+
 html[dir='rtl'] body {
+  font-family: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
   font-feature-settings: 'kern' 1;
+  line-height: 1.8;
+  letter-spacing: 0;
+}
+
+/* Arabic display headings use Cairo — bolder, more geometric. */
+html[dir='rtl'] .font-display {
+  font-family: 'Cairo', 'Manrope', system-ui, sans-serif;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+/* Arabic labels / stat captions: disable tracking entirely. */
+html[dir='rtl'] .stat-label,
+html[dir='rtl'] .tracking-\[0\.12em\] {
+  letter-spacing: 0;
+}
+
+/* Tabular numbers stay LTR-direction even in RTL layouts for readability. */
+html[dir='rtl'] .tabular-nums {
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 /* ─── Reusable design primitives ──────────────────────────────────────────── */
@@ -121,6 +146,43 @@ html[dir='rtl'] .skeleton {
 }
 .animate-fade-in {
   animation: fade-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ─── Dialog / Modal animations ───────────────────────────────────────────── */
+/* Used by Radix-based dialog primitives via `.dialog-overlay-animate`        */
+/* and `.dialog-content-animate` classes.                                     */
+
+@keyframes dialog-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes dialog-overlay-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.dialog-overlay-animate {
+  animation: dialog-overlay-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.dialog-overlay-animate[data-state='closed'] {
+  animation: dialog-overlay-out 150ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes dialog-content-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes dialog-content-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(4px) scale(0.98); }
+}
+
+.dialog-content-animate {
+  animation: dialog-content-in 250ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+/* Radix propagates data-state to the Content's children via context */
+[data-state='closed'] .dialog-content-animate {
+  animation: dialog-content-out 150ms cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 
 /* Respect users who prefer reduced motion. */

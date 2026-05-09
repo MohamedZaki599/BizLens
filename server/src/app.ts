@@ -15,6 +15,7 @@ import transactionRoutes from './modules/transactions/transaction.routes';
 import dashboardRoutes from './modules/dashboard/dashboard.routes';
 import userRoutes from './modules/users/users.routes';
 import alertRoutes from './modules/alerts/alerts.routes';
+import signalRoutes from './modules/signals/signals.routes';
 import { initIntelligence } from './intelligence';
 
 export const createApp = () => {
@@ -90,6 +91,7 @@ export const createApp = () => {
   app.use('/api/v1/transactions', transactionRoutes);
   app.use('/api/v1/dashboard', dashboardRoutes);
   app.use('/api/v1/alerts', alertRoutes);
+  app.use('/api/v1/signals', signalRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

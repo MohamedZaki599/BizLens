@@ -6,8 +6,10 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Manrope', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'IBM Plex Sans Arabic', 'system-ui', 'sans-serif'],
+        display: ['Manrope', 'Cairo', 'Inter', 'system-ui', 'sans-serif'],
+        'ar-body': ['IBM Plex Sans Arabic', 'Inter', 'system-ui', 'sans-serif'],
+        'ar-display': ['Cairo', 'Manrope', 'system-ui', 'sans-serif'],
       },
       // BizLens design tokens (CSS variables → Tailwind utilities).
       // Driven by the data-theme attribute on <html>.

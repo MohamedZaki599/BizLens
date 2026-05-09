@@ -1,29 +1,11 @@
-import { useCallback } from 'react';
-import { useUiStore } from '@/store/ui-store';
-import { formatCurrency, formatNumber } from './utils';
-
 /**
- * Returns a currency formatter bound to the user's current language +
- * currency preferences. Components should prefer this over calling
- * `formatCurrency` directly so the output reacts to preference changes.
+ * Backward-compatible format re-exports.
+ * The canonical implementations now live in `lib/i18n/formatters/`.
  */
-export const useFormatCurrency = () => {
-  const language = useUiStore((s) => s.language);
-  const currency = useUiStore((s) => s.currency);
-  return useCallback(
-    (value: number) => formatCurrency(value, language, currency),
-    [language, currency],
-  );
-};
-
-export const useFormatNumber = () => {
-  const language = useUiStore((s) => s.language);
-  return useCallback((value: number) => formatNumber(value, language), [language]);
-};
+export { useFormatCurrency, useFormatNumber } from './i18n/formatters';
 
 /**
  * A reasonable curated list of currencies for the settings picker.
- * Not exhaustive — users can still set anything via the API.
  */
 export const SUPPORTED_CURRENCIES: ReadonlyArray<{ code: string; label: string }> = [
   { code: 'USD', label: 'US Dollar (USD)' },
