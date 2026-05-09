@@ -34,11 +34,12 @@ export interface IEventBus {
   flush(): Promise<void>;
 }
 
+import { runInBackground } from '../../core/async/task-manager';
+
 // ─── In-Process Implementation ────────────────────────────────────────────
 
 class InProcessEventBus implements IEventBus {
   private handlers = new Map<DomainEventType, Set<EventHandler<any>>>();
-  private pending: Promise<void>[] = [];
 
   on<T extends DomainEventType>(type: T, handler: EventHandler<T>): void {
     if (!this.handlers.has(type)) {
@@ -61,21 +62,14 @@ class InProcessEventBus implements IEventBus {
     });
 
     for (const handler of handlers) {
-      const p = handler(event).catch((err: unknown) => {
-        logger.error('event-bus:handler-failed', {
-          type: event.type,
-          error: err instanceof Error ? err.message : String(err),
-          stack: err instanceof Error ? err.stack : undefined,
-        });
+      runInBackground(`Event:${event.type}`, async () => {
+        await handler(event);
       });
-      this.pending.push(p);
     }
   }
 
   async flush(): Promise<void> {
-    const batch = [...this.pending];
-    this.pending = [];
-    await Promise.allSettled(batch);
+    // Await operations using the centralized task manager if needed in tests
   }
 }
 

@@ -87,33 +87,36 @@ export const signalEngine = {
 
       const computeMs = Math.round(performance.now() - startMs);
 
-      // Step 4: Cache
-      signalCache.set(userId, { signals, computedAt: Date.now() });
+      // Step 4: Persist individual signals
+      const persistedSignals = await persistSignals(userId, signals);
 
-      // Step 5: Persist snapshot (fire-and-forget)
-      persistSnapshot(userId, signals, computeMs).catch((err) => {
+      // Step 5: Cache the persisted signals
+      signalCache.set(userId, { signals: persistedSignals, computedAt: Date.now() });
+
+      // Step 6: Persist snapshot (fire-and-forget)
+      persistSnapshot(userId, persistedSignals, computeMs).catch((err) => {
         logger.error('signal-engine:persist-failed', {
           userId,
           error: err instanceof Error ? err.message : String(err),
         });
       });
 
-      // Step 6: Emit event
+      // Step 7: Emit event
       eventBus.emit({
         type: 'SIGNALS_RECOMPUTED',
         userId,
-        signalCount: signals.length,
+        signalCount: persistedSignals.length,
         computeMs,
         timestamp: new Date(),
       });
 
       logger.info('signal-engine:computed', {
         userId,
-        signalCount: signals.length,
+        signalCount: persistedSignals.length,
         computeMs,
       });
 
-      return signals;
+      return persistedSignals;
     } catch (err) {
       const computeMs = Math.round(performance.now() - startMs);
       logger.error('signal-engine:failed', {
@@ -161,9 +164,76 @@ export const signalEngine = {
   invalidate(userId: string): void {
     signalCache.delete(userId);
   },
+
+  /**
+   * Update lifecycle status of a signal.
+   */
+  async updateSignalStatus(
+    userId: string, 
+    key: string, 
+    data: { status: 'NEW' | 'REVIEWED' | 'INVESTIGATING' | 'SNOOZED' | 'RESOLVED', snoozedUntil?: Date | null, resolutionNotes?: string }
+  ): Promise<FinancialSignal> {
+    const updated = await prisma.financialSignal.update({
+      where: { userId_key: { userId, key } },
+      data,
+    });
+    
+    // Update cache if it exists
+    const cached = signalCache.get(userId);
+    if (cached) {
+      const idx = cached.signals.findIndex(s => s.key === key);
+      if (idx !== -1) {
+        cached.signals[idx] = updated as any;
+      }
+    }
+    
+    return updated as any;
+  },
 };
 
 // ─── Persistence ──────────────────────────────────────────────────────────
+
+const persistSignals = async (userId: string, signals: FinancialSignal[]): Promise<FinancialSignal[]> => {
+  const results: FinancialSignal[] = [];
+  
+  for (const sig of signals) {
+    try {
+      const persisted = await prisma.financialSignal.upsert({
+        where: {
+          userId_key: {
+            userId,
+            key: sig.key,
+          },
+        },
+        create: {
+          userId,
+          key: sig.key,
+          value: sig.value,
+          severity: sig.severity.toUpperCase() as any,
+          trend: sig.trend.toUpperCase() as any,
+          confidence: sig.confidence,
+          metadata: sig.metadata ? JSON.parse(JSON.stringify(sig.metadata)) : {},
+          ttlCategory: sig.ttlCategory,
+        },
+        update: {
+          value: sig.value,
+          severity: sig.severity.toUpperCase() as any,
+          trend: sig.trend.toUpperCase() as any,
+          confidence: sig.confidence,
+          metadata: sig.metadata ? JSON.parse(JSON.stringify(sig.metadata)) : {},
+          ttlCategory: sig.ttlCategory,
+          generatedAt: new Date(),
+        },
+      });
+      results.push(persisted as any);
+    } catch (err) {
+      logger.error(`signal-engine:upsert-failed`, { userId, key: sig.key, error: err });
+      results.push(sig); // Fallback to memory signal if DB fails
+    }
+  }
+  
+  return results;
+};
 
 const persistSnapshot = async (
   userId: string,
