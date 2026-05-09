@@ -20,5 +20,5 @@ export { useAssistantStore } from './store/assistant-store';
 export { OperationalGuidanceCard } from './components/OperationalGuidanceCard';
 
 // ─── Store ────────────────────────────────────────────────────────────────
-export { useOnboardingStore } from './store/onboarding-store';
-export type { OnboardingStage, MilestoneKey } from './store/onboarding-store';
+export { useOnboardingStore, useNeedsOnboarding, useActivationProgress } from './store/onboarding-store';
+export type { OnboardingStage, ActivationMilestone } from './store/onboarding-store';
