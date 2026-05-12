@@ -18,6 +18,7 @@ import { aggregateByType, buildExpenseComposition } from './dashboard.service';
 import { listBudgets } from './budgets.service';
 import { detectSubscriptions } from './subscriptions.service';
 import { signalEngine } from '../../intelligence/engine/signal-engine';
+import { isSignalKey } from '../../intelligence/signals/signal.types';
 
 /**
  * System prompt for the Signal Analyst persona.
@@ -481,7 +482,7 @@ export const buildAssistantContext = async (
 
   // 1. Fetch active signal if key provided
   let activeSignal: SignalInsight | undefined;
-  if (signalKey) {
+  if (signalKey && isSignalKey(signalKey)) {
     const sig = await signalEngine.getSignal(userId, signalKey);
     if (sig) {
       activeSignal = {

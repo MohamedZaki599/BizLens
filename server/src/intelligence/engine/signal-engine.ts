@@ -23,7 +23,7 @@ import { runAllGenerators } from '../signals/signal-registry';
 import { getThresholdConfig } from '../thresholds/threshold-store';
 import { eventBus } from '../events/event-bus';
 import { logger } from '../../config/logger';
-import type { FinancialSignal, SignalGenerationContext } from '../signals/signal.types';
+import type { FinancialSignal, SignalGenerationContext, SignalKey } from '../signals/signal.types';
 import { prisma } from '@bizlens/database';
 
 // ─── TTL Configuration ────────────────────────────────────────────────────
@@ -146,7 +146,7 @@ export const signalEngine = {
   /**
    * Find a specific signal by key from the latest computation.
    */
-  async getSignal(userId: string, key: string, userMode?: string): Promise<FinancialSignal | undefined> {
+  async getSignal(userId: string, key: SignalKey, userMode?: string): Promise<FinancialSignal | undefined> {
     const signals = await this.getSignals(userId, userMode);
     return signals.find((s) => s.key === key);
   },
@@ -170,7 +170,7 @@ export const signalEngine = {
    */
   async updateSignalStatus(
     userId: string, 
-    key: string, 
+    key: SignalKey, 
     data: { status: 'NEW' | 'REVIEWED' | 'INVESTIGATING' | 'SNOOZED' | 'RESOLVED', snoozedUntil?: Date | null, resolutionNotes?: string }
   ): Promise<FinancialSignal> {
     const updateData: Record<string, unknown> = { status: data.status };
@@ -182,17 +182,31 @@ export const signalEngine = {
       where: { userId_key: { userId, key } },
       data: updateData,
     });
+
+    const result: FinancialSignal = {
+      key,
+      value: updated.value,
+      severity: updated.severity.toLowerCase() as FinancialSignal['severity'],
+      trend: updated.trend.toLowerCase() as FinancialSignal['trend'],
+      confidence: updated.confidence,
+      metadata: (updated.metadata as FinancialSignal['metadata']) ?? {},
+      generatedAt: updated.generatedAt,
+      ttlCategory: updated.ttlCategory as FinancialSignal['ttlCategory'],
+      status: updated.status as FinancialSignal['status'],
+      snoozedUntil: updated.snoozedUntil,
+      resolutionNotes: updated.resolutionNotes,
+    };
     
     // Update cache if it exists
     const cached = signalCache.get(userId);
     if (cached) {
       const idx = cached.signals.findIndex(s => s.key === key);
       if (idx !== -1) {
-        cached.signals[idx] = updated;
+        cached.signals[idx] = result;
       }
     }
     
-    return updated;
+    return result;
   },
 };
 
@@ -230,7 +244,13 @@ const persistSignals = async (userId: string, signals: FinancialSignal[]): Promi
           generatedAt: new Date(),
         },
       });
-      results.push(persisted);
+      results.push({
+        ...sig,
+        generatedAt: persisted.generatedAt,
+        status: (persisted.status as FinancialSignal['status']) ?? sig.status,
+        snoozedUntil: persisted.snoozedUntil,
+        resolutionNotes: persisted.resolutionNotes,
+      });
     } catch (err) {
       logger.error(`signal-engine:upsert-failed`, { userId, key: sig.key, error: err });
       results.push(sig); // Fallback to memory signal if DB fails

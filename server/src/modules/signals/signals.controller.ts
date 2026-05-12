@@ -1,6 +1,7 @@
 import type { RequestHandler } from 'express';
 import { signalEngine } from '../../intelligence';
 import { buildMessage } from '../../intelligence/localization/message-builder';
+import { isSignalKey } from '../../intelligence/signals/signal.types';
 import { asyncHandler } from '../../utils/async-handler';
 import { HttpError } from '../../utils/http-error';
 
@@ -46,6 +47,10 @@ export const getSignals: RequestHandler = asyncHandler(async (req, res) => {
 export const getSignalByKey: RequestHandler = asyncHandler(async (req, res) => {
   const userId = req.user!.id;
   const { key } = req.params;
+
+  if (!isSignalKey(key)) {
+    throw HttpError.notFound(`Signal "${key}" not found`);
+  }
 
   const signal = await signalEngine.getSignal(userId, key);
 
@@ -118,6 +123,10 @@ export const updateSignal: RequestHandler = asyncHandler(async (req, res) => {
   const userId = req.user!.id;
   const { key } = req.params;
   const { status, snoozedUntil, resolutionNotes } = req.body;
+
+  if (!isSignalKey(key)) {
+    throw HttpError.notFound(`Signal "${key}" not found`);
+  }
 
   const signal = await signalEngine.updateSignalStatus(userId, key, {
     status,
