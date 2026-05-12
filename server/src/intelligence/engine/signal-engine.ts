@@ -173,9 +173,14 @@ export const signalEngine = {
     key: string, 
     data: { status: 'NEW' | 'REVIEWED' | 'INVESTIGATING' | 'SNOOZED' | 'RESOLVED', snoozedUntil?: Date | null, resolutionNotes?: string }
   ): Promise<FinancialSignal> {
+    const updateData: Record<string, unknown> = { status: data.status };
+    if (data.snoozedUntil !== undefined) updateData.snoozedUntil = data.snoozedUntil;
+    if (data.resolutionNotes !== undefined) updateData.resolutionNotes = data.resolutionNotes;
+    if (data.status === 'RESOLVED') updateData.resolvedAt = new Date();
+
     const updated = await prisma.financialSignal.update({
       where: { userId_key: { userId, key } },
-      data,
+      data: updateData,
     });
     
     // Update cache if it exists
