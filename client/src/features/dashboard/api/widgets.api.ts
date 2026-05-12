@@ -92,7 +92,7 @@ export interface AssistantDigest {
 
 const buildParams = (filters?: DashboardFilters) => {
   if (!filters) return {};
-  const params: Record<string, any> = { range: filters.range };
+  const params: Record<string, string | number | boolean | string[] | undefined> = { range: filters.range };
   if (filters.range === 'custom' && filters.customRange) {
     params.startDate = filters.customRange.startDate;
     params.endDate = filters.customRange.endDate;

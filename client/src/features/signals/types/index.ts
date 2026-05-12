@@ -10,7 +10,7 @@ export interface FinancialSignalDto {
   severity: SignalSeverity;
   trend: SignalTrend;
   confidence: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   ttlCategory: string;
   status: SignalStatus;
   snoozedUntil: string | null;

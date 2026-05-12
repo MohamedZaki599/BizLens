@@ -45,11 +45,26 @@ export const SignalWorkspacePanel = () => {
 
   const slideFrom = isRtl ? '-100%' : '100%';
 
+  interface SignalMetadata {
+    title?: string;
+    description?: string;
+    action?: string;
+    explainability?: {
+      reasoningChain?: string[];
+      thresholdContext?: string;
+    };
+    payload?: {
+      route?: string;
+    };
+  }
+
+  const metadata = signal?.metadata as SignalMetadata | undefined;
+
   // Extract reasoning from signal metadata
-  const reasoningChain: string[] = signal?.metadata?.explainability?.reasoningChain || [];
-  const description = signal?.metadata?.description || signal?.metadata?.explainability?.thresholdContext || t('signal.defaultExplanation');
-  const actionLabel = signal?.metadata?.action || t('signal.workspace.reviewTransactions');
-  const actionRoute = signal?.metadata?.payload?.route || '/app/transactions';
+  const reasoningChain: string[] = metadata?.explainability?.reasoningChain || [];
+  const description = metadata?.description || metadata?.explainability?.thresholdContext || t('signal.defaultExplanation');
+  const actionLabel = metadata?.action || t('signal.workspace.reviewTransactions');
+  const actionRoute = metadata?.payload?.route || '/app/transactions';
 
   return (
     <AnimatePresence>
@@ -79,7 +94,7 @@ export const SignalWorkspacePanel = () => {
                 <div className="flex items-center justify-between p-6 border-b border-outline/30">
                   <div className="flex items-center gap-3">
                     <SignalSeverityBadge severity={signal.severity} />
-                    <SignalLifecycleBadge status={(signal as any).status || 'NEW'} />
+                    <SignalLifecycleBadge status={signal.status || 'NEW'} />
                   </div>
                   <Button variant="tertiary" size="sm" onClick={closeWorkspace} className="rounded-full p-2" aria-label={t('common.close')}>
                     <X size={20} />
@@ -91,7 +106,7 @@ export const SignalWorkspacePanel = () => {
                   {/* Signal title + value */}
                   <section>
                     <h2 className="text-xl font-display font-semibold text-ink mb-2 break-words">
-                      {signal.metadata?.title || signal.key.replace(/_/g, ' ')}
+                      {metadata?.title || signal.key.replace(/_/g, ' ')}
                     </h2>
                     {signal.value != null && (
                       <div className="text-2xl font-bold tabular-nums text-ink mb-3">

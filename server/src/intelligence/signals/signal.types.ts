@@ -95,6 +95,15 @@ export interface FinancialSignal {
    * Consumers use this to decide whether to recompute or serve cached.
    */
   ttlCategory: 'dashboard' | 'alert' | 'analytical';
+
+  /** Lifecycle status. */
+  status?: 'NEW' | 'REVIEWED' | 'INVESTIGATING' | 'SNOOZED' | 'RESOLVED';
+
+  /** If snoozed, until when. */
+  snoozedUntil?: Date | string | null;
+
+  /** Notes provided during resolution/snooze. */
+  resolutionNotes?: string | null;
 }
 
 // ─── Operational Insight Contract ─────────────────────────────────────────

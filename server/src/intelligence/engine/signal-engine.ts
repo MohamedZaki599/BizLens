@@ -188,11 +188,11 @@ export const signalEngine = {
     if (cached) {
       const idx = cached.signals.findIndex(s => s.key === key);
       if (idx !== -1) {
-        cached.signals[idx] = updated as any;
+        cached.signals[idx] = updated;
       }
     }
     
-    return updated as any;
+    return updated;
   },
 };
 
@@ -230,7 +230,7 @@ const persistSignals = async (userId: string, signals: FinancialSignal[]): Promi
           generatedAt: new Date(),
         },
       });
-      results.push(persisted as any);
+      results.push(persisted);
     } catch (err) {
       logger.error(`signal-engine:upsert-failed`, { userId, key: sig.key, error: err });
       results.push(sig); // Fallback to memory signal if DB fails

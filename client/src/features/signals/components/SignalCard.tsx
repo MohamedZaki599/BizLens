@@ -1,10 +1,9 @@
-import { cn } from '@/lib/utils';
+import { ArrowRight } from 'lucide-react';
 import { useT } from '@/lib/i18n';
 import type { PrioritySignalViewModel } from '../types';
 import { SignalSeverityBadge } from './SignalSeverityBadge';
 import { Button } from '@/components/Button';
 import { useSignalWorkspace } from '../hooks/useSignalWorkspace';
-import { ArrowRight } from 'lucide-react';
 
 interface SignalCardProps {
   signal: PrioritySignalViewModel;

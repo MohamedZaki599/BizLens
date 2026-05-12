@@ -23,7 +23,7 @@ const MILESTONES: ActivationMilestone[] = [
  */
 export const ActivationProgressTracker = ({ className }: ActivationProgressTrackerProps) => {
   const ti = useTi();
-  const { completed, total, percentage } = useActivationProgress();
+  const { completed, total } = useActivationProgress();
   const milestones = useOnboardingStore((s) => s.milestones);
   const showChecklist = useOnboardingStore((s) => s.showChecklist);
 

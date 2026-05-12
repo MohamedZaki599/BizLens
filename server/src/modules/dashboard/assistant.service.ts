@@ -490,7 +490,7 @@ export const buildAssistantContext = async (
         summary: sig.metadata?.explainability?.reasoningChain?.[0] || 'Operational anomaly detected',
         drivers: (sig.metadata?.explainability?.reasoningChain as string[]) || [],
         metric: sig.value ? formatMoney(sig.value) : undefined,
-        trend: sig.trend.toUpperCase() as any,
+        trend: sig.trend.toUpperCase() as 'UP' | 'DOWN' | 'FLAT' | 'UNKNOWN',
       };
     }
   }
@@ -500,7 +500,13 @@ export const buildAssistantContext = async (
     listBudgets(userId),
     aggregateByType(userId, 'EXPENSE', start, now),
     aggregateByType(userId, 'EXPENSE', prevStart, prevEnd),
-    buildExpenseComposition(userId, { from: start, to: now, label: 'Current Month' } as any),
+    buildExpenseComposition(userId, { 
+      from: start, 
+      to: now, 
+      label: 'Current Month',
+      prevFrom: prevStart,
+      prevTo: prevEnd 
+    }),
     prisma.transaction.count({ where: { userId, date: { gte: subDays(now, 30) } } }),
     prisma.transaction.findFirst({
       where: { userId },
