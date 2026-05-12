@@ -1,5 +1,7 @@
 import type { RequestHandler } from 'express';
 import { signalEngine } from '../../intelligence';
+import { buildMessage } from '../../intelligence/localization/message-builder';
+import { isSignalKey } from '../../intelligence/signals/signal.types';
 import { asyncHandler } from '../../utils/async-handler';
 import { HttpError } from '../../utils/http-error';
 
@@ -23,10 +25,13 @@ export const getSignals: RequestHandler = asyncHandler(async (req, res) => {
     severity: s.severity.toUpperCase() as 'NONE' | 'INFO' | 'WARNING' | 'CRITICAL',
     trend: s.trend.toUpperCase() as 'UP' | 'DOWN' | 'FLAT' | 'UNKNOWN',
     confidence: s.confidence,
-    metadata: s.metadata,
-    status: (s as any).status || 'NEW',
-    snoozedUntil: (s as any).snoozedUntil ? new Date((s as any).snoozedUntil).toISOString() : null,
-    resolutionNotes: (s as any).resolutionNotes || null,
+    metadata: {
+      ...s.metadata,
+      description: s.metadata?.description || buildMessage(s),
+    },
+    status: s.status || 'NEW',
+    snoozedUntil: s.snoozedUntil ? new Date(s.snoozedUntil).toISOString() : null,
+    resolutionNotes: s.resolutionNotes || null,
     ttlCategory: s.ttlCategory,
     generatedAt: s.generatedAt.toISOString(),
     expiresAt: null,
@@ -43,6 +48,10 @@ export const getSignalByKey: RequestHandler = asyncHandler(async (req, res) => {
   const userId = req.user!.id;
   const { key } = req.params;
 
+  if (!isSignalKey(key)) {
+    throw HttpError.notFound(`Signal "${key}" not found`);
+  }
+
   const signal = await signalEngine.getSignal(userId, key);
 
   if (!signal) {
@@ -58,10 +67,13 @@ export const getSignalByKey: RequestHandler = asyncHandler(async (req, res) => {
       severity: signal.severity.toUpperCase(),
       trend: signal.trend.toUpperCase(),
       confidence: signal.confidence,
-      metadata: signal.metadata,
-      status: (signal as any).status || 'NEW',
-      snoozedUntil: (signal as any).snoozedUntil ? new Date((signal as any).snoozedUntil).toISOString() : null,
-      resolutionNotes: (signal as any).resolutionNotes || null,
+      metadata: {
+        ...signal.metadata,
+        description: signal.metadata?.description || buildMessage(signal),
+      },
+      status: signal.status || 'NEW',
+      snoozedUntil: signal.snoozedUntil ? new Date(signal.snoozedUntil).toISOString() : null,
+      resolutionNotes: signal.resolutionNotes || null,
       ttlCategory: signal.ttlCategory,
       generatedAt: signal.generatedAt.toISOString(),
       expiresAt: null,
@@ -88,10 +100,13 @@ export const recomputeSignals: RequestHandler = asyncHandler(async (req, res) =>
     severity: s.severity.toUpperCase(),
     trend: s.trend.toUpperCase(),
     confidence: s.confidence,
-    metadata: s.metadata,
-    status: (s as any).status || 'NEW',
-    snoozedUntil: (s as any).snoozedUntil ? new Date((s as any).snoozedUntil).toISOString() : null,
-    resolutionNotes: (s as any).resolutionNotes || null,
+    metadata: {
+      ...s.metadata,
+      description: s.metadata?.description || buildMessage(s),
+    },
+    status: s.status || 'NEW',
+    snoozedUntil: s.snoozedUntil ? new Date(s.snoozedUntil).toISOString() : null,
+    resolutionNotes: s.resolutionNotes || null,
     ttlCategory: s.ttlCategory,
     generatedAt: s.generatedAt.toISOString(),
     expiresAt: null,
@@ -109,6 +124,10 @@ export const updateSignal: RequestHandler = asyncHandler(async (req, res) => {
   const { key } = req.params;
   const { status, snoozedUntil, resolutionNotes } = req.body;
 
+  if (!isSignalKey(key)) {
+    throw HttpError.notFound(`Signal "${key}" not found`);
+  }
+
   const signal = await signalEngine.updateSignalStatus(userId, key, {
     status,
     snoozedUntil: snoozedUntil ? new Date(snoozedUntil) : null,
@@ -125,9 +144,9 @@ export const updateSignal: RequestHandler = asyncHandler(async (req, res) => {
       trend: signal.trend.toUpperCase(),
       confidence: signal.confidence,
       metadata: signal.metadata,
-      status: (signal as any).status,
-      snoozedUntil: (signal as any).snoozedUntil ? new Date((signal as any).snoozedUntil).toISOString() : null,
-      resolutionNotes: (signal as any).resolutionNotes,
+      status: signal.status,
+      snoozedUntil: signal.snoozedUntil ? new Date(signal.snoozedUntil).toISOString() : null,
+      resolutionNotes: signal.resolutionNotes,
       ttlCategory: signal.ttlCategory,
       generatedAt: signal.generatedAt.toISOString(),
       expiresAt: null,

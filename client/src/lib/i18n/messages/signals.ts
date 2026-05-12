@@ -24,6 +24,10 @@ export const signalMessagesEn = {
   'signal.queue.loading': 'Analyzing financial operations…',
   'signal.queue.error': 'Failed to load operational signals.',
 
+  // Priority Section
+  'signal.priority.title': 'What Changed',
+  'signal.queue.viewAll': 'View all operational signals',
+
   // Signal Card
   'signal.card.recommended': 'Recommended',
   'signal.card.reviewCta': 'Review',
@@ -56,6 +60,14 @@ export const signalMessagesEn = {
   // Default signal content
   'signal.defaultExplanation': 'Detected an operational anomaly that requires attention.',
   'signal.defaultAction': 'Review transaction details',
+
+  // Confidence levels
+  'signal.confidence.high': 'High confidence',
+  'signal.confidence.medium': 'Medium confidence',
+  'signal.confidence.low': 'Low confidence',
+
+  // Freshness
+  'signal.freshness.updated': 'Updated {time} ago',
 } as const;
 
 export const signalMessagesAr = {
@@ -78,6 +90,10 @@ export const signalMessagesAr = {
   'signal.queue.empty': 'كل شيء واضح! لا توجد إشارات تتطلب انتباهك حاليًا.',
   'signal.queue.loading': 'جارٍ تحليل العمليات المالية…',
   'signal.queue.error': 'تعذّر تحميل الإشارات التشغيلية.',
+
+  // Priority Section
+  'signal.priority.title': 'ما الذي تغيّر',
+  'signal.queue.viewAll': 'عرض جميع الإشارات التشغيلية',
 
   // Signal Card
   'signal.card.recommended': 'الإجراء المُوصى به',
@@ -111,4 +127,12 @@ export const signalMessagesAr = {
   // Default signal content
   'signal.defaultExplanation': 'تم اكتشاف شذوذ تشغيلي يتطلب الانتباه.',
   'signal.defaultAction': 'مراجعة تفاصيل المعاملات',
+
+  // Confidence levels
+  'signal.confidence.high': 'ثقة عالية',
+  'signal.confidence.medium': 'ثقة متوسطة',
+  'signal.confidence.low': 'ثقة منخفضة',
+
+  // Freshness
+  'signal.freshness.updated': 'آخر تحديث منذ {time}',
 } as const;

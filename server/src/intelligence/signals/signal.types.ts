@@ -95,6 +95,15 @@ export interface FinancialSignal {
    * Consumers use this to decide whether to recompute or serve cached.
    */
   ttlCategory: 'dashboard' | 'alert' | 'analytical';
+
+  /** Lifecycle status. */
+  status?: 'NEW' | 'REVIEWED' | 'INVESTIGATING' | 'SNOOZED' | 'RESOLVED';
+
+  /** If snoozed, until when. */
+  snoozedUntil?: Date | string | null;
+
+  /** Notes provided during resolution/snooze. */
+  resolutionNotes?: string | null;
 }
 
 // ─── Operational Insight Contract ─────────────────────────────────────────
@@ -136,6 +145,20 @@ export type SignalGenerator<TSnapshot> = (
 ) => FinancialSignal[];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
+
+/** Runtime set of all valid signal keys — kept in sync with SignalKey type. */
+export const SIGNAL_KEYS: readonly SignalKey[] = [
+  'PROFIT_MARGIN', 'REVENUE_GROWTH', 'PROFIT_TREND', 'PROFIT_DROP', 'EXPENSE_GROWTH',
+  'BURN_RATE', 'EXPENSE_RATIO', 'TOP_EXPENSE_CATEGORY', 'TOP_INCOME_CATEGORY', 'CATEGORY_CONCENTRATION',
+  'PROJECTED_EXPENSE', 'PROJECTED_INCOME', 'PROJECTED_PROFIT', 'CASH_RUNWAY_DAYS', 'FORECAST_OVERSPEND',
+  'SPEND_SPIKE', 'SPENDING_ANOMALY', 'WEEKLY_SPEND_CHANGE',
+  'STALE_DATA', 'RECURRING_EXPENSE',
+] as const;
+
+const signalKeySet: ReadonlySet<string> = new Set(SIGNAL_KEYS);
+
+/** Type guard: narrows a string to SignalKey at runtime. */
+export const isSignalKey = (value: string): value is SignalKey => signalKeySet.has(value);
 
 /** Create a signal with sensible defaults. */
 export const createSignal = (

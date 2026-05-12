@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Minus, Shield, ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Shield, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useT, useTi } from '@/lib/i18n';
 import { useUiStore } from '@/store/ui-store';
 import { cn } from '@/lib/utils';

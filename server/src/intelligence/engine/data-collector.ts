@@ -9,7 +9,7 @@
  * FinancialSnapshot to every calculator and signal generator.
  */
 
-import { prisma, type Prisma } from '@bizlens/database';
+import { prisma } from '@bizlens/database';
 import {
   startOfMonth,
   endOfMonth,

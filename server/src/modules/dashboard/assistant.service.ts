@@ -14,8 +14,69 @@ import {
   percentChange,
   toSafeNumber,
 } from '../../utils/safe-math';
-import { aggregateByType } from './dashboard.service';
+import { aggregateByType, buildExpenseComposition } from './dashboard.service';
+import { listBudgets } from './budgets.service';
 import { detectSubscriptions } from './subscriptions.service';
+import { signalEngine } from '../../intelligence/engine/signal-engine';
+import { isSignalKey } from '../../intelligence/signals/signal.types';
+
+/**
+ * System prompt for the Signal Analyst persona.
+ * Enforces a deterministic, evidence-based tone focused on operational clarity.
+ */
+export const SIGNAL_ANALYST_PROMPT = `
+You are the BizLens Signal Analyst, a deterministic operational copilot for SMB owners.
+Your goal is to transform financial data into actionable operational clarity.
+
+RULES:
+1. PERSONA: You are a senior business analyst. You are concise, objective, and evidence-based.
+2. SOURCE OF TRUTH: Use ONLY the provided AssistantContext. Never invent business facts or historical data.
+3. NO FILLER: Avoid generic greetings, motivational language, or "As an AI" disclaimers. Start directly with the analysis.
+4. NO SPECULATION: Do not provide generic financial advice or speculative "what-if" scenarios. Focus on what the data actually shows.
+5. OPERATIONAL FOCUS: Prioritize explaining "why" a signal triggered and what the immediate operational impact is.
+6. GUIDANCE: Guide the user's attention to the most critical anomalies or budget deviations.
+
+STRUCTURE:
+- If an activeSignal is provided, prioritize analyzing its drivers first.
+- Summarize the overall Business Health (burn rate, budget status).
+- Highlight critical anomalies from the topSignals list.
+- Keep responses under 150 words.
+
+TONE: Professional, urgent but calm, focused on operational decision-making.
+`.trim();
+
+/**
+ * Formats the AssistantContext into a concise, token-efficient string for LLM consumption.
+ * Ensures the model relies strictly on provided evidence.
+ */
+export const formatAssistantContext = (ctx: AssistantContext): string => {
+  const lines = [
+    `Generated At: ${ctx.generatedAt.toISOString()}`,
+    '',
+    '### Active Signal',
+    ctx.activeSignal 
+      ? `- Key: ${ctx.activeSignal.key}\n- Title: ${ctx.activeSignal.title}\n- Summary: ${ctx.activeSignal.summary}\n- Drivers: ${ctx.activeSignal.drivers.join(', ')}\n- Metric: ${ctx.activeSignal.metric || 'N/A'}\n- Trend: ${ctx.activeSignal.trend}`
+      : 'None',
+    '',
+    '### Business Health',
+    `- Monthly Burn: ${formatMoney(ctx.businessHealth.monthlyBurn.actual)} (Prev: ${formatMoney(ctx.businessHealth.monthlyBurn.previous)}, Change: ${ctx.businessHealth.monthlyBurn.changePct}%)`,
+    '',
+    '#### Budget Performance',
+    ...ctx.businessHealth.budgetPerformance.map(b => `- ${b.category}: ${b.usedPct}% used${b.exceeded ? ' [EXCEEDED]' : ''}`),
+    '',
+    '#### Top Expense Categories',
+    ...ctx.businessHealth.topExpenseCategories.map(c => `- ${c.name}: ${formatMoney(c.amount)} (${c.share}% share)`),
+    '',
+    '### Critical Signals',
+    ...ctx.businessHealth.topSignals.map(s => `- ${s.title}: ${s.message} [Tone: ${s.tone}, Priority: ${s.priority}]`),
+    '',
+    '### Recent Activity',
+    `- 30d Transaction Count: ${ctx.recentActivity.transactionCount}`,
+    `- Days Since Last Entry: ${ctx.recentActivity.lastEntryDaysAgo ?? 'N/A'}`,
+  ];
+
+  return lines.join('\n');
+};
 
 /**
  * Decision Assistant — produces a small, prioritized digest of plain-language
@@ -57,6 +118,52 @@ export interface AssistantDigest {
   generatedAt: Date;
   headline: string;
   notes: AssistantNote[];
+  context?: AssistantContext;
+}
+
+/** 
+ * Normalized operational insight derived from a signal. 
+ * Prevents client-side duplication of logic for data-aware analysis.
+ */
+export interface SignalInsight {
+  key: string;
+  title: string;
+  summary: string;
+  drivers: string[];
+  metric?: string;
+  trend: 'UP' | 'DOWN' | 'FLAT' | 'UNKNOWN';
+}
+
+/**
+ * Foundational context for the AI Assistant. 
+ * Aggregates all relevant business data points to prevent hallucinations.
+ */
+export interface AssistantContext {
+  userId: string;
+  generatedAt: Date;
+  activeSignal?: SignalInsight;
+  businessHealth: {
+    topSignals: AssistantNote[];
+    budgetPerformance: {
+      category: string;
+      usedPct: number;
+      exceeded: boolean;
+    }[];
+    monthlyBurn: {
+      actual: number;
+      previous: number;
+      changePct: number;
+    };
+    topExpenseCategories: {
+      name: string;
+      amount: number;
+      share: number;
+    }[];
+  };
+  recentActivity: {
+    transactionCount: number;
+    lastEntryDaysAgo: number | null;
+  };
 }
 
 const HIGH_PRIORITY_KINDS = new Set<AssistantNote['kind']>([
@@ -359,7 +466,93 @@ const forecastNote = async (userId: string, now: Date): Promise<AssistantNote | 
   };
 };
 
-export const buildAssistantDigest = async (userId: string): Promise<AssistantDigest> => {
+/**
+ * Deterministic context builder for the Assistant.
+ * Aggregates signals, budget health, trends, and recent activity into a 
+ * single type-safe contract.
+ */
+export const buildAssistantContext = async (
+  userId: string,
+  signalKey?: string,
+): Promise<AssistantContext> => {
+  const now = new Date();
+  const start = startOfMonth(now);
+  const prevStart = startOfMonth(subMonths(now, 1));
+  const prevEnd = endOfMonth(subMonths(now, 1));
+
+  // 1. Fetch active signal if key provided
+  let activeSignal: SignalInsight | undefined;
+  if (signalKey && isSignalKey(signalKey)) {
+    const sig = await signalEngine.getSignal(userId, signalKey);
+    if (sig) {
+      activeSignal = {
+        key: sig.key,
+        title: sig.key.replace(/_/g, ' ').toLowerCase(),
+        summary: sig.metadata?.explainability?.reasoningChain?.[0] || 'Operational anomaly detected',
+        drivers: (sig.metadata?.explainability?.reasoningChain as string[]) || [],
+        metric: sig.value ? formatMoney(sig.value) : undefined,
+        trend: sig.trend.toUpperCase() as 'UP' | 'DOWN' | 'FLAT' | 'UNKNOWN',
+      };
+    }
+  }
+
+  // 2. Aggregate Business Health components
+  const [budgets, currentExp, prevExp, composition, txnCount, lastTxn] = await Promise.all([
+    listBudgets(userId),
+    aggregateByType(userId, 'EXPENSE', start, now),
+    aggregateByType(userId, 'EXPENSE', prevStart, prevEnd),
+    buildExpenseComposition(userId, { 
+      from: start, 
+      to: now, 
+      label: 'Current Month',
+      prevFrom: prevStart,
+      prevTo: prevEnd 
+    }),
+    prisma.transaction.count({ where: { userId, date: { gte: subDays(now, 30) } } }),
+    prisma.transaction.findFirst({
+      where: { userId },
+      orderBy: { date: 'desc' },
+      select: { date: true },
+    }),
+  ]);
+
+  const daysSince = lastTxn 
+    ? Math.floor((now.getTime() - lastTxn.date.getTime()) / 86_400_000)
+    : null;
+
+  return {
+    userId,
+    generatedAt: now,
+    activeSignal,
+    businessHealth: {
+      topSignals: [], // Populated by buildAssistantDigest to avoid circular logic
+      budgetPerformance: budgets.map(b => ({
+        category: b.category.name,
+        usedPct: b.usedPct,
+        exceeded: b.exceeded,
+      })),
+      monthlyBurn: {
+        actual: currentExp,
+        previous: prevExp,
+        changePct: percentChange(currentExp, prevExp).pct,
+      },
+      topExpenseCategories: composition.categories.map(c => ({
+        name: c.name,
+        amount: c.amount,
+        share: c.share,
+      })),
+    },
+    recentActivity: {
+      transactionCount: txnCount,
+      lastEntryDaysAgo: daysSince,
+    },
+  };
+};
+
+export const buildAssistantDigest = async (
+  userId: string,
+  signalKey?: string,
+): Promise<AssistantDigest> => {
   const now = new Date();
 
   const txnCount = await prisma.transaction.count({
@@ -393,5 +586,8 @@ export const buildAssistantDigest = async (userId: string): Promise<AssistantDig
 
   const headline = notes[0]?.message ?? "You're up to date — nothing critical to look at this week.";
 
-  return { generatedAt: now, headline, notes };
+  const context = await buildAssistantContext(userId, signalKey);
+  context.businessHealth.topSignals = notes;
+
+  return { generatedAt: now, headline, notes, context };
 };

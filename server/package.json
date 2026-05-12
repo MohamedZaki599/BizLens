@@ -9,7 +9,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "node --import tsx --test \"src/**/*.test.ts\"",
+    "test": "node --import tsx --test",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:rich": "tsx prisma/seed-rich-data.ts"
   },
@@ -36,7 +36,7 @@
     "@types/node": "^22.9.0",
     "@typescript-eslint/eslint-plugin": "^8.14.0",
     "@typescript-eslint/parser": "^8.14.0",
-    "eslint": "^9.14.0",
+    "eslint": "^8.57.0",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }

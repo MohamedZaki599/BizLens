@@ -28,6 +28,7 @@ const RANGES: DashboardRange[] = ['this_month', 'last_month', 'last_30_days', 'a
 
 export const DashboardPage = () => {
   const t = useT();
+  const navigate = useNavigate();
   const formatCurrency = useFormatCurrency();
   const { openQuickAdd } = useOutletContext<{
     openQuickAdd: (initialType?: TransactionType) => void;
@@ -43,7 +44,7 @@ export const DashboardPage = () => {
   const mode = metrics.data?.userMode ?? user?.userMode ?? 'FREELANCER';
   const cfg = MODE_CONFIG[mode];
 
-  const hasNoData = metrics.data && metrics.data.totalIncome === 0 && metrics.data.totalExpenses === 0;
+  const hasNoData = metrics.data && metrics.data.totals.income === 0 && metrics.data.totals.expense === 0;
   const hasNoSignals = !signals || signals.length === 0;
 
   return (

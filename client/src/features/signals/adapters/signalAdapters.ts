@@ -1,5 +1,4 @@
 import type { FinancialSignalDto, MetricCardViewModel, ForecastViewModel, PrioritySignalViewModel } from '../types';
-
 import { getFreshnessStatus } from '../utils/freshness';
 
 export const mapSignalToMetricCardVM = (
@@ -11,10 +10,9 @@ export const mapSignalToMetricCardVM = (
   const freshness = getFreshnessStatus(generatedAt, signal.ttlCategory, isFetching);
 
   let change;
-  // Try to extract change metadata if available
   if (signal.metadata?.delta !== undefined && signal.metadata?.previous !== undefined) {
     change = {
-      pct: signal.value, // value is often the pct for growth signals
+      pct: signal.value,
       direction: signal.trend === 'UP' ? 'up' : signal.trend === 'DOWN' ? 'down' : 'flat',
       hasComparison: signal.confidence > 0,
     } as const;
@@ -23,16 +21,19 @@ export const mapSignalToMetricCardVM = (
   return {
     id: signal.id,
     key: signal.key,
-    formattedValue: String(signal.value), // Usually format Currency in UI, but keep raw here or formatted
+    formattedValue: String(signal.value),
     severity: signal.severity,
     trend: signal.trend,
     confidence: signal.confidence,
+    status: signal.status,
+    snoozedUntil: signal.snoozedUntil,
+    resolutionNotes: signal.resolutionNotes,
     generatedAt,
     freshness,
     isStale: freshness === 'stale',
     label,
     value: signal.value,
-    caption: `Updated ${generatedAt.toLocaleTimeString()}`,
+    caption: signal.metadata?.description || `Signal ${signal.key}`,
     change,
   };
 };
@@ -71,15 +72,18 @@ export const mapSignalToPriorityVM = (
   return {
     id: signal.id,
     key: signal.key,
-    formattedValue: String(signal.value),
+    formattedValue: signal.value ? `$${signal.value.toLocaleString()}` : '',
     severity: signal.severity,
     trend: signal.trend,
     confidence: signal.confidence,
+    status: signal.status,
+    snoozedUntil: signal.snoozedUntil,
+    resolutionNotes: signal.resolutionNotes,
     generatedAt,
     freshness,
     isStale: freshness === 'stale',
     title: signal.metadata?.title || signal.key.replace(/_/g, ' '),
-    explanation: signal.metadata?.explanation || 'No explanation provided.',
-    recommendedAction: signal.metadata?.recommendedAction || 'Monitor closely.',
+    explanation: signal.metadata?.description || 'Operational signal detected.',
+    recommendedAction: signal.metadata?.recommendedAction || signal.metadata?.action || 'Review transaction details',
   };
 };

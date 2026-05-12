@@ -174,7 +174,8 @@ router.get(
   '/assistant',
   asyncHandler(async (req, res) => {
     if (!req.user) throw HttpError.unauthorized();
-    res.json(await buildAssistantDigest(req.user.id));
+    const signalKey = req.query.signalKey as string | undefined;
+    res.json(await buildAssistantDigest(req.user.id, signalKey));
   }),
 );
 

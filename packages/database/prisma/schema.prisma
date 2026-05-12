@@ -149,20 +149,33 @@ enum AlertSeverity {
 
 // ─── Intelligence / Signal Engine ─────────────────────────────────────────
 
+enum SignalStatus {
+  NEW
+  REVIEWED
+  INVESTIGATING
+  SNOOZED
+  RESOLVED
+}
+
 /// A computed financial signal persisted by the Signal Engine.
 /// Each (userId, key) pair is unique — updated on every recomputation.
 model FinancialSignal {
-  id          String          @id @default(uuid())
-  userId      String
-  key         String                                   /// e.g. 'PROFIT_MARGIN'
-  value       Float
-  severity    SignalSeverity  @default(NONE)
-  trend       SignalTrend     @default(UNKNOWN)
-  confidence  Float           @default(1.0)
-  metadata    Json            @default("{}")
-  ttlCategory String          @default("dashboard")   /// 'dashboard' | 'alert' | 'analytical'
-  generatedAt DateTime        @default(now())
-  expiresAt   DateTime?
+  id              String          @id @default(uuid())
+  userId          String
+  key             String                                   /// e.g. 'PROFIT_MARGIN'
+  value           Float
+  severity        SignalSeverity  @default(NONE)
+  trend           SignalTrend     @default(UNKNOWN)
+  confidence      Float           @default(1.0)
+  metadata        Json            @default("{}")
+  ttlCategory     String          @default("dashboard")   /// 'dashboard' | 'alert' | 'analytical'
+  generatedAt     DateTime        @default(now())
+  expiresAt       DateTime?
+  status          SignalStatus    @default(NEW)
+  snoozedUntil    DateTime?
+  resolutionNotes String?
+  updatedAt       DateTime        @updatedAt
+  resolvedAt      DateTime?
 
   @@unique([userId, key])
   @@index([userId])

@@ -4,7 +4,7 @@ import type { DashboardFilters } from '../types';
 
 export const dashboardApi = {
   async metrics(filters: DashboardFilters): Promise<DashboardMetrics> {
-    const params: Record<string, any> = { range: filters.range };
+    const params: Record<string, string | number | boolean | string[] | undefined> = { range: filters.range };
     if (filters.range === 'custom' && filters.customRange) {
       params.startDate = filters.customRange.startDate;
       params.endDate = filters.customRange.endDate;
@@ -18,7 +18,7 @@ export const dashboardApi = {
   },
   
   async insights(filters: DashboardFilters): Promise<Insight[]> {
-    const params: Record<string, any> = { range: filters.range };
+    const params: Record<string, string | number | boolean | string[] | undefined> = { range: filters.range };
     if (filters.range === 'custom' && filters.customRange) {
       params.startDate = filters.customRange.startDate;
       params.endDate = filters.customRange.endDate;

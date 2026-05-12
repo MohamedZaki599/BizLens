@@ -143,9 +143,8 @@ export const BudgetsPage = () => {
 
   const [form, setForm] = useState<BudgetFormState>({ open: false, editing: null });
   const [confirmTarget, setConfirmTarget] = useState<BudgetItem | null>(null);
-  const [pendingId, setPendingId] = useState<string | null>(null);
 
-  const budgets = data?.budgets ?? [];
+  const budgets = useMemo(() => data?.budgets ?? [], [data?.budgets]);
 
   const stats = useMemo(() => {
     const totalCap = budgets.reduce((acc, b) => acc + b.limit, 0);
@@ -198,15 +197,12 @@ export const BudgetsPage = () => {
 
   const handleConfirmDelete = async () => {
     if (!confirmTarget) return;
-    setPendingId(confirmTarget.id);
     try {
       await remove.mutateAsync(confirmTarget.id);
       toast.success(t('toast.budget.deleted'));
       setConfirmTarget(null);
     } catch (err) {
       toast.error(extractErrorMessage(err, t('toast.error.generic')));
-    } finally {
-      setPendingId(null);
     }
   };
 

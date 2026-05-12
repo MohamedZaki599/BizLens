@@ -18,7 +18,7 @@ export type {
   SignalTrend,
   SignalGenerationContext,
 } from './signals/signal.types';
-export { createSignal } from './signals/signal.types';
+export { createSignal, isSignalKey } from './signals/signal.types';
 
 // ── Thresholds ─────────────────────────────────────────────────────────
 export { systemDefaults } from './thresholds/defaults';

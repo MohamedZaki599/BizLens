@@ -1,7 +1,6 @@
 import { env } from './config/env';
 import { createApp } from './app';
 import { logger } from './config/logger';
-import { disconnect } from '@bizlens/database';
 
 const app = createApp();
 
