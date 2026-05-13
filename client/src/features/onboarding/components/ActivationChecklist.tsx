@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronDown, ChevronUp, Database, Sparkles, Eye, Zap, X } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Database, Target, Eye, Zap, X } from 'lucide-react';
 import { useT } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { useOnboardingStore, useActivationProgress, type ActivationMilestone } from '../store/onboarding-store';
@@ -11,7 +11,7 @@ const MILESTONE_CONFIG: {
   colorDone: string;
 }[] = [
   { id: 'data_connected', icon: Database, colorDone: 'text-secondary' },
-  { id: 'first_signal', icon: Sparkles, colorDone: 'text-primary-container' },
+  { id: 'first_signal', icon: Target, colorDone: 'text-primary-container' },
   { id: 'signal_reviewed', icon: Eye, colorDone: 'text-primary' },
   { id: 'first_action', icon: Zap, colorDone: 'text-secondary' },
 ];
@@ -44,7 +44,7 @@ export const ActivationChecklist = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
           <div className="h-9 w-9 rounded-xl bg-primary-container/15 text-primary-container flex items-center justify-center shrink-0">
-            <Sparkles size={18} strokeWidth={1.5} />
+            <Target size={18} strokeWidth={1.5} />
           </div>
           <div className="min-w-0">
             <h3 className="text-sm font-semibold text-ink truncate">

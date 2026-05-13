@@ -6,7 +6,7 @@ import {
   CheckCircle2,
   Info,
   RefreshCw,
-  Sparkles,
+  Activity,
   TrendingDown,
   type LucideIcon,
 } from 'lucide-react';
@@ -17,6 +17,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { Skeleton } from '@/components/Skeleton';
 import { useT, useTi } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
+import { useSignalWorkspace } from '@/features/signals/hooks/useSignalWorkspace';
 
 const toneIcon: Record<AssistantTone, LucideIcon> = {
   positive: CheckCircle2,
@@ -119,10 +120,10 @@ const NoteCard = ({ note }: { note: AssistantNote }) => {
             <div className="mt-3">
               <button
                 onClick={handleAction}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline focus-ring rounded"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline focus-ring rounded min-h-[44px] px-1 -mx-1"
               >
                 {note.action.label}
-                <ArrowRight size={12} aria-hidden />
+                <ArrowRight size={12} aria-hidden className="rtl:rotate-180" />
               </button>
             </div>
           )}
@@ -136,23 +137,26 @@ export const AssistantPage = () => {
   const t = useT();
   const ti = useTi();
   const formatTime = useFormatTime();
-  const { data, isLoading, isFetching, refetch } = useAssistantDigest();
+  const activeSignalKey = useSignalWorkspace((s) => s.activeSignalKey);
+  const { data, isLoading, isFetching, refetch } = useAssistantDigest(activeSignalKey);
 
   return (
     <div className="space-y-6 animate-fade-in">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-bold tracking-tight inline-flex items-center gap-2">
-            <Sparkles size={22} className="text-primary" aria-hidden />
+            <Activity size={22} className="text-primary" aria-hidden />
             {t('assistant.title')}
           </h1>
           <p className="text-ink-muted mt-1">{t('assistant.subtitle')}</p>
         </div>
         <Button
-          variant="ghost"
+          variant="secondary"
+          size="sm"
           onClick={() => refetch()}
           disabled={isFetching}
           loading={isFetching}
+          aria-label={t('assistant.refresh')}
         >
           <RefreshCw size={14} aria-hidden />
           {t('assistant.refresh')}
@@ -167,14 +171,14 @@ export const AssistantPage = () => {
         </div>
       ) : !data || data.notes.length === 0 ? (
         <EmptyState
-          icon={Sparkles}
+          icon={Activity}
           title={t('assistant.empty.title')}
           subtitle={t('assistant.empty.subtitle')}
         />
       ) : (
         <>
-          <section className="card bg-primary/5 border-primary/15">
-            <p className="text-xs uppercase tracking-wide text-primary font-medium">
+          <section className="card bg-surface-high/50 border-outline/20">
+            <p className="text-xs uppercase tracking-wide text-ink-muted font-medium">
               {t('assistant.headline')}
             </p>
             <p className="font-display text-lg sm:text-xl font-semibold text-ink mt-1.5 leading-snug">

@@ -38,7 +38,7 @@ export const DashboardPage = () => {
   const setRange = useSetRange();
   const { data: user } = useCurrentUser();
   const metrics = useDashboardMetrics();
-  const recent = useTransactions({ limit: 6 });
+  const recent = useTransactions({ limit: 5 });
   const { data: signals } = useSignalsQuery('priority');
 
   const mode = metrics.data?.userMode ?? user?.userMode ?? 'FREELANCER';
@@ -48,23 +48,24 @@ export const DashboardPage = () => {
   const hasNoSignals = !signals || signals.length === 0;
 
   return (
-    <div className="space-y-6 animate-fade-in relative">
+    <div className="space-y-5 relative">
+      {/* Header — calm, informational */}
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight">{t('dashboard.title')}</h1>
-          <p className="text-ink-muted mt-1">
-            {user?.name ? `${t('dashboard.greeting')} ${user.name} — ` : ''}
+          <h1 className="font-display text-2xl font-bold tracking-tight">{t('dashboard.title')}</h1>
+          <p className="text-sm text-ink-muted mt-0.5">
+            {user?.name ? `${user.name} — ` : ''}
             {t(cfg.headlineKey)}
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <ActivationProgressTracker className="hidden md:flex" />
           
           <div
             role="tablist"
             aria-label={t('dashboard.range.label')}
-            className="inline-flex p-1 rounded-xl bg-surface-high"
+            className="inline-flex p-0.5 rounded-lg bg-surface-high"
           >
             {RANGES.map((r) => (
               <button
@@ -73,9 +74,9 @@ export const DashboardPage = () => {
                 aria-selected={range === r}
                 onClick={() => setRange(r)}
                 className={cn(
-                  'h-8 px-3 rounded-lg text-xs font-medium transition-all duration-200 ease-quintessential focus-ring',
+                  'h-7 px-2.5 rounded-md text-xs font-medium transition-all duration-150 focus-ring',
                   range === r
-                    ? 'bg-surface-lowest text-ink shadow-ambient'
+                    ? 'bg-surface-lowest text-ink shadow-sm'
                     : 'text-ink-muted hover:text-ink',
                 )}
               >
@@ -86,11 +87,12 @@ export const DashboardPage = () => {
         </div>
       </header>
 
+      {/* System notifications — minimal */}
       <NotificationBanner />
       <StaleDataReminder onAdd={() => openQuickAdd('EXPENSE')} />
       {metrics.data?.warnings && <WarningBanner warnings={metrics.data.warnings} />}
 
-      {/* Activation guidance — shown until all milestones are complete */}
+      {/* Activation — shown until milestones complete */}
       <ActivationChecklist />
 
       {hasNoData ? (
@@ -100,75 +102,79 @@ export const DashboardPage = () => {
         />
       ) : (
         <>
-          {/* New Signal-Centric Decision Interface */}
+          {/* A. Operational Focus — what needs attention today */}
           {signals && signals.length > 0 && <ExecutiveFocusBar signals={signals} />}
-          
-          {hasNoSignals && (
-            <OperationalGuidanceCard 
-              titleKey="guidance.reviewSignal.title"
-              descKey="guidance.reviewSignal.desc"
-              actionLabelKey="guidance.reviewSignal.action"
-              onAction={() => {/* navigate or scroll to signals section if any */}}
-              className="mb-8"
-            />
-          )}
 
-          <DecisionQueue />
-          
+          {/* B. Priority Signals — the decision queue */}
+          <section id="priority-decision-queue">
+            {hasNoSignals ? (
+              <OperationalGuidanceCard 
+                titleKey="guidance.reviewSignal.title"
+                descKey="guidance.reviewSignal.desc"
+                actionLabelKey="guidance.reviewSignal.action"
+                onAction={() => navigate('/app/assistant')}
+              />
+            ) : (
+              <DecisionQueue />
+            )}
+          </section>
+
+          {/* Signal workspace modal */}
           <SignalWorkspacePanel />
 
-          <section className="mt-12 mb-8">
-            <h2 className="font-display text-xl font-bold tracking-tight text-ink mb-4">{t('dashboard.historicalTrends')}</h2>
+          {/* C. Supporting Trends — secondary, visually receded */}
+          <section className="pt-4 border-t border-outline/10">
+            <h2 className="text-sm font-medium text-ink-muted mb-3">{t('dashboard.historicalTrends')}</h2>
             <div className="grid gap-4 lg:grid-cols-2">
               <ExpenseTrendChart />
               <ExpenseDonutChart />
             </div>
           </section>
 
-          <section className="card mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-lg font-semibold tracking-tight">
-                {t('dashboard.recent')}
-              </h2>
-            </div>
+          {/* Recent transactions — tertiary */}
+          <section className="pt-4 border-t border-outline/10">
+            <h2 className="text-sm font-medium text-ink-muted mb-3">
+              {t('dashboard.recent')}
+            </h2>
             {recent.isLoading ? (
-              <div className="space-y-3" aria-busy>
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-12 w-full" />
+              <div className="space-y-2" aria-busy>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
                 ))}
               </div>
             ) : recent.data?.items.length === 0 ? (
-              <p className="text-sm text-ink-muted py-6 text-center">{t('dashboard.recent.empty')}</p>
+              <p className="text-xs text-ink-muted py-4 text-center">{t('dashboard.recent.empty')}</p>
             ) : (
-              <ul className="divide-y divide-outline/30">
+              <ul className="divide-y divide-outline/15">
                 {recent.data?.items.map((tx) => (
-                  <li key={tx.id} className="flex items-center justify-between py-3 gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
+                  <li key={tx.id} className="flex items-center justify-between py-2.5 gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       <span
                         aria-hidden
-                        className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ background: tx.category.color ? `${tx.category.color}22` : undefined }}
+                        className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ background: tx.category.color ? `${tx.category.color}15` : undefined }}
                       >
                         {tx.type === 'INCOME' ? (
-                          <ArrowUpRight size={16} className="text-secondary" />
+                          <ArrowUpRight size={14} className="text-secondary" />
                         ) : (
-                          <ArrowDownRight size={16} className="text-danger" />
+                          <ArrowDownRight size={14} className="text-danger" />
                         )}
                       </span>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">
+                        <p className="text-sm font-medium truncate text-ink">
                           {tx.description || tx.category.name}
                         </p>
-                        <p className="text-xs text-ink-muted">
-                          {tx.category.name} · {format(new Date(tx.date), 'MMM d, yyyy')}
+                        <p className="text-[11px] text-ink-muted">
+                          {tx.category.name} · {format(new Date(tx.date), 'MMM d')}
                         </p>
                       </div>
                     </div>
                     <span
                       className={cn(
-                        'text-sm font-semibold tabular-nums shrink-0',
-                        tx.type === 'INCOME' ? 'text-secondary' : 'text-danger',
+                        'text-sm font-medium tabular-nums shrink-0',
+                        tx.type === 'INCOME' ? 'text-secondary' : 'text-ink',
                       )}
+                      dir="ltr"
                     >
                       {tx.type === 'INCOME' ? '+' : '−'}
                       {formatCurrency(Number(tx.amount))}

@@ -2,7 +2,37 @@ import { api } from '@/lib/api';
 import type { DashboardMetrics, Insight } from '@/types/domain';
 import type { DashboardFilters } from '../types';
 
+export interface AssistantAction {
+  label: string;
+  type: 'filter' | 'navigate';
+  payload: Record<string, string>;
+}
+
+export interface AssistantNote {
+  id: string;
+  kind: string;
+  title: string;
+  message: string;
+  metric?: string;
+  tone: 'positive' | 'neutral' | 'warning' | 'negative';
+  priority: 'high' | 'normal';
+  action?: AssistantAction;
+}
+
+export interface AssistantDigest {
+  generatedAt: string;
+  headline: string;
+  notes: AssistantNote[];
+}
+
 export const dashboardApi = {
+  async assistant(signalKey?: string): Promise<AssistantDigest> {
+    const params: Record<string, string> = {};
+    if (signalKey) params.signalKey = signalKey;
+    const { data } = await api.get<AssistantDigest>('/dashboard/assistant', { params });
+    return data;
+  },
+
   async metrics(filters: DashboardFilters): Promise<DashboardMetrics> {
     const params: Record<string, string | number | boolean | string[] | undefined> = { range: filters.range };
     if (filters.range === 'custom' && filters.customRange) {

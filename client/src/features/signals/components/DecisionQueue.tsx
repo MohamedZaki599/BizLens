@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSignalsQuery } from '../hooks/useSignalsQuery';
 import { SignalCard } from './SignalCard';
 import { useT } from '@/lib/i18n';
+import { useFormatCurrency } from '@/lib/format';
 import type { PrioritySignalViewModel } from '../types';
 import { Loader2, ArrowRight } from 'lucide-react';
 import { NoSignalsEmpty } from '@/features/onboarding';
@@ -56,6 +57,7 @@ export const DecisionQueue = () => {
   const t = useT();
   const navigate = useNavigate();
   const { data: signals, isLoading, isError } = useSignalsQuery('priority');
+  const formatCurrency = useFormatCurrency();
 
   if (isLoading) {
     return (
@@ -76,7 +78,7 @@ export const DecisionQueue = () => {
 
   const prioritySignals: PrioritySignalViewModel[] = signals.map(s => ({
     ...s,
-    formattedValue: s.value ? `$${s.value.toLocaleString()}` : '',
+    formattedValue: s.value ? formatCurrency(Number(s.value)) : '',
     title: s.metadata?.title || s.key.replace(/_/g, ' '),
     explanation: s.metadata?.description || t('signal.defaultExplanation'),
     recommendedAction: s.metadata?.action || t('signal.defaultAction'),
@@ -110,10 +112,10 @@ export const DecisionQueue = () => {
               <Button
                 variant="tertiary"
                 onClick={() => navigate('/app/assistant')}
-                className="text-sm font-medium text-brand-primary hover:text-brand-primary/80"
+                className="text-sm font-medium text-brand-primary hover:text-brand-primary/80 min-h-[44px] focus-visible:ring-2 focus-visible:ring-offset-2"
               >
                 {t('signal.queue.viewAll')}
-                <ArrowRight size={16} className="rtl:rotate-180" />
+                <ArrowRight size={16} className="rtl:rotate-180" aria-hidden />
               </Button>
             </div>
           )}

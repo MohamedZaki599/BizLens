@@ -162,8 +162,10 @@ export const widgetsApi = {
     });
     return data;
   },
-  async assistant(): Promise<AssistantDigest> {
-    const { data } = await api.get<AssistantDigest>('/dashboard/assistant');
+  async assistant(signalKey?: string): Promise<AssistantDigest> {
+    const params: Record<string, string> = {};
+    if (signalKey) params.signalKey = signalKey;
+    const { data } = await api.get<AssistantDigest>('/dashboard/assistant', { params });
     return data;
   },
 };
