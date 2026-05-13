@@ -146,7 +146,7 @@ export const SignalWorkspacePanel = () => {
                     navigate(`/app/assistant?signalKey=${activeSignalKey}`);
                     closeWorkspace();
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-high/80 border border-outline/15 text-xs text-ink-muted hover:text-ink hover:border-outline/30 transition-colors focus-ring min-h-[36px]"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-high/80 border border-outline/15 text-xs text-ink-muted hover:text-ink hover:border-outline/30 transition-all duration-150 focus-ring min-h-[36px]"
                 >
                   {t('signal.workspace.askWhy')}
                 </button>
@@ -156,17 +156,17 @@ export const SignalWorkspacePanel = () => {
                     navigate(`/app/assistant?signalKey=${activeSignalKey}`);
                     closeWorkspace();
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-high/80 border border-outline/15 text-xs text-ink-muted hover:text-ink hover:border-outline/30 transition-colors focus-ring min-h-[36px]"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-high/80 border border-outline/15 text-xs text-ink-muted hover:text-ink hover:border-outline/30 transition-all duration-150 focus-ring min-h-[36px]"
                 >
                   {t('signal.workspace.explainImpact')}
                 </button>
               </div>
             </DialogBody>
 
-            {/* Sticky footer — actions */}
+            {/* Sticky footer — lifecycle actions */}
             <DialogFooter className="flex-col gap-3 items-stretch">
               <Button
-                className="w-full justify-between bg-brand-primary text-white hover:bg-brand-primary/90 h-11 focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
+                className="w-full justify-between bg-brand-primary text-white hover:bg-brand-primary/90 h-11 focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-all duration-150"
                 onClick={() => {
                   navigate(actionRoute);
                   closeWorkspace();
@@ -176,33 +176,34 @@ export const SignalWorkspacePanel = () => {
                 <ArrowRight size={16} className="rtl:rotate-180" aria-hidden="true" />
               </Button>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <Button
                   variant="secondary"
-                  className="flex-1 text-secondary border-secondary/30 hover:bg-secondary/10 focus-visible:ring-2 focus-visible:ring-offset-2"
+                  size="sm"
+                  className="flex-1 focus-visible:ring-2 focus-visible:ring-offset-2 transition-colors duration-150"
                   onClick={() => handleUpdateStatus('RESOLVED')}
                 >
-                  <Check size={16} aria-hidden="true" />
+                  <Check size={14} aria-hidden="true" />
                   {t('signal.workspace.resolve')}
                 </Button>
                 <Button
                   variant="secondary"
-                  className="flex-1 focus-visible:ring-2 focus-visible:ring-offset-2"
+                  size="sm"
+                  className="flex-1 focus-visible:ring-2 focus-visible:ring-offset-2 transition-colors duration-150"
                   onClick={() => handleUpdateStatus('INVESTIGATING')}
                 >
-                  <Search size={16} aria-hidden="true" />
+                  <Search size={14} aria-hidden="true" />
                   {t('signal.workspace.investigate')}
                 </Button>
                 <Button
                   variant="tertiary"
                   size="sm"
-                  className="text-ink-muted focus-visible:ring-2 focus-visible:ring-offset-2"
+                  className="text-ink-muted focus-visible:ring-2 focus-visible:ring-offset-2 transition-colors duration-150"
                   title={t('signal.workspace.snooze')}
                   aria-label={t('signal.workspace.snooze')}
                   onClick={() => handleUpdateStatus('SNOOZED')}
                 >
-                  <BellOff size={18} aria-hidden="true" />
-                  <span className="sr-only">{t('signal.workspace.snooze')}</span>
+                  <BellOff size={16} aria-hidden="true" />
                 </Button>
               </div>
             </DialogFooter>
