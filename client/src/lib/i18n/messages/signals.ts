@@ -7,19 +7,21 @@ export const signalMessagesEn = {
   // Signal lifecycle statuses
   'signal.status.NEW': 'New',
   'signal.status.REVIEWED': 'Reviewed',
-  'signal.status.INVESTIGATING': 'Investigating',
-  'signal.status.SNOOZED': 'Snoozed',
-  'signal.status.RESOLVED': 'Resolved',
+  'signal.status.INVESTIGATING': 'Under Review',
+  'signal.status.SNOOZED': 'Monitoring',
+  'signal.status.RESOLVED': 'Stable',
 
   // Executive Focus Bar
   'signal.focusBar.critical': 'Critical Signals',
   'signal.focusBar.investigating': 'Investigating',
   'signal.focusBar.awaitingReview': 'Awaiting Review',
   'signal.focusBar.reviewCta': 'Review Priority Signals',
+  'signal.focusBar.needsAttention': 'signals need your attention',
 
   // Decision Queue
-  'signal.queue.title': 'Priority Decision Queue',
-  'signal.queue.subtitle': 'Signals requiring your operational review.',
+  'signal.queue.title': 'Priority Signals',
+  'signal.queue.subtitle': 'Operational changes requiring your review.',
+  'signal.queue.recommended': 'Recommended next review',
   'signal.queue.empty': 'All clear! No priority signals require attention right now.',
   'signal.queue.loading': 'Analyzing financial operations…',
   'signal.queue.error': 'Failed to load operational signals.',
@@ -44,12 +46,14 @@ export const signalMessagesEn = {
   'signal.workspace.aiDescription': 'I can help you analyze the specific transactions causing this spike or forecast the impact on this month\'s cash flow.',
   'signal.workspace.analyzeTransactions': 'Analyze transactions',
   'signal.workspace.forecastImpact': 'Forecast impact',
-  'signal.workspace.resolve': 'Resolve',
-  'signal.workspace.investigate': 'Investigate',
-  'signal.workspace.snooze': 'Snooze',
+  'signal.workspace.resolve': 'Mark as Stable',
+  'signal.workspace.investigate': 'Situation Review',
+  'signal.workspace.snooze': 'Continue Monitoring',
   'signal.workspace.confidence': 'Confidence',
   'signal.workspace.reviewTransactions': 'Review transaction details',
   'signal.workspace.adjustThreshold': 'Adjust budget threshold',
+  'signal.workspace.askWhy': 'Why this changed',
+  'signal.workspace.explainImpact': 'Operational impact',
 
   // Severity labels
   'signal.severity.CRITICAL': 'Critical',
@@ -74,19 +78,21 @@ export const signalMessagesAr = {
   // Signal lifecycle statuses
   'signal.status.NEW': 'جديد',
   'signal.status.REVIEWED': 'تمت المراجعة',
-  'signal.status.INVESTIGATING': 'قيد التحقيق',
-  'signal.status.SNOOZED': 'مؤجَّل',
-  'signal.status.RESOLVED': 'تم الحل',
+  'signal.status.INVESTIGATING': 'قيد المراجعة',
+  'signal.status.SNOOZED': 'مراقبة مستمرة',
+  'signal.status.RESOLVED': 'مستقر',
 
   // Executive Focus Bar
   'signal.focusBar.critical': 'إشارات حرجة',
   'signal.focusBar.investigating': 'قيد التحقيق',
   'signal.focusBar.awaitingReview': 'بانتظار المراجعة',
   'signal.focusBar.reviewCta': 'مراجعة الإشارات ذات الأولوية',
+  'signal.focusBar.needsAttention': 'إشارات تحتاج انتباهك',
 
   // Decision Queue
-  'signal.queue.title': 'قائمة القرارات ذات الأولوية',
-  'signal.queue.subtitle': 'إشارات تتطلب مراجعتك التشغيلية.',
+  'signal.queue.title': 'الإشارات ذات الأولوية',
+  'signal.queue.subtitle': 'تغييرات تشغيلية تتطلب مراجعتك.',
+  'signal.queue.recommended': 'المراجعة التالية المُوصى بها',
   'signal.queue.empty': 'كل شيء واضح! لا توجد إشارات تتطلب انتباهك حاليًا.',
   'signal.queue.loading': 'جارٍ تحليل العمليات المالية…',
   'signal.queue.error': 'تعذّر تحميل الإشارات التشغيلية.',
@@ -111,12 +117,14 @@ export const signalMessagesAr = {
   'signal.workspace.aiDescription': 'يمكنني مساعدتك في تحليل المعاملات المسببة لهذا الارتفاع أو توقع التأثير على التدفق النقدي لهذا الشهر.',
   'signal.workspace.analyzeTransactions': 'تحليل المعاملات',
   'signal.workspace.forecastImpact': 'توقع التأثير',
-  'signal.workspace.resolve': 'حل',
-  'signal.workspace.investigate': 'تحقيق',
-  'signal.workspace.snooze': 'تأجيل',
+  'signal.workspace.resolve': 'تم الاستقرار',
+  'signal.workspace.investigate': 'مراجعة الوضع',
+  'signal.workspace.snooze': 'متابعة المراقبة',
   'signal.workspace.confidence': 'مستوى الثقة',
   'signal.workspace.reviewTransactions': 'مراجعة تفاصيل المعاملات',
   'signal.workspace.adjustThreshold': 'تعديل حدود الميزانية',
+  'signal.workspace.askWhy': 'لماذا تغيّر هذا',
+  'signal.workspace.explainImpact': 'التأثير التشغيلي',
 
   // Severity labels
   'signal.severity.CRITICAL': 'حرج',
