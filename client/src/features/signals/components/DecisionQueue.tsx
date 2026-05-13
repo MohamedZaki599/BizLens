@@ -15,12 +15,10 @@ function groupAndPrioritize(signals: PrioritySignalViewModel[]): PrioritySignalV
   const sevMap = { CRITICAL: 3, WARNING: 2, INFO: 1, NONE: 0 };
   const sorted = [...signals].sort((a, b) => sevMap[b.severity] - sevMap[a.severity]);
 
-  // Identify recurring expense signals (key contains RECURRING or SUBSCRIPTION)
   const recurringKeys = new Set(['RECURRING_EXPENSE', 'SUBSCRIPTION_DETECTED', 'RECURRING_CHARGE']);
   const recurring = sorted.filter(s => recurringKeys.has(s.key) || s.key.includes('RECURRING'));
   const nonRecurring = sorted.filter(s => !recurringKeys.has(s.key) && !s.key.includes('RECURRING'));
 
-  // If multiple recurring signals exist, cluster them into one summary
   if (recurring.length > 1) {
     const highest = recurring[0];
     const grouped: PrioritySignalViewModel = {
@@ -33,7 +31,6 @@ function groupAndPrioritize(signals: PrioritySignalViewModel[]): PrioritySignalV
     return [...nonRecurring.slice(0, MAX_VISIBLE - 1), grouped].slice(0, MAX_VISIBLE);
   }
 
-  // Similarly, group category anomalies
   const anomalyKeys = ['CATEGORY_ANOMALY', 'EXPENSE_SPIKE', 'SPEND_SPIKE'];
   const anomalies = nonRecurring.filter(s => anomalyKeys.some(k => s.key.includes(k)));
   const others = nonRecurring.filter(s => !anomalyKeys.some(k => s.key.includes(k)));
@@ -61,16 +58,16 @@ export const DecisionQueue = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-ink-muted">
-        <Loader2 className="w-8 h-8 animate-spin mb-4 text-brand-primary" />
-        <p>{t('signal.queue.loading')}</p>
+      <div className="flex flex-col items-center justify-center py-16 text-ink-muted">
+        <Loader2 className="w-6 h-6 animate-spin mb-3 text-brand-primary" />
+        <p className="text-sm">{t('signal.queue.loading')}</p>
       </div>
     );
   }
 
   if (isError || !signals) {
     return (
-      <div className="p-6 bg-danger/5 border border-danger/20 rounded-xl text-danger text-center">
+      <div className="p-5 bg-danger/5 border border-danger/15 rounded-xl text-danger text-center text-sm">
         {t('signal.queue.error')}
       </div>
     );
@@ -90,39 +87,45 @@ export const DecisionQueue = () => {
   const visible = groupAndPrioritize(prioritySignals);
   const totalCount = signals.length;
 
+  if (visible.length === 0) {
+    return <NoSignalsEmpty />;
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3">
+      {/* Attention guidance — recommended next review */}
+      <div className="flex items-baseline justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-ink font-display">{t('signal.queue.title')}</h2>
-          <p className="text-sm text-ink-muted mt-0.5">{t('signal.queue.subtitle')}</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-ink-muted">
+            {t('signal.queue.recommended')}
+          </p>
+          <h2 className="text-lg font-semibold text-ink font-display mt-0.5">
+            {t('signal.queue.title')}
+          </h2>
         </div>
+        {totalCount > MAX_VISIBLE && (
+          <Button
+            variant="tertiary"
+            size="sm"
+            onClick={() => navigate('/app/assistant')}
+            className="text-xs font-medium text-brand-primary hover:text-brand-primary/80 min-h-[44px] focus-visible:ring-2 focus-visible:ring-offset-2"
+          >
+            {t('signal.queue.viewAll')}
+            <ArrowRight size={14} className="rtl:rotate-180" aria-hidden />
+          </Button>
+        )}
       </div>
 
-      {visible.length > 0 ? (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {visible.map(signal => (
-              <SignalCard key={signal.id} signal={signal} />
-            ))}
-          </div>
-
-          {totalCount > MAX_VISIBLE && (
-            <div className="flex justify-center pt-2">
-              <Button
-                variant="tertiary"
-                onClick={() => navigate('/app/assistant')}
-                className="text-sm font-medium text-brand-primary hover:text-brand-primary/80 min-h-[44px] focus-visible:ring-2 focus-visible:ring-offset-2"
-              >
-                {t('signal.queue.viewAll')}
-                <ArrowRight size={16} className="rtl:rotate-180" aria-hidden />
-              </Button>
-            </div>
-          )}
-        </>
-      ) : (
-        <NoSignalsEmpty />
-      )}
+      {/* Signal cards — first card is the recommended focal point */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        {visible.map((signal, index) => (
+          <SignalCard
+            key={signal.id}
+            signal={signal}
+            recommended={index === 0}
+          />
+        ))}
+      </div>
     </div>
   );
 };
