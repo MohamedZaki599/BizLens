@@ -7,50 +7,84 @@ import { cn } from '@/lib/utils';
 
 interface SignalCardProps {
   signal: PrioritySignalViewModel;
+  /** Whether this is the top-priority recommended signal */
+  recommended?: boolean;
 }
 
 /**
- * SignalCard — operational signal summary.
- * Each card answers: what changed, why it matters, what to do next.
- * Calm, scannable, actionable.
+ * SignalCard — operational signal with priority-based visual hierarchy.
+ *
+ * Critical: subtle start-border accent, always-visible action
+ * Normal: calm weight, hover-reveal action
+ * Resolved: reduced emphasis, softer typography
  */
-export const SignalCard = ({ signal }: SignalCardProps) => {
+export const SignalCard = ({ signal, recommended = false }: SignalCardProps) => {
   const t = useT();
   const { openWorkspace } = useSignalWorkspace();
+
+  const isCritical = signal.severity === 'CRITICAL';
+  const isResolved = signal.status === 'RESOLVED' || signal.status === 'SNOOZED';
 
   return (
     <button
       type="button"
       onClick={() => openWorkspace(signal.key)}
       className={cn(
-        'group flex flex-col text-start w-full bg-surface rounded-xl border border-outline/20 p-4',
+        'group relative flex flex-col text-start w-full rounded-xl p-4',
         'transition-all duration-150 ease-out',
-        'hover:border-outline/40 hover:shadow-sm',
         'focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
         'active:scale-[0.99]',
+        // Priority-based visual treatment
+        isCritical && !isResolved
+          ? 'bg-surface border border-outline/30 shadow-sm hover:shadow-md hover:border-outline/50'
+          : isResolved
+            ? 'bg-surface-high/40 border border-outline/10 opacity-75 hover:opacity-100'
+            : 'bg-surface border border-outline/20 hover:border-outline/35 hover:shadow-sm',
+        // Recommended signal gets subtle elevation
+        recommended && !isResolved && 'ring-1 ring-brand-primary/10 shadow-sm',
       )}
     >
+      {/* Critical accent border */}
+      {isCritical && !isResolved && (
+        <span className="absolute inset-y-2 start-0 w-0.5 rounded-full bg-danger/60" aria-hidden />
+      )}
+
       {/* What changed */}
       <div className="flex items-start justify-between gap-3 mb-2">
-        <h3 className="font-display text-sm font-semibold text-ink leading-snug line-clamp-2 break-words group-hover:text-brand-primary transition-colors">
+        <h3 className={cn(
+          'font-display text-sm font-semibold leading-snug line-clamp-2 break-words transition-colors',
+          isResolved
+            ? 'text-ink-muted'
+            : 'text-ink group-hover:text-brand-primary',
+        )}>
           {signal.title}
         </h3>
         <SignalSeverityBadge severity={signal.severity} />
       </div>
 
       {/* Why it matters */}
-      <p className="text-xs text-ink-muted leading-relaxed line-clamp-2 break-words mb-3">
+      <p className={cn(
+        'text-xs leading-relaxed line-clamp-2 break-words mb-3',
+        isResolved ? 'text-ink-muted/70' : 'text-ink-muted',
+      )}>
         {signal.explanation}
       </p>
 
       {/* Metric + action */}
       <div className="mt-auto flex items-center justify-between gap-2 pt-2 border-t border-outline/10">
         {signal.formattedValue && (
-          <span className="text-base font-semibold tabular-nums text-ink" dir="ltr">
+          <span className={cn(
+            'text-base font-semibold tabular-nums',
+            isResolved ? 'text-ink-muted' : 'text-ink',
+          )} dir="ltr">
             {signal.formattedValue}
           </span>
         )}
-        <span className="ms-auto inline-flex items-center gap-1 text-xs font-medium text-brand-primary opacity-0 group-hover:opacity-100 transition-opacity">
+        <span className={cn(
+          'ms-auto inline-flex items-center gap-1 text-xs font-medium text-brand-primary transition-opacity',
+          // Critical: always visible. Others: hover-reveal
+          isCritical && !isResolved ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+        )}>
           {t('signal.card.reviewCta')}
           <ArrowRight size={12} className="rtl:rotate-180" aria-hidden />
         </span>

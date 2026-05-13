@@ -134,8 +134,32 @@ export const SignalWorkspacePanel = () => {
               )}
 
               {/* Confidence */}
-              <div className="text-xs text-ink-muted">
+              <div className="text-xs text-ink-muted mb-4">
                 {t('signal.workspace.confidence')}: {Math.round(signal.confidence * 100)}%
+              </div>
+
+              {/* Contextual intelligence actions — embedded, not separate */}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate(`/app/assistant?signalKey=${activeSignalKey}`);
+                    closeWorkspace();
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-high/80 border border-outline/15 text-xs text-ink-muted hover:text-ink hover:border-outline/30 transition-colors focus-ring min-h-[36px]"
+                >
+                  {t('signal.workspace.askWhy')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate(`/app/assistant?signalKey=${activeSignalKey}`);
+                    closeWorkspace();
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-high/80 border border-outline/15 text-xs text-ink-muted hover:text-ink hover:border-outline/30 transition-colors focus-ring min-h-[36px]"
+                >
+                  {t('signal.workspace.explainImpact')}
+                </button>
               </div>
             </DialogBody>
 
