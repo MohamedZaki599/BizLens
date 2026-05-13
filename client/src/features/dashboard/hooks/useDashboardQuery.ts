@@ -91,9 +91,9 @@ export const useBudgetSuggestions = () =>
     staleTime: 5 * 60_000,
   });
 
-export const useAssistantDigest = () =>
+export const useAssistantDigest = (signalKey?: string | null) =>
   useQuery({
-    queryKey: dashboardKeys.assistant(),
-    queryFn: widgetsApi.assistant,
+    queryKey: [...dashboardKeys.assistant(), signalKey ?? ''],
+    queryFn: () => widgetsApi.assistant(signalKey || undefined),
     staleTime: 60_000,
   });

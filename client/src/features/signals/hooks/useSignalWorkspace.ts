@@ -10,6 +10,12 @@ interface SignalWorkspaceState {
 export const useSignalWorkspace = create<SignalWorkspaceState>((set) => ({
   isOpen: false,
   activeSignalKey: null,
-  openWorkspace: (signalKey) => set({ isOpen: true, activeSignalKey: signalKey }),
-  closeWorkspace: () => set({ isOpen: false, activeSignalKey: null }),
+  openWorkspace: (signalKey) => {
+    document.body.style.overflow = 'hidden';
+    set({ isOpen: true, activeSignalKey: signalKey });
+  },
+  closeWorkspace: () => {
+    document.body.style.overflow = '';
+    set({ isOpen: false, activeSignalKey: null });
+  },
 }));

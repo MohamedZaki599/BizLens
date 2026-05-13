@@ -36,7 +36,7 @@ export const SignalCard = ({ signal }: SignalCardProps) => {
         </p>
 
         {signal.formattedValue && (
-          <div className="mt-3 text-xl font-bold tabular-nums text-ink truncate">
+          <div className="mt-3 text-xl font-bold tabular-nums text-ink truncate" dir="ltr">
             {signal.formattedValue}
           </div>
         )}
@@ -50,7 +50,7 @@ export const SignalCard = ({ signal }: SignalCardProps) => {
           </span>
           <Button
             onClick={handleOpenWorkspace}
-            className="shrink-0 bg-brand-primary text-white hover:bg-brand-primary/90 rounded-lg px-3 h-8 text-sm"
+            className="shrink-0 bg-brand-primary text-white hover:bg-brand-primary/90 rounded-lg px-3 h-8 min-h-[44px] min-w-[44px] text-sm focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
           >
             {t('signal.card.reviewCta')}
             <ArrowRight className="rtl:rotate-180" size={14} />

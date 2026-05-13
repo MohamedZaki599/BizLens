@@ -48,7 +48,7 @@ export const DashboardPage = () => {
   const hasNoSignals = !signals || signals.length === 0;
 
   return (
-    <div className="space-y-6 animate-fade-in relative">
+    <div className="space-y-5 animate-fade-in relative">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-bold tracking-tight">{t('dashboard.title')}</h1>
@@ -108,24 +108,33 @@ export const DashboardPage = () => {
               titleKey="guidance.reviewSignal.title"
               descKey="guidance.reviewSignal.desc"
               actionLabelKey="guidance.reviewSignal.action"
-              onAction={() => {/* navigate or scroll to signals section if any */}}
+              onAction={() => {
+                const el = document.getElementById('priority-decision-queue');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  navigate('/app/assistant');
+                }
+              }}
               className="mb-8"
             />
           )}
 
-          <DecisionQueue />
+          <section id="priority-decision-queue">
+            <DecisionQueue />
+          </section>
           
           <SignalWorkspacePanel />
 
-          <section className="mt-12 mb-8">
-            <h2 className="font-display text-xl font-bold tracking-tight text-ink mb-4">{t('dashboard.historicalTrends')}</h2>
+          <section className="mt-8 mb-6">
+            <h2 className="font-display text-lg font-semibold tracking-tight text-ink-muted mb-3">{t('dashboard.historicalTrends')}</h2>
             <div className="grid gap-4 lg:grid-cols-2">
               <ExpenseTrendChart />
               <ExpenseDonutChart />
             </div>
           </section>
 
-          <section className="card mb-8">
+          <section className="card mb-6 border-outline/20">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display text-lg font-semibold tracking-tight">
                 {t('dashboard.recent')}
