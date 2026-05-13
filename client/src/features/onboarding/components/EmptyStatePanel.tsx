@@ -4,7 +4,7 @@ import {
   Database,
   Radio,
   CheckCircle2,
-  Sparkles,
+  Activity,
   BarChart3,
   MessageCircle,
   Plus,
@@ -183,7 +183,7 @@ export const AssistantIdleEmpty = () => {
               key={key}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-lowest border border-outline/15 text-xs text-ink-muted hover:text-ink hover:border-outline/30 transition-colors cursor-pointer"
             >
-              <Sparkles size={12} />
+              <Activity size={12} />
               {t(`empty.assistant-idle.prompt.${key}`)}
             </span>
           ))}
