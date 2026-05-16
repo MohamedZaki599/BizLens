@@ -65,7 +65,7 @@ export const DashboardPage = () => {
           <div
             role="tablist"
             aria-label={t('dashboard.range.label')}
-            className="inline-flex p-0.5 rounded-lg bg-surface-high"
+            className="inline-flex flex-wrap p-0.5 rounded-lg bg-surface-high overflow-x-auto max-w-full"
           >
             {RANGES.map((r) => (
               <button
@@ -74,7 +74,7 @@ export const DashboardPage = () => {
                 aria-selected={range === r}
                 onClick={() => setRange(r)}
                 className={cn(
-                  'h-7 px-2.5 rounded-md text-xs font-medium transition-all duration-150 focus-ring',
+                  'px-2.5 rounded-md text-xs font-medium transition-all duration-150 focus-ring min-h-[44px] flex items-center justify-center',
                   range === r
                     ? 'bg-surface-lowest text-ink shadow-sm'
                     : 'text-ink-muted hover:text-ink',
@@ -123,17 +123,17 @@ export const DashboardPage = () => {
           <SignalWorkspacePanel />
 
           {/* C. Supporting Trends — secondary, visually receded */}
-          <section className="pt-4 border-t border-outline/10">
-            <h2 className="text-sm font-medium text-ink-muted mb-3">{t('dashboard.historicalTrends')}</h2>
-            <div className="grid gap-4 lg:grid-cols-2">
+          <section className="pt-8 mt-4 border-t border-outline/10">
+            <h2 className="text-sm font-medium text-ink-muted opacity-80 mb-3">{t('dashboard.historicalTrends')}</h2>
+            <div className="grid gap-4 lg:grid-cols-2 opacity-90">
               <ExpenseTrendChart />
               <ExpenseDonutChart />
             </div>
           </section>
 
           {/* Recent transactions — tertiary */}
-          <section className="pt-4 border-t border-outline/10">
-            <h2 className="text-sm font-medium text-ink-muted mb-3">
+          <section className="pt-8 mt-4 border-t border-outline/10 opacity-90">
+            <h2 className="text-sm font-medium text-ink-muted opacity-80 mb-3">
               {t('dashboard.recent')}
             </h2>
             {recent.isLoading ? (

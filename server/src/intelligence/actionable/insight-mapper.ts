@@ -11,7 +11,7 @@ import { formatMoney, formatPctChange } from '../../utils/safe-math';
  * all intelligence is derived ONLY from the centralized signal engine.
  */
 
-export const mapSignalToInsight = (signal: FinancialSignal): OperationalInsight | null => {
+export const mapSignalToInsight = (signal: FinancialSignal, currency = 'USD'): OperationalInsight | null => {
   const { key, value, severity, trend, metadata, confidence } = signal;
   const explain = metadata.explainability;
   
@@ -78,7 +78,7 @@ export const mapSignalToInsight = (signal: FinancialSignal): OperationalInsight 
     case 'PROJECTED_EXPENSE':
     case 'FORECAST_OVERSPEND': {
       insight.summary = 'On track to overspend';
-      insight.explanation = `If you continue at this rate, you'll spend about ${formatMoney(value)} this period. ${explain.reasoningChain.join(' ')}`;
+      insight.explanation = `If you continue at this rate, you'll spend about ${formatMoney(value, currency)} this period. ${explain.reasoningChain.join(' ')}`;
       break;
     }
 
@@ -115,9 +115,9 @@ const mapSeverity = (severity: FinancialSignal['severity'], trend: FinancialSign
 /**
  * Bulk maps a list of signals, filters out unmapped ones, and sorts by urgency.
  */
-export const mapSignalsToInsights = (signals: FinancialSignal[]): OperationalInsight[] => {
+export const mapSignalsToInsights = (signals: FinancialSignal[], currency = 'USD'): OperationalInsight[] => {
   return signals
-    .map(mapSignalToInsight)
+    .map((s) => mapSignalToInsight(s, currency))
     .filter((i): i is OperationalInsight => i !== null)
     .sort((a, b) => {
       const urgencyWeight = { high: 0, medium: 1, low: 2 };

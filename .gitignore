@@ -25,3 +25,10 @@ scratch/
 # OS files
 Thumbs.db
 desktop.ini
+
+
+#agent_db
+.agents
+
+*.agent
+*.kiro

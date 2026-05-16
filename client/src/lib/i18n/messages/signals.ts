@@ -33,7 +33,7 @@ export const signalMessagesEn = {
   // Signal Card
   'signal.card.recommended': 'Recommended',
   'signal.card.reviewCta': 'Review',
-  'signal.card.askAi': 'Ask AI:',
+  'signal.card.askAi': 'Drill down:',
   'signal.card.explainImpact': 'Explain impact',
   'signal.card.showRelated': 'Show related',
 
@@ -42,8 +42,8 @@ export const signalMessagesEn = {
   'signal.workspace.notFound': 'Signal not found',
   'signal.workspace.whyTitle': 'Why this happened',
   'signal.workspace.actionsTitle': 'Recommended Actions',
-  'signal.workspace.aiGuide': 'AI Guide',
-  'signal.workspace.aiDescription': 'I can help you analyze the specific transactions causing this spike or forecast the impact on this month\'s cash flow.',
+  'signal.workspace.aiGuide': 'Analysis Guide',
+  'signal.workspace.aiDescription': 'Analyze the specific transactions causing this spike or forecast the impact on this month\'s cash flow.',
   'signal.workspace.analyzeTransactions': 'Analyze transactions',
   'signal.workspace.forecastImpact': 'Forecast impact',
   'signal.workspace.resolve': 'Mark Stable',
@@ -104,7 +104,7 @@ export const signalMessagesAr = {
   // Signal Card
   'signal.card.recommended': 'الإجراء المُوصى به',
   'signal.card.reviewCta': 'مراجعة',
-  'signal.card.askAi': 'اسأل الذكاء الاصطناعي:',
+  'signal.card.askAi': 'تعمّق:',
   'signal.card.explainImpact': 'اشرح التأثير',
   'signal.card.showRelated': 'أظهر المرتبطة',
 
@@ -113,8 +113,8 @@ export const signalMessagesAr = {
   'signal.workspace.notFound': 'لم يتم العثور على الإشارة',
   'signal.workspace.whyTitle': 'لماذا حدث هذا',
   'signal.workspace.actionsTitle': 'الإجراءات الموصى بها',
-  'signal.workspace.aiGuide': 'دليل الذكاء الاصطناعي',
-  'signal.workspace.aiDescription': 'يمكنني مساعدتك في تحليل المعاملات المسببة لهذا الارتفاع أو توقع التأثير على التدفق النقدي لهذا الشهر.',
+  'signal.workspace.aiGuide': 'دليل التحليل',
+  'signal.workspace.aiDescription': 'حلّل المعاملات المسببة لهذا الارتفاع أو توقّع التأثير على التدفق النقدي لهذا الشهر.',
   'signal.workspace.analyzeTransactions': 'تحليل المعاملات',
   'signal.workspace.forecastImpact': 'توقع التأثير',
   'signal.workspace.resolve': 'مستقر',

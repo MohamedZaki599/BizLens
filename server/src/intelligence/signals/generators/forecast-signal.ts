@@ -39,6 +39,20 @@ export const generateForecastSignals = (
         actualExpense: snapshot.monthExpense,
         dailyBurnRate: projection.dailyBurnRate,
         remainingDays: projection.remainingDays,
+        explainability: {
+          formula: 'actualExpense + (dailyBurnRate * remainingDays)',
+          inputs: {
+            actualExpense: snapshot.monthExpense,
+            dailyBurnRate: projection.dailyBurnRate,
+            remainingDays: projection.remainingDays,
+            daysElapsed: snapshot.monthDaysElapsed,
+            totalDays: snapshot.monthTotalDays,
+          },
+          reasoningChain: [
+            `Daily burn rate: ${projection.dailyBurnRate.toFixed(2)} (${snapshot.monthExpense} over ${snapshot.monthDaysElapsed} days)`,
+            `Projected month-end expense: ${projection.projectedExpense.toFixed(2)} (${snapshot.monthExpense} actual + ${projection.dailyBurnRate.toFixed(2)} × ${projection.remainingDays} remaining days)`,
+          ],
+        },
       },
       ttlCategory: 'analytical',
     }),
@@ -52,6 +66,20 @@ export const generateForecastSignals = (
         actualIncome: snapshot.monthIncome,
         dailyEarnRate: projection.dailyEarnRate,
         remainingDays: projection.remainingDays,
+        explainability: {
+          formula: 'actualIncome + (dailyEarnRate * remainingDays)',
+          inputs: {
+            actualIncome: snapshot.monthIncome,
+            dailyEarnRate: projection.dailyEarnRate,
+            remainingDays: projection.remainingDays,
+            daysElapsed: snapshot.monthDaysElapsed,
+            totalDays: snapshot.monthTotalDays,
+          },
+          reasoningChain: [
+            `Daily earn rate: ${projection.dailyEarnRate.toFixed(2)} (${snapshot.monthIncome} over ${snapshot.monthDaysElapsed} days)`,
+            `Projected month-end income: ${projection.projectedIncome.toFixed(2)} (${snapshot.monthIncome} actual + ${projection.dailyEarnRate.toFixed(2)} × ${projection.remainingDays} remaining days)`,
+          ],
+        },
       },
       ttlCategory: 'analytical',
     }),
@@ -66,6 +94,20 @@ export const generateForecastSignals = (
       metadata: {
         projectedIncome: projection.projectedIncome,
         projectedExpense: projection.projectedExpense,
+        explainability: {
+          formula: 'projectedIncome - projectedExpense',
+          inputs: {
+            projectedIncome: projection.projectedIncome,
+            projectedExpense: projection.projectedExpense,
+            projectedProfit: projection.projectedProfit,
+          },
+          reasoningChain: [
+            `Projected profit: ${projection.projectedProfit.toFixed(2)} (${projection.projectedIncome.toFixed(2)} income − ${projection.projectedExpense.toFixed(2)} expense)`,
+            projection.projectedProfit < 0
+              ? 'Projected to end the month at a loss — expenses outpacing income'
+              : `Projected to end the month profitable with ${projection.projectedProfit.toFixed(2)} net`,
+          ],
+        },
       },
       ttlCategory: 'analytical',
     }),
@@ -82,7 +124,29 @@ export const generateForecastSignals = (
         trend: runway <= 7 ? 'down' : 'flat',
         severity: runway <= 3 ? 'critical' : runway <= 7 ? 'warning' : 'info',
         confidence: snapshot.monthDaysElapsed >= 7 ? 0.8 : 0.4,
-        metadata: { dailyNetBurn: netBurnRate, currentBalance: snapshot.monthProfit },
+        metadata: {
+          dailyNetBurn: netBurnRate,
+          currentBalance: snapshot.monthProfit,
+          explainability: {
+            formula: 'currentBalance / dailyNetBurn',
+            inputs: {
+              currentBalance: snapshot.monthProfit,
+              dailyNetBurn: netBurnRate,
+              dailyBurnRate: projection.dailyBurnRate,
+              dailyEarnRate: projection.dailyEarnRate,
+              runwayDays: runway,
+            },
+            thresholdContext: runway <= 3
+              ? `Critical: only ${runway} days of runway remaining`
+              : runway <= 7
+                ? `Warning: only ${runway} days of runway remaining`
+                : undefined,
+            reasoningChain: [
+              `Net daily burn: ${netBurnRate.toFixed(2)} (${projection.dailyBurnRate.toFixed(2)} expense − ${projection.dailyEarnRate.toFixed(2)} income per day)`,
+              `Cash runway: ${runway} days at current burn rate (${snapshot.monthProfit} balance ÷ ${netBurnRate.toFixed(2)} daily net burn)`,
+            ],
+          },
+        },
         ttlCategory: 'analytical',
       }),
     );

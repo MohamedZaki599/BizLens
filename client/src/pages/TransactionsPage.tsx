@@ -223,6 +223,7 @@ export const TransactionsPage = () => {
                       'text-sm font-semibold tabular-nums',
                       tx.type === 'INCOME' ? 'text-secondary' : 'text-danger',
                     )}
+                    dir="ltr"
                   >
                     {tx.type === 'INCOME' ? '+' : '−'}
                     {formatCurrency(Number(tx.amount))}

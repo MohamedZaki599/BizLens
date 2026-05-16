@@ -100,7 +100,7 @@ html[dir='rtl'] .tabular-nums {
   }
 
   .focus-ring {
-    @apply outline-none ring-0 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-bg;
+    @apply outline-none ring-0 focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg;
   }
 
   .card {
@@ -190,9 +190,9 @@ html[dir='rtl'] .skeleton {
   *,
   *::before,
   *::after {
-    animation-duration: 0.001ms !important;
+    animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
 }

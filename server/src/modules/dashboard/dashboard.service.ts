@@ -15,6 +15,9 @@ import {
   toSafeNumber,
 } from '../../utils/safe-math';
 import type { ResolvedRange } from './dashboard.range';
+import { signalEngine } from '../../intelligence/engine/signal-engine';
+import { deriveWarnings, validateConsistency } from '../../intelligence/adapters/dashboard-adapter';
+import { logger } from '../../config/logger';
 
 /**
  * Pure data-access helpers for the dashboard. Keep these functions free of
@@ -125,27 +128,23 @@ export const buildMetrics = async (
   const incomeChange = percentChange(income, prevIncome);
   const expenseChange = percentChange(expense, prevExpense);
 
-  const warnings: MetricsResult['warnings'] = [];
-  if (income > 0 && expense > income) {
-    warnings.push({
-      id: 'spend-exceeds-income',
-      severity: 'critical',
-      message: 'Expenses exceed income for this period.',
-    });
-  }
-  if (biggestExp && biggestExp.share >= 50) {
-    warnings.push({
-      id: 'concentrated-spend',
-      severity: 'warning',
-      message: `${biggestExp.name} accounts for ${biggestExp.share}% of spending.`,
-    });
-  }
-  if (expenseChange.hasComparison && expenseChange.pct >= 30) {
-    warnings.push({
-      id: 'expense-spike',
-      severity: 'warning',
-      message: `Spending is up ${expenseChange.pct}% versus the previous period.`,
-    });
+  // Derive warnings from canonical signals (replaces inline threshold checks)
+  const signals = await signalEngine.getSignals(userId, user?.userMode);
+  const signalWarnings = deriveWarnings(signals);
+  const warnings: MetricsResult['warnings'] = signalWarnings.map(
+    ({ signalKey: _signalKey, ...rest }) => rest,
+  );
+
+  // Validate consistency between dashboard-computed changes and signal-derived trends
+  const consistency = validateConsistency(
+    {
+      expense: { direction: expenseChange.direction, pct: expenseChange.pct },
+      profit: { direction: profitChange.direction, pct: profitChange.pct },
+    },
+    signals,
+  );
+  if (!consistency.consistent) {
+    logger.warn('Dashboard/signal trend mismatch', { userId, issues: consistency.issues });
   }
 
   return {
@@ -164,6 +163,10 @@ const MS_PER_DAY = 86_400_000;
 
 export const buildForecast = async (userId: string, r: ResolvedRange) => {
   const now = new Date();
+  // Fetch user currency for monetary formatting
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { currency: true } });
+  const currency = user?.currency ?? 'USD';
+
   const effectiveFrom = r.from ?? startOfMonth(now);
   const effectiveTo = r.to ?? endOfMonth(now);
   const totalDays = Math.max(
@@ -193,17 +196,17 @@ export const buildForecast = async (userId: string, r: ResolvedRange) => {
   const profitChange = percentChange(projectedProfit, lastInc - lastExp);
 
   let narrative = `Based on your activity so far, you're on track for ${formatMoney(
-    projectedExpense,
-  )} in expenses and ${formatMoney(projectedIncome)} in income — a projected profit of ${formatMoney(
-    projectedProfit,
+    projectedExpense, currency,
+  )} in expenses and ${formatMoney(projectedIncome, currency)} in income — a projected profit of ${formatMoney(
+    projectedProfit, currency,
   )}.`;
   if (expChange.hasComparison && expChange.pct >= 15) {
     narrative = `If you continue at this rate, you'll spend about ${formatMoney(
-      projectedExpense,
+      projectedExpense, currency,
     )} this period — ${Math.round(expChange.pct)}% more than the prior period.`;
   } else if (projectedProfit < 0) {
     narrative = `If you continue at this rate, you'll end the period down ${formatMoney(
-      Math.abs(projectedProfit),
+      Math.abs(projectedProfit), currency,
     )}. Time to look at expenses.`;
   }
 
@@ -223,6 +226,10 @@ export const buildForecast = async (userId: string, r: ResolvedRange) => {
 
 export const buildMoneyLeak = async (userId: string, r: ResolvedRange) => {
   const now = new Date();
+  // Fetch user currency for monetary formatting
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { currency: true } });
+  const currency = user?.currency ?? 'USD';
+
   const thisFrom = r.from ?? startOfMonth(now);
   const thisTo = r.to ?? endOfMonth(now);
   const baseStart = startOfMonth(subMonths(thisFrom, 3));
@@ -279,9 +286,9 @@ export const buildMoneyLeak = async (userId: string, r: ResolvedRange) => {
     extra: top.extra,
     annualized,
     message: `${cat.name} is costing you ${formatMoney(
-      top.extra,
+      top.extra, currency,
     )} more this period than your baseline average — that's ${formatMoney(
-      annualized,
+      annualized, currency,
     )} a year if it sticks.`,
   };
 };

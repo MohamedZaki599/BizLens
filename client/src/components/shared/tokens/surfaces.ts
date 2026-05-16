@@ -2,6 +2,19 @@
  * BizLens Design Tokens — Spacing, radius, shadows, overlays, surfaces.
  */
 
+/**
+ * Spacing rhythm — the standard vertical/horizontal rhythm used across the app.
+ * Maps directly to Tailwind's spacing scale.
+ */
+export const rhythm = {
+  /** 16px — compact spacing (gap between related elements). Tailwind: space-4, gap-4, p-4. */
+  4: '1rem',
+  /** 20px — default spacing (section internal padding). Tailwind: space-5, gap-5, p-5. */
+  5: '1.25rem',
+  /** 24px — generous spacing (section separation). Tailwind: space-6, gap-6, p-6. */
+  6: '1.5rem',
+} as const;
+
 /** Semantic spacing scale (maps to Tailwind spacing where possible). */
 export const spacing = {
   /** Dialog internal padding. */

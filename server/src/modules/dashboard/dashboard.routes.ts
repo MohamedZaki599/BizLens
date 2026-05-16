@@ -37,6 +37,7 @@ router.get(
     const { range } = req.query as { range: string };
     const r = resolveRange(range);
     const metrics = await buildMetrics(req.user.id, range, r);
+    res.set('Cache-Control', 'private, max-age=300');
     res.json(metrics);
   }),
 );
@@ -47,7 +48,12 @@ router.get(
     if (!req.user) throw HttpError.unauthorized();
     // Insights use fixed comparison windows internally, so the dashboard
     // range is intentionally not forwarded here.
-    const insights = await insightEngine.generate(req.user.id);
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { currency: true },
+    });
+    const currency = user?.currency ?? 'USD';
+    const insights = await insightEngine.generate(req.user.id, currency);
     res.json({ insights });
   }),
 );
@@ -74,7 +80,9 @@ router.get(
   asyncHandler(async (req, res) => {
     if (!req.user) throw HttpError.unauthorized();
     const { range } = req.query as { range: string };
-    res.json(await buildForecast(req.user.id, resolveRange(range)));
+    const forecast = await buildForecast(req.user.id, resolveRange(range));
+    res.set('Cache-Control', 'private, max-age=300');
+    res.json(forecast);
   }),
 );
 
@@ -93,7 +101,9 @@ router.get(
   '/weekly-summary',
   asyncHandler(async (req, res) => {
     if (!req.user) throw HttpError.unauthorized();
-    res.json(await buildWeeklySummary(req.user.id));
+    const summary = await buildWeeklySummary(req.user.id);
+    res.set('Cache-Control', 'private, max-age=300');
+    res.json(summary);
   }),
 );
 

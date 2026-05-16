@@ -31,7 +31,20 @@ export const generateProfitSignals = (
         margin.profit > 0 ? 'up' : margin.profit < 0 ? 'down' : 'flat',
       severity: margin.profit < 0 ? 'warning' : 'none',
       confidence: snapshot.monthTransactionCount >= 5 ? 1.0 : 0.5,
-      metadata: { profit: margin.profit, income: snapshot.monthIncome, expense: snapshot.monthExpense },
+      metadata: {
+        profit: margin.profit,
+        income: snapshot.monthIncome,
+        expense: snapshot.monthExpense,
+        explainability: {
+          formula: '(income - expense) / income * 100',
+          inputs: { income: snapshot.monthIncome, expense: snapshot.monthExpense, profit: margin.profit },
+          reasoningChain: [
+            margin.profit < 0
+              ? `Expenses (${snapshot.monthExpense}) exceed income (${snapshot.monthIncome}) — operating at a loss`
+              : `Profit margin at ${margin.marginPct}% (${margin.profit} profit on ${snapshot.monthIncome} income)`,
+          ],
+        },
+      },
       ttlCategory: 'dashboard',
     }),
   );
@@ -43,7 +56,20 @@ export const generateProfitSignals = (
       generatedAt,
       trend: revenueGrowth.direction,
       confidence: revenueGrowth.hasComparison ? 1.0 : 0.0,
-      metadata: { current: snapshot.monthIncome, previous: snapshot.prevMonthIncome, delta: revenueGrowth.delta },
+      metadata: {
+        current: snapshot.monthIncome,
+        previous: snapshot.prevMonthIncome,
+        delta: revenueGrowth.delta,
+        explainability: {
+          formula: '(currentIncome - previousIncome) / |previousIncome| * 100',
+          inputs: { current: snapshot.monthIncome, previous: snapshot.prevMonthIncome, changePct: revenueGrowth.pct },
+          reasoningChain: [
+            revenueGrowth.hasComparison
+              ? `Revenue ${revenueGrowth.direction} ${Math.abs(revenueGrowth.pct)}% vs last month (${snapshot.monthIncome} vs ${snapshot.prevMonthIncome})`
+              : 'No prior month data for revenue comparison',
+          ],
+        },
+      },
       ttlCategory: 'dashboard',
     }),
   );
@@ -56,7 +82,21 @@ export const generateProfitSignals = (
       trend: expenseGrowth.direction,
       severity: expenseGrowth.hasComparison && expenseGrowth.pct >= 30 ? 'warning' : 'none',
       confidence: expenseGrowth.hasComparison ? 1.0 : 0.0,
-      metadata: { current: snapshot.monthExpense, previous: snapshot.prevMonthExpense, delta: expenseGrowth.delta },
+      metadata: {
+        current: snapshot.monthExpense,
+        previous: snapshot.prevMonthExpense,
+        delta: expenseGrowth.delta,
+        explainability: {
+          formula: '(currentExpense - previousExpense) / |previousExpense| * 100',
+          inputs: { current: snapshot.monthExpense, previous: snapshot.prevMonthExpense, changePct: expenseGrowth.pct },
+          thresholdContext: expenseGrowth.pct >= 30 ? 'Exceeded 30% expense growth warning threshold' : undefined,
+          reasoningChain: [
+            expenseGrowth.hasComparison
+              ? `Expenses ${expenseGrowth.direction} ${Math.abs(expenseGrowth.pct)}% vs last month (${snapshot.monthExpense} vs ${snapshot.prevMonthExpense})`
+              : 'No prior month data for expense comparison',
+          ],
+        },
+      },
       ttlCategory: 'dashboard',
     }),
   );
@@ -83,6 +123,24 @@ export const generateProfitSignals = (
         currentProfit: profitTrend.currentProfit,
         previousProfit: profitTrend.previousProfit,
         isDropping: profitTrend.isDropping,
+        explainability: {
+          formula: '(currentProfit - previousProfit) / |previousProfit| * 100',
+          inputs: {
+            currentProfit: profitTrend.currentProfit,
+            previousProfit: profitTrend.previousProfit,
+            changePct: profitTrend.change.pct,
+          },
+          thresholdContext: profitTrend.isDropping
+            ? `Profit dropped ${Math.abs(profitTrend.change.pct)}% (warning: ${dropWarning}%, critical: ${dropCritical}%)`
+            : undefined,
+          reasoningChain: [
+            profitTrend.change.hasComparison
+              ? profitTrend.isDropping
+                ? `Profit dropped ${Math.abs(profitTrend.change.pct)}% vs last month (${profitTrend.currentProfit} vs ${profitTrend.previousProfit})`
+                : `Profit ${profitTrend.change.direction} ${Math.abs(profitTrend.change.pct)}% vs last month`
+              : 'No prior month data for profit trend comparison',
+          ],
+        },
       },
       ttlCategory: 'dashboard',
     }),

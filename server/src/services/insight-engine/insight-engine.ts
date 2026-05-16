@@ -108,8 +108,14 @@ const totalsByCategory = async (
 
 // ─── Insight generators ───────────────────────────────────────────────────
 
-/** #1 Weekly comparison — week-over-week movement on the more volatile side. */
-const weeklyComparison = async (userId: string): Promise<Insight | null> => {
+/** 
+ * #1 Weekly comparison — week-over-week movement on the more volatile side.
+ * @deprecated Overlaps with WEEKLY_SPEND_CHANGE signal generator.
+ * // TODO: consolidate with signal engine — this generator computes the same
+ * // week-over-week expense/income change that the WEEKLY_SPEND_CHANGE signal
+ * // already provides. Kept for now because /insights has a different response format.
+ */
+const weeklyComparison = async (userId: string, currency = 'USD'): Promise<Insight | null> => {
   const now = new Date();
   const thisStart = startOfWeek(now, { weekStartsOn: 1 });
   const thisEnd = endOfWeek(now, { weekStartsOn: 1 });
@@ -181,7 +187,7 @@ const weeklyComparison = async (userId: string): Promise<Insight | null> => {
 };
 
 /** #2 Monthly comparison — this-month vs last-month profit & spend. */
-const monthlyComparison = async (userId: string): Promise<Insight | null> => {
+const monthlyComparison = async (userId: string, currency = 'USD'): Promise<Insight | null> => {
   const now = new Date();
   const thisStart = startOfMonth(now);
   const thisEnd = endOfMonth(now);
@@ -201,10 +207,10 @@ const monthlyComparison = async (userId: string): Promise<Insight | null> => {
       id: 'monthly-debut',
       kind: 'monthly-comparison',
       title: 'Monthly trend',
-      message: `You've spent ${formatMoney(thisExp)} this month so far. Last month had no recorded spend to compare against.`,
+      message: `You've spent ${formatMoney(thisExp, currency)} this month so far. Last month had no recorded spend to compare against.`,
       tone: 'neutral',
       severity: 'info',
-      metric: formatMoney(thisExp),
+      metric: formatMoney(thisExp, currency),
       priority: 50,
     };
   }
@@ -259,7 +265,7 @@ const monthlyComparison = async (userId: string): Promise<Insight | null> => {
 };
 
 /** #3 Top expense category — actionable, with budget share. */
-const topExpense = async (userId: string): Promise<Insight | null> => {
+const topExpense = async (userId: string, _currency = 'USD'): Promise<Insight | null> => {
   const now = new Date();
   const start = startOfMonth(now);
   const end = endOfMonth(now);
@@ -294,7 +300,7 @@ const topExpense = async (userId: string): Promise<Insight | null> => {
 };
 
 /** #3b Top income — surfaces the engine of growth. */
-const topIncome = async (userId: string): Promise<Insight | null> => {
+const topIncome = async (userId: string, _currency = 'USD'): Promise<Insight | null> => {
   const now = new Date();
   const start = startOfMonth(now);
   const end = endOfMonth(now);
@@ -323,8 +329,14 @@ const topIncome = async (userId: string): Promise<Insight | null> => {
   };
 };
 
-/** #4 Profit trend — month-over-month change. */
-const profitTrend = async (userId: string): Promise<Insight | null> => {
+/**
+ * #4 Profit trend — month-over-month change.
+ * @deprecated Overlaps with PROFIT_TREND signal generator.
+ * // TODO: consolidate with signal engine — this generator computes the same
+ * // month-over-month profit change that the PROFIT_TREND signal already provides.
+ * // Kept for now because /insights has a different response format.
+ */
+const profitTrend = async (userId: string, currency = 'USD'): Promise<Insight | null> => {
   const now = new Date();
   const thisStart = startOfMonth(now);
   const thisEnd = endOfMonth(now);
@@ -352,10 +364,10 @@ const profitTrend = async (userId: string): Promise<Insight | null> => {
       id: 'profit-debut',
       kind: 'profit-trend',
       title: 'Monthly profit',
-      message: `Your profit so far this month is ${formatMoney(thisProfit)}.`,
+      message: `Your profit so far this month is ${formatMoney(thisProfit, currency)}.`,
       tone,
       severity: thisProfit < 0 ? 'warning' : 'info',
-      metric: formatMoney(thisProfit),
+      metric: formatMoney(thisProfit, currency),
       priority: 20,
     };
   }
@@ -407,8 +419,12 @@ const profitTrend = async (userId: string): Promise<Insight | null> => {
 /**
  * #5 Spending anomaly — flags a category whose this-month spend is dramatically
  * higher than its 3-month average (excluding categories with no history).
+ * @deprecated Overlaps with SPENDING_ANOMALY signal generator.
+ * // TODO: consolidate with signal engine — this generator computes the same
+ * // baseline-vs-current anomaly detection that the SPENDING_ANOMALY signal
+ * // already provides. Kept for now because /insights has a different response format.
  */
-const spendingAnomaly = async (userId: string): Promise<Insight | null> => {
+const spendingAnomaly = async (userId: string, _currency = 'USD'): Promise<Insight | null> => {
   const now = new Date();
   const thisStart = startOfMonth(now);
   const thisEnd = endOfMonth(now);
@@ -472,14 +488,14 @@ export const insightEngine = {
    * comparisons stay meaningful regardless of the dashboard's selected range.
    * The `/insights` route therefore does not forward a `range` parameter.
    */
-  async generate(userId: string): Promise<Insight[]> {
+  async generate(userId: string, currency = 'USD'): Promise<Insight[]> {
     const candidates = await Promise.all([
-      spendingAnomaly(userId),
-      profitTrend(userId),
-      topExpense(userId),
-      monthlyComparison(userId),
-      weeklyComparison(userId),
-      topIncome(userId),
+      spendingAnomaly(userId, currency),
+      profitTrend(userId, currency),
+      topExpense(userId, currency),
+      monthlyComparison(userId, currency),
+      weeklyComparison(userId, currency),
+      topIncome(userId, currency),
     ]);
 
     const sorted = candidates

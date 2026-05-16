@@ -178,7 +178,7 @@ export const AlertCenter = ({ language }: { language: string }) => {
                       <span
                         aria-hidden
                         className={cn(
-                          'absolute start-0 inset-y-0 w-[3px] rounded-r',
+                          'absolute start-0 inset-y-0 w-[3px] rounded-e',
                           severityRail[a.severity],
                           a.isRead && 'opacity-40',
                         )}

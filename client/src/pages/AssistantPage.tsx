@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle,
   ArrowRight,
+  BarChart3,
   CheckCircle2,
   Info,
   RefreshCw,
-  Activity,
   TrendingDown,
   type LucideIcon,
 } from 'lucide-react';
@@ -89,15 +89,15 @@ const NoteCard = ({ note }: { note: AssistantNote }) => {
       )}
     >
       <span aria-hidden className={cn('absolute inset-y-0 start-0 w-1', tone.rail)} />
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-3 sm:gap-4">
         <span
           aria-hidden
           className={cn(
-            'h-10 w-10 shrink-0 rounded-xl flex items-center justify-center',
+            'h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-xl flex items-center justify-center',
             tone.chip,
           )}
         >
-          <Icon size={18} />
+          <Icon size={16} />
         </span>
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-baseline gap-2">
@@ -115,7 +115,7 @@ const NoteCard = ({ note }: { note: AssistantNote }) => {
                 : t('assistant.priority.normal')}
             </span>
           </div>
-          <p className="mt-1.5 text-sm text-ink-muted leading-relaxed">{note.message}</p>
+          <p className="mt-1.5 text-sm text-ink-muted leading-relaxed break-words">{note.message}</p>
           {note.action && (
             <div className="mt-3">
               <button
@@ -137,15 +137,18 @@ export const AssistantPage = () => {
   const t = useT();
   const ti = useTi();
   const formatTime = useFormatTime();
-  const activeSignalKey = useSignalWorkspace((s) => s.activeSignalKey);
+  const [searchParams] = useSearchParams();
+  const urlSignalKey = searchParams.get('signalKey');
+  const storeSignalKey = useSignalWorkspace((s) => s.activeSignalKey);
+  const activeSignalKey = urlSignalKey || storeSignalKey;
   const { data, isLoading, isFetching, refetch } = useAssistantDigest(activeSignalKey);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-bold tracking-tight inline-flex items-center gap-2">
-            <Activity size={22} className="text-primary" aria-hidden />
+            <BarChart3 size={22} className="text-primary" aria-hidden />
             {t('assistant.title')}
           </h1>
           <p className="text-ink-muted mt-1">{t('assistant.subtitle')}</p>
@@ -171,7 +174,7 @@ export const AssistantPage = () => {
         </div>
       ) : !data || data.notes.length === 0 ? (
         <EmptyState
-          icon={Activity}
+          icon={BarChart3}
           title={t('assistant.empty.title')}
           subtitle={t('assistant.empty.subtitle')}
         />
@@ -181,7 +184,7 @@ export const AssistantPage = () => {
             <p className="text-xs uppercase tracking-wide text-ink-muted font-medium">
               {t('assistant.headline')}
             </p>
-            <p className="font-display text-lg sm:text-xl font-semibold text-ink mt-1.5 leading-snug">
+            <p className="font-display text-lg sm:text-xl font-semibold text-ink mt-1.5 leading-snug break-words">
               {data.headline}
             </p>
             <p className="text-[11px] text-ink-muted mt-2">

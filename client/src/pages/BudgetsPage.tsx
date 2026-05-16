@@ -73,7 +73,7 @@ const BudgetCard = ({
             >
               {b.category.name}
             </button>
-            <p className="text-xs text-ink-muted tabular-nums mt-0.5">
+            <p className="text-xs text-ink-muted tabular-nums mt-0.5" dir="ltr">
               {formatCurrency(b.used)} / {formatCurrency(b.limit)}
             </p>
           </div>
@@ -279,7 +279,7 @@ export const BudgetsPage = () => {
               </span>
               <div>
                 <p className="stat-label">{t('budgets.totalCap')}</p>
-                <p className="font-display text-2xl font-semibold tabular-nums">
+                <p className="font-display text-2xl font-semibold tabular-nums" dir="ltr">
                   {formatCurrency(stats.totalCap)}
                 </p>
               </div>
@@ -290,7 +290,7 @@ export const BudgetsPage = () => {
               </span>
               <div>
                 <p className="stat-label">{t('budgets.totalUsed')}</p>
-                <p className="font-display text-2xl font-semibold tabular-nums">
+                <p className="font-display text-2xl font-semibold tabular-nums" dir="ltr">
                   {formatCurrency(stats.totalUsed)}
                 </p>
               </div>
@@ -359,7 +359,7 @@ export const BudgetsPage = () => {
                   />
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{s.category.name}</p>
-                    <p className="text-xs text-ink-muted tabular-nums mt-0.5">
+                    <p className="text-xs text-ink-muted tabular-nums mt-0.5" dir="ltr">
                       {ti('budgets.suggestions.average', {
                         amount: formatCurrency(s.averageMonthly),
                       })}{' '}

@@ -231,7 +231,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
             className={cn(
               'w-full h-11 rounded-xl bg-surface-lowest ps-3 pe-10 text-sm text-start',
               'flex items-center gap-2 transition-all duration-200 ease-quintessential',
-              'border border-transparent focus:outline-none',
+              'border border-transparent focus:outline-none focus-ring',
               open && 'border-primary/50',
               error && 'border-danger/40',
               disabled && 'opacity-50 cursor-not-allowed',

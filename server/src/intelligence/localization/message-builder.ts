@@ -8,7 +8,7 @@
 import type { FinancialSignal } from '../signals/signal.types';
 import { en } from './templates/en';
 
-type MessageTemplates = Record<string, (signal: FinancialSignal) => string>;
+type MessageTemplates = Record<string, (signal: FinancialSignal, currency?: string) => string>;
 
 const LOCALES: Record<string, MessageTemplates> = {
   en,
@@ -22,13 +22,14 @@ const LOCALES: Record<string, MessageTemplates> = {
 export const buildMessage = (
   signal: FinancialSignal,
   locale: string = 'en',
+  currency?: string,
 ): string => {
   const templates = LOCALES[locale] ?? LOCALES.en;
   const template = templates[signal.key];
   if (!template) {
     return `Signal ${signal.key}: ${signal.value}`;
   }
-  return template(signal);
+  return template(signal, currency);
 };
 
 /**
@@ -37,10 +38,11 @@ export const buildMessage = (
 export const buildMessages = (
   signals: FinancialSignal[],
   locale: string = 'en',
+  currency?: string,
 ): Map<string, string> => {
   const result = new Map<string, string>();
   for (const signal of signals) {
-    result.set(signal.key, buildMessage(signal, locale));
+    result.set(signal.key, buildMessage(signal, locale, currency));
   }
   return result;
 };

@@ -8,7 +8,7 @@
 import type { FinancialSignal } from '../../signals/signal.types';
 import { formatMoney, formatPctChange } from '../../../utils/safe-math';
 
-type MessageTemplate = (signal: FinancialSignal) => string;
+type MessageTemplate = (signal: FinancialSignal, currency?: string) => string;
 
 const m = (signal: FinancialSignal) => signal.metadata as Record<string, any>;
 
@@ -28,15 +28,15 @@ export const en: Record<string, MessageTemplate> = {
       ? `No prior month to compare expenses against.`
       : `Expenses are ${s.trend} ${formatPctChange(s.value)} versus last month.`,
 
-  PROFIT_TREND: (s) =>
+  PROFIT_TREND: (s, currency) =>
     m(s).isDropping
       ? `Profit is down ${formatPctChange(Math.abs(s.value))} versus last month (${formatMoney(
-          m(s).currentProfit,
-        )} vs ${formatMoney(m(s).previousProfit)}).`
+          m(s).currentProfit, currency,
+        )} vs ${formatMoney(m(s).previousProfit, currency)}).`
       : `Profit is up ${formatPctChange(s.value)} versus last month.`,
 
-  BURN_RATE: (s) =>
-    `You're spending about ${formatMoney(s.value)} per day.`,
+  BURN_RATE: (s, currency) =>
+    `You're spending about ${formatMoney(s.value, currency)} per day.`,
 
   EXPENSE_RATIO: (s) =>
     s.value >= 1
@@ -52,32 +52,32 @@ export const en: Record<string, MessageTemplate> = {
   CATEGORY_CONCENTRATION: (s) =>
     `${m(s).categoryName} accounts for ${s.value}% of spending — consider diversifying.`,
 
-  SPEND_SPIKE: (s) =>
+  SPEND_SPIKE: (s, currency) =>
     `${m(s).categoryName} spending spiked ${formatPctChange(s.value)} above its baseline (${formatMoney(
-      m(s).currentAmount,
-    )} vs ~${formatMoney(m(s).baselineAvg)} average).`,
+      m(s).currentAmount, currency,
+    )} vs ~${formatMoney(m(s).baselineAvg, currency)} average).`,
 
-  WEEKLY_SPEND_CHANGE: (s) =>
+  WEEKLY_SPEND_CHANGE: (s, currency) =>
     s.confidence === 0
       ? `No prior week to compare spending against.`
       : `Weekly spending is ${s.trend} ${formatPctChange(s.value)} (${formatMoney(
-          m(s).thisWeek,
-        )} vs ${formatMoney(m(s).lastWeek)} last week).`,
+          m(s).thisWeek, currency,
+        )} vs ${formatMoney(m(s).lastWeek, currency)} last week).`,
 
-  PROJECTED_EXPENSE: (s) =>
+  PROJECTED_EXPENSE: (s, currency) =>
     m(s).isOverspending
-      ? `On track to spend ${formatMoney(s.value)} this month — ${formatPctChange(
+      ? `On track to spend ${formatMoney(s.value, currency)} this month — ${formatPctChange(
           m(s).vsLastMonth,
         )} versus last month.`
-      : `Projected expenses for the month: ${formatMoney(s.value)}.`,
+      : `Projected expenses for the month: ${formatMoney(s.value, currency)}.`,
 
-  PROJECTED_INCOME: (s) =>
-    `Projected income for the month: ${formatMoney(s.value)}.`,
+  PROJECTED_INCOME: (s, currency) =>
+    `Projected income for the month: ${formatMoney(s.value, currency)}.`,
 
-  PROJECTED_PROFIT: (s) =>
+  PROJECTED_PROFIT: (s, currency) =>
     s.value >= 0
-      ? `Projected profit: ${formatMoney(s.value)}.`
-      : `On track for a ${formatMoney(Math.abs(s.value))} loss this month.`,
+      ? `Projected profit: ${formatMoney(s.value, currency)}.`
+      : `On track for a ${formatMoney(Math.abs(s.value), currency)} loss this month.`,
 
   CASH_RUNWAY_DAYS: (s) =>
     s.value <= 3
@@ -92,8 +92,8 @@ export const en: Record<string, MessageTemplate> = {
       ? `It's been ${s.value} days since your last transaction. Update your data to keep insights accurate.`
       : `You haven't logged a transaction in ${s.value} days — add the latest to keep trends fresh.`,
 
-  RECURRING_EXPENSE: (s) =>
-    `${m(s).categoryName} of about ${formatMoney(s.value)} repeats monthly (detected across ${
+  RECURRING_EXPENSE: (s, currency) =>
+    `${m(s).categoryName} of about ${formatMoney(s.value, currency)} repeats monthly (detected across ${
       m(s).monthsDetected
     } months).`,
 };

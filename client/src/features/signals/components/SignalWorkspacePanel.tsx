@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useSignalWorkspace } from '../hooks/useSignalWorkspace';
 import { useSignalByKeyQuery, useUpdateSignalStatusMutation } from '../hooks/useSignalsQuery';
-import { X, Check, Search, BellOff, ArrowRight } from 'lucide-react';
+import { Check, Search, BellOff, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { SignalSeverityBadge } from './SignalSeverityBadge';
 import { SignalLifecycleBadge } from './SignalLifecycleBadge';
@@ -21,7 +21,7 @@ import {
 
 export const SignalWorkspacePanel = () => {
   const t = useT();
-  const { isRtl } = useLocale();
+  const { dir } = useLocale();
   const formatCurrency = useFormatCurrency();
   const { isOpen, activeSignalKey, closeWorkspace } = useSignalWorkspace();
   const { data: signal, isLoading } = useSignalByKeyQuery(activeSignalKey || '');
@@ -78,9 +78,9 @@ export const SignalWorkspacePanel = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent size="md" hideClose={false}>
+      <DialogContent size="md" hideClose={false} dir={dir}>
         {isLoading ? (
-          <div className="flex items-center justify-center h-64 text-ink-muted">
+          <div className="flex items-center justify-center h-64 text-ink-muted" aria-busy>
             {t('signal.workspace.loading')}
           </div>
         ) : signal ? (
@@ -146,9 +146,9 @@ export const SignalWorkspacePanel = () => {
                     navigate(`/app/assistant?signalKey=${activeSignalKey}`);
                     closeWorkspace();
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-high/80 border border-outline/15 text-xs text-ink-muted hover:text-ink hover:border-outline/30 transition-all duration-150 focus-ring min-h-[36px]"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-high/80 border border-outline/15 text-xs text-ink-muted hover:text-ink hover:border-outline/30 transition-all duration-150 focus-ring min-h-[44px] max-w-full"
                 >
-                  {t('signal.workspace.askWhy')}
+                  <span className="truncate">{t('signal.workspace.askWhy')}</span>
                 </button>
                 <button
                   type="button"
@@ -156,9 +156,9 @@ export const SignalWorkspacePanel = () => {
                     navigate(`/app/assistant?signalKey=${activeSignalKey}`);
                     closeWorkspace();
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-high/80 border border-outline/15 text-xs text-ink-muted hover:text-ink hover:border-outline/30 transition-all duration-150 focus-ring min-h-[36px]"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-high/80 border border-outline/15 text-xs text-ink-muted hover:text-ink hover:border-outline/30 transition-all duration-150 focus-ring min-h-[44px] max-w-full"
                 >
-                  {t('signal.workspace.explainImpact')}
+                  <span className="truncate">{t('signal.workspace.explainImpact')}</span>
                 </button>
               </div>
             </DialogBody>
@@ -166,39 +166,39 @@ export const SignalWorkspacePanel = () => {
             {/* Sticky footer — lifecycle actions */}
             <DialogFooter className="flex-col gap-3 items-stretch">
               <Button
-                className="w-full justify-between bg-brand-primary text-white hover:bg-brand-primary/90 h-11 focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-all duration-150"
+                className="w-full justify-between bg-brand-primary text-white hover:bg-brand-primary/90 h-11 focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-all duration-150 min-w-0"
                 onClick={() => {
                   navigate(actionRoute);
                   closeWorkspace();
                 }}
               >
-                {actionLabel}
-                <ArrowRight size={16} className="rtl:rotate-180" aria-hidden="true" />
+                <span className="truncate">{actionLabel}</span>
+                <ArrowRight size={16} className="shrink-0 rtl:rotate-180" aria-hidden="true" />
               </Button>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="flex-1 focus-visible:ring-2 focus-visible:ring-offset-2 transition-colors duration-150"
+                  className="flex-1 min-w-0 focus-visible:ring-2 focus-visible:ring-offset-2 transition-colors duration-150"
                   onClick={() => handleUpdateStatus('RESOLVED')}
                 >
-                  <Check size={14} aria-hidden="true" />
-                  {t('signal.workspace.resolve')}
+                  <Check size={14} aria-hidden="true" className="shrink-0" />
+                  <span className="truncate">{t('signal.workspace.resolve')}</span>
                 </Button>
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="flex-1 focus-visible:ring-2 focus-visible:ring-offset-2 transition-colors duration-150"
+                  className="flex-1 min-w-0 focus-visible:ring-2 focus-visible:ring-offset-2 transition-colors duration-150"
                   onClick={() => handleUpdateStatus('INVESTIGATING')}
                 >
-                  <Search size={14} aria-hidden="true" />
-                  {t('signal.workspace.investigate')}
+                  <Search size={14} aria-hidden="true" className="shrink-0" />
+                  <span className="truncate">{t('signal.workspace.investigate')}</span>
                 </Button>
                 <Button
                   variant="tertiary"
                   size="sm"
-                  className="text-ink-muted focus-visible:ring-2 focus-visible:ring-offset-2 transition-colors duration-150"
+                  className="shrink-0 text-ink-muted focus-visible:ring-2 focus-visible:ring-offset-2 transition-colors duration-150"
                   title={t('signal.workspace.snooze')}
                   aria-label={t('signal.workspace.snooze')}
                   onClick={() => handleUpdateStatus('SNOOZED')}

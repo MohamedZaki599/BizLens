@@ -11,7 +11,8 @@
     "lint": "eslint \"src/**/*.ts\"",
     "test": "node --import tsx --test",
     "db:seed": "tsx prisma/seed.ts",
-    "db:seed:rich": "tsx prisma/seed-rich-data.ts"
+    "db:seed:rich": "tsx prisma/seed-rich-data.ts",
+    "db:seed:validate": "tsx prisma/seed-rich-data.ts && tsx src/test/validate-seed.ts"
   },
   "dependencies": {
     "@bizlens/database": "*",

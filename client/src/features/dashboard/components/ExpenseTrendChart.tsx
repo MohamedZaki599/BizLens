@@ -20,7 +20,7 @@ export const ExpenseTrendChart = () => {
 
   if (isLoading) {
     return (
-      <div className="card" aria-busy>
+      <div className="bg-surface-lowest rounded-2xl p-6 border border-outline/5" aria-busy>
         <Skeleton className="h-3 w-32 mb-4" />
         <Skeleton className="h-48 w-full" />
       </div>
@@ -35,7 +35,7 @@ export const ExpenseTrendChart = () => {
   }));
 
   return (
-    <div className="card">
+    <div className="bg-surface-lowest rounded-2xl p-6 border border-outline/5 overflow-hidden">
       <h3 className="stat-label mb-4">{t('charts.trend.title')}</h3>
       <ResponsiveContainer width="100%" height={220}>
         <AreaChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
