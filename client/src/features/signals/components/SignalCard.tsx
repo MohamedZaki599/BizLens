@@ -81,9 +81,15 @@ export const SignalCard = ({ signal, recommended = false }: SignalCardProps) => 
           </span>
         )}
         <span className={cn(
-          'ms-auto inline-flex items-center gap-1 text-xs font-medium text-brand-primary transition-opacity',
+          'ms-auto inline-flex items-center gap-1.5 text-xs font-medium',
+          'px-3 min-h-[36px] rounded-lg',
+          'bg-primary/10 text-primary border border-primary/15',
+          'transition-all duration-150',
+          'group-hover:bg-primary/15 group-hover:border-primary/25',
+          'group-focus-visible:bg-primary/15',
+          'group-active:scale-[0.98]',
           // Critical: always visible. Others: hover-reveal
-          isCritical && !isResolved ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+          isCritical && !isResolved ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100',
         )}>
           {t('signal.card.reviewCta')}
           <ArrowRight size={12} className="rtl:rotate-180" aria-hidden />

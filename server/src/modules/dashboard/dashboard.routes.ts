@@ -54,6 +54,9 @@ router.get(
     });
     const currency = user?.currency ?? 'USD';
     const insights = await insightEngine.generate(req.user.id, currency);
+    // Each insight includes `localized` with semantic translation keys (titleKey,
+    // titleParams, messageKey, messageParams) alongside legacy prose fields.
+    res.setHeader('X-Deprecated-Fields', 'description,title,message,headline');
     res.json({ insights });
   }),
 );
@@ -185,6 +188,9 @@ router.get(
   asyncHandler(async (req, res) => {
     if (!req.user) throw HttpError.unauthorized();
     const signalKey = req.query.signalKey as string | undefined;
+    res.setHeader('X-Deprecated-Fields', 'description,title,message,headline');
+    // Response includes headlineKey/headlineParams (localized headline derived
+    // from top note) and each note's `localized` field with semantic keys.
     res.json(await buildAssistantDigest(req.user.id, signalKey));
   }),
 );

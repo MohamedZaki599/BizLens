@@ -11,6 +11,8 @@
  *  - Signals carry enough metadata to reconstruct context without re-querying.
  */
 
+import type { LocalizedPayload } from '../localization/localization.types';
+
 // ─── Enums ────────────────────────────────────────────────────────────────
 
 export type SignalSeverity = 'none' | 'info' | 'warning' | 'critical';
@@ -71,6 +73,11 @@ export interface FinancialSignal {
 
   /** Signal-specific structured data. Never used for display — only for downstream logic. */
   metadata: {
+    /**
+     * Human-readable description of the signal.
+     * @deprecated Use `localized.summaryKey` with interpolation params instead. Removal target: v0.3.0.
+     */
+    description?: string;
     /** Explainability context required for all signals for auditability and operational insights. */
     explainability?: {
       /** The specific formulas or calculation steps used (e.g., "(ThisWeek - LastWeek) / LastWeek") */
@@ -81,11 +88,19 @@ export interface FinancialSignal {
       thresholdContext?: string;
       /** English-readable reasoning chain for LLM context or debugging */
       reasoningChain: string[];
+      /** Parallel array of interpolation params for each reasoningChain entry (raw values only). */
+      reasoningParams?: Record<string, number | string>[];
       /** IDs of the primary entities involved (e.g., Category UUID) */
       sourceEntities?: string[];
     };
     [key: string]: unknown;
   };
+
+  /**
+   * Localized payload containing semantic translation keys and raw interpolation parameters.
+   * Replaces legacy prose fields (metadata.description) with language-agnostic contracts.
+   */
+  localized?: LocalizedPayload;
 
   /** When this signal was computed. */
   generatedAt: Date;

@@ -1,5 +1,4 @@
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { format } from 'date-fns';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { useDashboardMetrics } from '../hooks/useDashboardQuery';
 import type { DashboardRange } from '../types';
@@ -11,7 +10,7 @@ import { ExpenseTrendChart } from '../components/ExpenseTrendChart';
 import { ExpenseDonutChart } from '../components/ExpenseDonutChart';
 import { NotificationBanner } from '@/features/alerts/NotificationBanner';
 import { MODE_CONFIG } from '../mode-config';
-import { useT } from '@/lib/i18n';
+import { useT, useFormatDate } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { useFormatCurrency } from '@/lib/format';
 import { useTransactions } from '@/features/transactions/useTransactions';
@@ -30,6 +29,7 @@ export const DashboardPage = () => {
   const t = useT();
   const navigate = useNavigate();
   const formatCurrency = useFormatCurrency();
+  const formatDate = useFormatDate();
   const { openQuickAdd } = useOutletContext<{
     openQuickAdd: (initialType?: TransactionType) => void;
   }>();
@@ -165,7 +165,7 @@ export const DashboardPage = () => {
                           {tx.description || tx.category.name}
                         </p>
                         <p className="text-[11px] text-ink-muted">
-                          {tx.category.name} · {format(new Date(tx.date), 'MMM d')}
+                          {tx.category.name} · {formatDate(new Date(tx.date), 'short')}
                         </p>
                       </div>
                     </div>

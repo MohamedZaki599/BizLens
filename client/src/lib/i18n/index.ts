@@ -16,6 +16,9 @@ export { financialTermsEn, financialTermsAr } from './terminology/financial';
 // Re-export signal messages
 export { signalMessagesEn, signalMessagesAr } from './messages/signals';
 
+// Re-export Arabic plural helper
+export { arPlural, type ArabicPluralForms } from './plural';
+
 // Re-export formatters
 export {
   formatCurrency,

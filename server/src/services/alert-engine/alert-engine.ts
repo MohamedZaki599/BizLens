@@ -25,6 +25,8 @@ import {
 } from '../../utils/safe-math';
 import { signalEngine } from '../../intelligence/engine/signal-engine';
 import type { FinancialSignal } from '../../intelligence/signals/signal.types';
+import type { LocalizedAlert } from '../../intelligence/localization/localization.types';
+import type { LocalizationKey } from '../../intelligence/localization/key-registry';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -34,14 +36,22 @@ export interface AlertAction {
   payload: Record<string, string>;
 }
 
-interface DraftAlert {
+export interface DraftAlert {
   type: AlertType;
   severity: AlertSeverity;
+  /**
+   * @deprecated Use `localized.titleKey` with interpolation params instead. Removal target: v0.3.0
+   */
   title: string;
+  /**
+   * @deprecated Use `localized.messageKey` with interpolation params instead. Removal target: v0.3.0
+   */
   message: string;
   dedupeKey: string;
   expiresAt?: Date;
   action?: AlertAction;
+  /** Semantic localization payload with translation keys and raw params. */
+  localized?: LocalizedAlert;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -134,6 +144,12 @@ const ruleSpendSpike = async (userId: string, now: Date, currency = 'USD', signa
           type: 'filter',
           payload: { categoryId, type: 'EXPENSE' },
         },
+        localized: {
+          titleKey: 'alerts.spend_spike.title' as LocalizationKey,
+          titleParams: { categoryName },
+          messageKey: 'alerts.spend_spike.message' as LocalizationKey,
+          messageParams: { categoryName, changePct, currentAmount, baselineAvg },
+        },
       });
     }
     return drafts;
@@ -175,6 +191,12 @@ const ruleSpendSpike = async (userId: string, now: Date, currency = 'USD', signa
         type: 'filter',
         payload: { categoryId: c.categoryId, type: 'EXPENSE' },
       },
+      localized: {
+        titleKey: 'alerts.spend_spike.title' as LocalizationKey,
+        titleParams: { categoryName: c.name },
+        messageKey: 'alerts.spend_spike.message' as LocalizationKey,
+        messageParams: { categoryName: c.name, changePct: change.pct, currentAmount: c.total, baselineAvg: avg },
+      },
     });
   }
   return drafts;
@@ -200,6 +222,12 @@ const ruleSpendExceedsIncome = async (userId: string, now: Date, currency = 'USD
     )} out vs ${formatMoney(inc, currency)} in).`,
     dedupeKey: `spend-exceeds-income:${month(now)}`,
     expiresAt: endOfMonth(now),
+    localized: {
+      titleKey: 'alerts.expenses_exceed.title' as LocalizationKey,
+      titleParams: {},
+      messageKey: 'alerts.expenses_exceed.message' as LocalizationKey,
+      messageParams: { overBy, expense: exp, income: inc },
+    } satisfies LocalizedAlert,
     action: {
       label: 'View transactions',
       type: 'navigate',
@@ -229,6 +257,12 @@ const ruleProfitDrop = async (userId: string, now: Date, currency = 'USD', signa
       )} vs ${formatMoney(previousProfit, currency)}) — review your top expenses.`,
       dedupeKey: `profit-drop:${month(now)}`,
       expiresAt: endOfMonth(now),
+      localized: {
+        titleKey: 'alerts.profit_drop.title' as LocalizationKey,
+        titleParams: {},
+        messageKey: 'alerts.profit_drop.message' as LocalizationKey,
+        messageParams: { pct, currentProfit, previousProfit },
+      } satisfies LocalizedAlert,
     };
   }
 
@@ -275,6 +309,12 @@ const ruleProfitDrop = async (userId: string, now: Date, currency = 'USD', signa
       : `Your profit is down ${formatPctChange(change.pct)} versus last month — review your top expenses.`,
     dedupeKey: `profit-drop:${month(now)}`,
     expiresAt: endOfMonth(now),
+    localized: {
+      titleKey: 'alerts.profit_drop.title' as LocalizationKey,
+      titleParams: {},
+      messageKey: 'alerts.profit_drop.message' as LocalizationKey,
+      messageParams: { pct: change.pct, currentProfit: profit, previousProfit: lastProfit },
+    } satisfies LocalizedAlert,
     ...(culprit && {
       action: {
         label: `Review ${culprit.name}`,
@@ -311,6 +351,12 @@ const ruleCategoryConcentration = async (
       type: 'filter',
       payload: { categoryId: top.categoryId, type: 'EXPENSE' },
     },
+    localized: {
+      titleKey: 'alerts.category_concentration.title' as LocalizationKey,
+      titleParams: {},
+      messageKey: 'alerts.category_concentration.message' as LocalizationKey,
+      messageParams: { categoryName: top.name, sharePct: share, totalAmount: total },
+    } satisfies LocalizedAlert,
   };
 };
 
@@ -333,6 +379,12 @@ const ruleWeeklySpendIncrease = async (userId: string, now: Date, currency = 'US
       )} vs ${formatMoney(lastWeek, currency)} last week).`,
       dedupeKey: `weekly-spend-up:${week(now)}`,
       expiresAt: endOfWeek(now, { weekStartsOn: 1 }),
+      localized: {
+        titleKey: 'alerts.weekly_spend_increase.title' as LocalizationKey,
+        titleParams: {},
+        messageKey: 'alerts.weekly_spend_increase.message' as LocalizationKey,
+        messageParams: { changePct, thisWeek, lastWeek },
+      } satisfies LocalizedAlert,
     };
   }
 
@@ -356,6 +408,12 @@ const ruleWeeklySpendIncrease = async (userId: string, now: Date, currency = 'US
     )} vs ${formatMoney(lastExp, currency)} last week).`,
     dedupeKey: `weekly-spend-up:${week(now)}`,
     expiresAt: endOfWeek(now, { weekStartsOn: 1 }),
+    localized: {
+      titleKey: 'alerts.weekly_spend_increase.title' as LocalizationKey,
+      titleParams: {},
+      messageKey: 'alerts.weekly_spend_increase.message' as LocalizationKey,
+      messageParams: { changePct: change.pct, thisWeek: thisExp, lastWeek: lastExp },
+    } satisfies LocalizedAlert,
   };
 };
 
@@ -390,6 +448,12 @@ const ruleStaleData = async (userId: string, now: Date): Promise<DraftAlert | nu
       type: 'navigate',
       payload: { route: '/app/transactions', openQuickAdd: 'true' },
     },
+    localized: {
+      titleKey: 'alerts.stale_data.title' as LocalizationKey,
+      titleParams: {},
+      messageKey: 'alerts.stale_data.message' as LocalizationKey,
+      messageParams: { daysSince: days },
+    } satisfies LocalizedAlert,
   };
 };
 
@@ -417,6 +481,12 @@ const ruleForecastOverspend = async (userId: string, now: Date, currency = 'USD'
       )} this month — ${formatPctChange(vsLastMonth)} versus last month.`,
       dedupeKey: `forecast-overspend:${month(now)}:${Math.floor(dayOfMonth / 7)}`,
       expiresAt: endOfMonth(now),
+      localized: {
+        titleKey: 'alerts.forecast_overspend.title' as LocalizationKey,
+        titleParams: {},
+        messageKey: 'alerts.forecast_overspend.message' as LocalizationKey,
+        messageParams: { projected, vsLastMonth },
+      } satisfies LocalizedAlert,
     };
   }
 
@@ -447,6 +517,12 @@ const ruleForecastOverspend = async (userId: string, now: Date, currency = 'USD'
     )} this month — ${formatPctChange(change.pct)} versus last month.`,
     dedupeKey: `forecast-overspend:${month(now)}:${Math.floor(dayOfMonth / 7)}`,
     expiresAt: endOfMonth(now),
+    localized: {
+      titleKey: 'alerts.forecast_overspend.title' as LocalizationKey,
+      titleParams: {},
+      messageKey: 'alerts.forecast_overspend.message' as LocalizationKey,
+      messageParams: { projected, vsLastMonth: change.pct },
+    } satisfies LocalizedAlert,
   };
 };
 
@@ -497,6 +573,12 @@ const ruleRecurringDetected = async (userId: string, now: Date, currency = 'USD'
         type: 'filter',
         payload: { categoryId: b.categoryId, type: 'EXPENSE' },
       },
+      localized: {
+        titleKey: 'alerts.recurring_detected.title' as LocalizationKey,
+        titleParams: {},
+        messageKey: 'alerts.recurring_detected.message' as LocalizationKey,
+        messageParams: { categoryName: b.name, amount: b.amount, monthsDetected: b.months.size },
+      } satisfies LocalizedAlert,
     });
   }
   return drafts;
@@ -504,10 +586,27 @@ const ruleRecurringDetected = async (userId: string, now: Date, currency = 'USD'
 
 // ─── Persistence ──────────────────────────────────────────────────────────
 
+/**
+ * Persist draft alerts to the database.
+ *
+ * NOTE: The `localized` field on DraftAlert (LocalizedAlert payload with
+ * semantic translation keys and raw params) is intentionally NOT persisted.
+ * The current schema is frozen — no new columns can be added to the Alert
+ * model. The localized data is available at runtime when alerts are generated
+ * via `alertEngine.evaluate()`, but is not stored in the DB.
+ *
+ * When the schema freeze is lifted, a `localizedJson` text column should be
+ * added to the Alert model to persist `JSON.stringify(draft.localized)` alongside
+ * the existing `actionJson` field. Until then, consumers that need localized
+ * payloads should re-derive them from the alert type + dedupeKey context, or
+ * rely on the runtime DraftAlert objects before persistence.
+ */
 const persist = async (userId: string, drafts: DraftAlert[]): Promise<Alert[]> => {
   if (drafts.length === 0) return [];
 
   // Upsert each — idempotent on (userId, dedupeKey).
+  // Schema freeze: `draft.localized` is not persisted (no localizedJson column).
+  // The localized payload remains available at runtime on the DraftAlert object.
   const results = await Promise.all(
     drafts.map((d) =>
       prisma.alert.upsert({
