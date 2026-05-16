@@ -7,6 +7,12 @@ const router = Router();
 // All signal routes require authentication
 router.use(requireAuth);
 
+// Deprecation notice for legacy prose fields being replaced by localized keys
+router.use((_req, res, next) => {
+  res.setHeader('X-Deprecated-Fields', 'description,title,message,headline');
+  next();
+});
+
 /**
  * GET /api/v1/signals
  * List all current signals for the authenticated user (TTL-aware cache).

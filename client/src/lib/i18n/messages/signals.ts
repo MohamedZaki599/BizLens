@@ -72,68 +72,74 @@ export const signalMessagesEn = {
 
   // Freshness
   'signal.freshness.updated': 'Updated {time} ago',
+
+  // Grouped signal labels
+  'signal.grouped.recurring.title': '{count} recurring expense signals',
+  'signal.grouped.recurring.explanation': '{count} recurring charges detected across your subscriptions. Review to identify unnecessary spend.',
+  'signal.grouped.anomalies.title': '{count} expense anomalies',
+  'signal.grouped.anomalies.explanation': 'Detected spending anomalies across {count} categories. The most critical requires immediate review.',
 } as const;
 
 export const signalMessagesAr = {
   // Signal lifecycle statuses
-  'signal.status.NEW': 'جديد',
-  'signal.status.REVIEWED': 'تمت المراجعة',
+  'signal.status.NEW': 'جديدة',
+  'signal.status.REVIEWED': 'رُوجعت',
   'signal.status.INVESTIGATING': 'قيد المراجعة',
-  'signal.status.SNOOZED': 'مراقبة مستمرة',
-  'signal.status.RESOLVED': 'مستقر',
+  'signal.status.SNOOZED': 'تحت المراقبة',
+  'signal.status.RESOLVED': 'مستقرة',
 
   // Executive Focus Bar
-  'signal.focusBar.critical': 'حرج',
+  'signal.focusBar.critical': 'حرجة',
   'signal.focusBar.investigating': 'قيد المراجعة',
   'signal.focusBar.awaitingReview': 'بانتظار المراجعة',
-  'signal.focusBar.reviewCta': 'مراجعة الإشارات',
-  'signal.focusBar.needsAttention': 'إشارات تحتاج انتباه',
+  'signal.focusBar.reviewCta': 'راجع الإشارات',
+  'signal.focusBar.needsAttention': 'من الإشارات تتطلب انتباهك',
 
   // Decision Queue
   'signal.queue.title': 'إشارات ذات أولوية',
-  'signal.queue.subtitle': 'تغييرات تشغيلية تتطلب مراجعة.',
-  'signal.queue.recommended': 'التالي المقترح',
-  'signal.queue.empty': 'لا توجد إشارات تتطلب انتباه حاليًا.',
+  'signal.queue.subtitle': 'تغييرات تشغيلية تستدعي مراجعتك.',
+  'signal.queue.recommended': 'الأولى بالمراجعة',
+  'signal.queue.empty': 'لا توجد إشارات تستدعي تدخلك حاليًا.',
   'signal.queue.loading': 'جارٍ تحميل الإشارات…',
   'signal.queue.error': 'تعذّر تحميل الإشارات.',
 
   // Priority Section
   'signal.priority.title': 'ما الذي تغيّر',
-  'signal.queue.viewAll': 'عرض جميع الإشارات',
+  'signal.queue.viewAll': 'عرض كل الإشارات',
 
   // Signal Card
-  'signal.card.recommended': 'الإجراء المُوصى به',
-  'signal.card.reviewCta': 'مراجعة',
+  'signal.card.recommended': 'موصى به',
+  'signal.card.reviewCta': 'راجع',
   'signal.card.askAi': 'تعمّق:',
-  'signal.card.explainImpact': 'اشرح التأثير',
-  'signal.card.showRelated': 'أظهر المرتبطة',
+  'signal.card.explainImpact': 'وضّح الأثر',
+  'signal.card.showRelated': 'عرض المرتبطة',
 
   // Workspace Panel
-  'signal.workspace.loading': 'جارٍ تحميل مساحة العمل…',
-  'signal.workspace.notFound': 'لم يتم العثور على الإشارة',
-  'signal.workspace.whyTitle': 'لماذا حدث هذا',
-  'signal.workspace.actionsTitle': 'الإجراءات الموصى بها',
+  'signal.workspace.loading': 'جارٍ التحميل…',
+  'signal.workspace.notFound': 'الإشارة غير موجودة',
+  'signal.workspace.whyTitle': 'سبب الحدوث',
+  'signal.workspace.actionsTitle': 'إجراءات مقترحة',
   'signal.workspace.aiGuide': 'دليل التحليل',
-  'signal.workspace.aiDescription': 'حلّل المعاملات المسببة لهذا الارتفاع أو توقّع التأثير على التدفق النقدي لهذا الشهر.',
-  'signal.workspace.analyzeTransactions': 'تحليل المعاملات',
-  'signal.workspace.forecastImpact': 'توقع التأثير',
-  'signal.workspace.resolve': 'مستقر',
+  'signal.workspace.aiDescription': 'حلّل المعاملات المسببة لهذا الارتفاع أو توقّع أثره على التدفق النقدي الشهري.',
+  'signal.workspace.analyzeTransactions': 'حلّل المعاملات',
+  'signal.workspace.forecastImpact': 'توقّع الأثر',
+  'signal.workspace.resolve': 'تثبيت كمستقرة',
   'signal.workspace.investigate': 'مراجعة',
   'signal.workspace.snooze': 'مراقبة',
-  'signal.workspace.confidence': 'الثقة',
+  'signal.workspace.confidence': 'درجة الثقة',
   'signal.workspace.reviewTransactions': 'عرض المعاملات',
   'signal.workspace.adjustThreshold': 'تعديل الحد',
   'signal.workspace.askWhy': 'لماذا تغيّر',
-  'signal.workspace.explainImpact': 'عرض التأثير',
+  'signal.workspace.explainImpact': 'عرض الأثر',
 
   // Severity labels
-  'signal.severity.CRITICAL': 'حرج',
+  'signal.severity.CRITICAL': 'حرجة',
   'signal.severity.WARNING': 'تحذير',
-  'signal.severity.INFO': 'معلومات',
-  'signal.severity.NONE': 'بلا',
+  'signal.severity.INFO': 'معلومة',
+  'signal.severity.NONE': 'عادية',
 
   // Default signal content
-  'signal.defaultExplanation': 'شذوذ تشغيلي مكتشف.',
+  'signal.defaultExplanation': 'رُصد انحراف تشغيلي.',
   'signal.defaultAction': 'عرض المعاملات',
 
   // Confidence levels
@@ -142,5 +148,11 @@ export const signalMessagesAr = {
   'signal.confidence.low': 'ثقة منخفضة',
 
   // Freshness
-  'signal.freshness.updated': 'آخر تحديث منذ {time}',
+  'signal.freshness.updated': 'تحديث منذ {time}',
+
+  // Grouped signal labels
+  'signal.grouped.recurring.title': '{count} من إشارات المصروفات المتكررة',
+  'signal.grouped.recurring.explanation': 'رُصدت {count} من المصروفات المتكررة ضمن اشتراكاتك. راجعها لتقليص الإنفاق غير الضروري.',
+  'signal.grouped.anomalies.title': '{count} من الانحرافات في المصروفات',
+  'signal.grouped.anomalies.explanation': 'رُصدت انحرافات في الإنفاق عبر {count} من الفئات. الأشد أهمية يستدعي مراجعة فورية.',
 } as const;

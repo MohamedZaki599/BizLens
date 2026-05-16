@@ -19,6 +19,8 @@ import { listBudgets } from './budgets.service';
 import { detectSubscriptions } from './subscriptions.service';
 import { signalEngine } from '../../intelligence/engine/signal-engine';
 import { isSignalKey } from '../../intelligence/signals/signal.types';
+import type { LocalizedNote } from '../../intelligence/localization/localization.types';
+import type { LocalizationKey } from '../../intelligence/localization/key-registry';
 
 /**
  * System prompt for the Signal Analyst persona.
@@ -128,17 +130,31 @@ export interface AssistantNote {
     | 'stale-data'
     | 'forecast'
     | 'signal-explanation';
+  /**
+   * @deprecated Use `localized.titleKey` with interpolation params instead. Removal target: v0.3.0
+   */
   title: string;
+  /**
+   * @deprecated Use `localized.messageKey` with interpolation params instead. Removal target: v0.3.0
+   */
   message: string;
   metric?: string;
   tone: AssistantTone;
   priority: AssistantPriority;
   action?: AssistantAction;
+  localized?: LocalizedNote;
 }
 
 export interface AssistantDigest {
   generatedAt: Date;
+  /**
+   * @deprecated Use `headlineKey` with `headlineParams` instead. Removal target: v0.3.0
+   */
   headline: string;
+  /** Localization key for the headline, derived from the top note's localized titleKey. */
+  headlineKey?: LocalizationKey;
+  /** Raw interpolation params for the headline localization key. */
+  headlineParams?: Record<string, number | string>;
   notes: AssistantNote[];
   context?: AssistantContext;
 }
@@ -260,6 +276,18 @@ const weeklyPulse = async (userId: string, now: Date, currency = 'USD'): Promise
     metric: change.hasComparison ? formatPctChange(change.pct) : formatMoney(profit, currency),
     tone,
     priority: 'normal',
+    localized: {
+      titleKey: 'assistant.weekly_pulse.title' as LocalizationKey,
+      titleParams: {},
+      messageKey: 'assistant.weekly_pulse.message' as LocalizationKey,
+      messageParams: {
+        profit,
+        income: thisInc,
+        expense: thisExp,
+        changePct: change.pct,
+        direction: change.direction,
+      },
+    },
   };
 };
 
@@ -291,6 +319,15 @@ const profitTrend = async (userId: string, now: Date, currency = 'USD'): Promise
       metric: formatMoney(profit, currency),
       tone: profit >= 0 ? 'positive' : 'warning',
       priority: 'normal',
+      localized: {
+        titleKey: 'assistant.profit_trend.title' as LocalizationKey,
+        titleParams: {},
+        messageKey: 'assistant.profit_trend.message' as LocalizationKey,
+        messageParams: {
+          profit,
+          hasComparison: 0,
+        },
+      },
     };
   }
 
@@ -307,6 +344,17 @@ const profitTrend = async (userId: string, now: Date, currency = 'USD'): Promise
     metric: formatPctChange(change.pct),
     tone: dropped ? (Math.abs(change.pct) >= 25 ? 'negative' : 'warning') : 'positive',
     priority: dropped && Math.abs(change.pct) >= 15 ? 'high' : 'normal',
+    localized: {
+      titleKey: 'assistant.profit_trend.title' as LocalizationKey,
+      titleParams: { direction: dropped ? 'down' : 'up' },
+      messageKey: 'assistant.profit_trend.message' as LocalizationKey,
+      messageParams: {
+        profit,
+        lastProfit,
+        changePct: change.pct,
+        hasComparison: 1,
+      },
+    },
   };
 };
 
@@ -373,6 +421,18 @@ const expenseDriver = async (userId: string, now: Date, currency = 'USD'): Promi
       type: 'filter',
       payload: { categoryId: cat.id, type: 'EXPENSE' },
     },
+    localized: {
+      titleKey: 'assistant.expense_driver.title' as LocalizationKey,
+      titleParams: {},
+      messageKey: 'assistant.expense_driver.message' as LocalizationKey,
+      messageParams: {
+        categoryName: cat.name,
+        delta: top.delta,
+        thisTotal: top.thisTotal,
+        lastTotal: top.lastTotal,
+        changePct: change.pct,
+      },
+    },
   };
 };
 
@@ -396,6 +456,17 @@ const subscriptionsNote = async (userId: string, currency = 'USD'): Promise<Assi
       label: 'Open subscriptions',
       type: 'filter',
       payload: { type: 'EXPENSE', recurring: 'true' },
+    },
+    localized: {
+      titleKey: 'assistant.subscriptions.title' as LocalizationKey,
+      titleParams: {},
+      messageKey: 'assistant.subscriptions.message' as LocalizationKey,
+      messageParams: {
+        count: subscriptions.length,
+        totalMonthly,
+        totalAnnual,
+        topName: top.name,
+      },
     },
   };
 };
@@ -422,6 +493,14 @@ const staleDataNote = async (userId: string, now: Date): Promise<AssistantNote |
       label: 'Add transaction',
       type: 'navigate',
       payload: { route: '/app/transactions', openQuickAdd: 'true' },
+    },
+    localized: {
+      titleKey: 'assistant.stale_data.title' as LocalizationKey,
+      titleParams: {},
+      messageKey: 'assistant.stale_data.message' as LocalizationKey,
+      messageParams: {
+        daysSince: days,
+      },
     },
   };
 };
@@ -462,6 +541,16 @@ const forecastNote = async (userId: string, now: Date, currency = 'USD'): Promis
       metric: formatMoney(projectedProfit, currency),
       tone: 'negative',
       priority: 'high',
+      localized: {
+        titleKey: 'assistant.forecast.title' as LocalizationKey,
+        titleParams: { variant: 'loss' },
+        messageKey: 'assistant.forecast.message' as LocalizationKey,
+        messageParams: {
+          projectedProfit,
+          projectedExp,
+          projectedInc,
+        },
+      },
     };
   }
   if (expChange.hasComparison && expChange.pct >= 15) {
@@ -475,6 +564,17 @@ const forecastNote = async (userId: string, now: Date, currency = 'USD'): Promis
       metric: formatPctChange(expChange.pct),
       tone: 'warning',
       priority: 'high',
+      localized: {
+        titleKey: 'assistant.forecast.title' as LocalizationKey,
+        titleParams: { variant: 'overspend' },
+        messageKey: 'assistant.forecast.message' as LocalizationKey,
+        messageParams: {
+          projectedExp,
+          changePct: expChange.pct,
+          projectedProfit,
+          projectedInc,
+        },
+      },
     };
   }
   return {
@@ -485,6 +585,16 @@ const forecastNote = async (userId: string, now: Date, currency = 'USD'): Promis
     metric: formatMoney(projectedProfit, currency),
     tone: 'positive',
     priority: 'normal',
+    localized: {
+      titleKey: 'assistant.forecast.title' as LocalizationKey,
+      titleParams: { variant: 'on_track' },
+      messageKey: 'assistant.forecast.message' as LocalizationKey,
+      messageParams: {
+        projectedProfit,
+        projectedExp,
+        projectedInc,
+      },
+    },
   };
 };
 
@@ -590,6 +700,16 @@ export const generateSignalInsight = async (
     tone,
     priority: 'high',
     action,
+    localized: {
+      titleKey: 'assistant.signal_explanation.title' as LocalizationKey,
+      titleParams: { signalKey },
+      messageKey: 'assistant.signal_explanation.message' as LocalizationKey,
+      messageParams: {
+        signalKey,
+        amount,
+        ...(pctChange != null ? { changePct: pctChange } : {}),
+      },
+    },
   };
 };
 
@@ -753,8 +873,17 @@ export const buildAssistantDigest = async (
     headline = 'No actionable changes detected this period.';
   }
 
+  // Derive localized headline key/params from the top note's localized data (if available).
+  let headlineKey: LocalizationKey | undefined;
+  let headlineParams: Record<string, number | string> | undefined;
+  const topNote = notes[0];
+  if (topNote?.localized) {
+    headlineKey = topNote.localized.titleKey;
+    headlineParams = topNote.localized.titleParams;
+  }
+
   const context = await buildAssistantContext(userId, signalKey);
   context.businessHealth.topSignals = notes;
 
-  return { generatedAt: now, headline, notes, context };
+  return { generatedAt: now, headline, headlineKey, headlineParams, notes, context };
 };

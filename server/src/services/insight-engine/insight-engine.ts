@@ -15,6 +15,7 @@ import {
   shareOf,
   toSafeNumber,
 } from '../../utils/safe-math';
+import type { LocalizationKey } from '../../intelligence/localization/key-registry';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -40,7 +41,13 @@ export interface Insight {
     | 'spending-anomaly'
     | 'budget-share'
     | 'first-data';
+  /**
+   * @deprecated Use `localized.titleKey` with interpolation params instead. Removal target: v0.3.0
+   */
   title: string;
+  /**
+   * @deprecated Use `localized.messageKey` with interpolation params instead. Removal target: v0.3.0
+   */
   message: string;
   tone: InsightTone;
   severity: InsightSeverity;
@@ -50,6 +57,13 @@ export interface Insight {
   action?: InsightAction;
   /** Lower number = higher priority. The primary insight has the lowest. */
   priority: number;
+  /** Localized payload with semantic translation keys and raw params. */
+  localized?: {
+    titleKey: LocalizationKey;
+    titleParams: Record<string, number | string>;
+    messageKey: LocalizationKey;
+    messageParams: Record<string, number | string>;
+  };
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -151,6 +165,18 @@ const weeklyComparison = async (userId: string, currency = 'USD'): Promise<Insig
       severity: expChange.direction === 'up' && expChange.pct > 25 ? 'warning' : 'info',
       metric: formatPctChange(expChange.pct),
       priority: 30,
+      localized: {
+        titleKey: 'insights.weekly_comparison.title' as LocalizationKey,
+        titleParams: { direction: expChange.direction },
+        messageKey: 'insights.weekly_comparison.message' as LocalizationKey,
+        messageParams: {
+          direction: expChange.direction,
+          changePct: expChange.pct,
+          thisAmount: thisExp,
+          lastAmount: lastExp,
+          side: 'expense',
+        },
+      },
     };
   }
 
@@ -171,6 +197,18 @@ const weeklyComparison = async (userId: string, currency = 'USD'): Promise<Insig
       severity: 'info',
       metric: formatPctChange(incChange.pct),
       priority: 35,
+      localized: {
+        titleKey: 'insights.weekly_comparison.title' as LocalizationKey,
+        titleParams: { direction: incChange.direction },
+        messageKey: 'insights.weekly_comparison.message' as LocalizationKey,
+        messageParams: {
+          direction: incChange.direction,
+          changePct: incChange.pct,
+          thisAmount: thisInc,
+          lastAmount: lastInc,
+          side: 'income',
+        },
+      },
     };
   }
 
@@ -212,6 +250,12 @@ const monthlyComparison = async (userId: string, currency = 'USD'): Promise<Insi
       severity: 'info',
       metric: formatMoney(thisExp, currency),
       priority: 50,
+      localized: {
+        titleKey: 'insights.monthly_comparison.title' as LocalizationKey,
+        titleParams: { direction: 'flat' },
+        messageKey: 'insights.monthly_comparison.message' as LocalizationKey,
+        messageParams: { thisAmount: thisExp, lastAmount: lastExp, direction: 'flat' },
+      },
     };
   }
 
@@ -261,6 +305,18 @@ const monthlyComparison = async (userId: string, currency = 'USD'): Promise<Insi
         }
       : {}),
     priority: 25,
+    localized: {
+      titleKey: 'insights.monthly_comparison.title' as LocalizationKey,
+      titleParams: { direction: change.direction },
+      messageKey: 'insights.monthly_comparison.message' as LocalizationKey,
+      messageParams: {
+        direction: change.direction,
+        changePct: change.pct,
+        thisAmount: thisExp,
+        lastAmount: lastExp,
+        ...(culpritName ? { categoryName: culpritName } : {}),
+      },
+    },
   };
 };
 
@@ -296,6 +352,17 @@ const topExpense = async (userId: string, _currency = 'USD'): Promise<Insight | 
       payload: { categoryId: top.categoryId, type: 'EXPENSE' },
     },
     priority: high ? 15 : 40,
+    localized: {
+      titleKey: 'insights.top_expense.title' as LocalizationKey,
+      titleParams: { categoryName: top.name },
+      messageKey: 'insights.top_expense.message' as LocalizationKey,
+      messageParams: {
+        categoryName: top.name,
+        sharePct: share,
+        amount: top.total,
+        totalExpense,
+      },
+    },
   };
 };
 
@@ -326,6 +393,17 @@ const topIncome = async (userId: string, _currency = 'USD'): Promise<Insight | n
       payload: { categoryId: top.categoryId, type: 'INCOME' },
     },
     priority: 45,
+    localized: {
+      titleKey: 'insights.top_income.title' as LocalizationKey,
+      titleParams: { categoryName: top.name },
+      messageKey: 'insights.top_income.message' as LocalizationKey,
+      messageParams: {
+        categoryName: top.name,
+        sharePct: share,
+        amount: top.total,
+        totalIncome: total,
+      },
+    },
   };
 };
 
@@ -369,6 +447,12 @@ const profitTrend = async (userId: string, currency = 'USD'): Promise<Insight | 
       severity: thisProfit < 0 ? 'warning' : 'info',
       metric: formatMoney(thisProfit, currency),
       priority: 20,
+      localized: {
+        titleKey: 'insights.profit_trend.title' as LocalizationKey,
+        titleParams: { direction: 'flat' },
+        messageKey: 'insights.profit_trend.message' as LocalizationKey,
+        messageParams: { thisProfit, thisIncome: thisInc, thisExpense: thisExp },
+      },
     };
   }
 
@@ -413,6 +497,18 @@ const profitTrend = async (userId: string, currency = 'USD'): Promise<Insight | 
       ? { action: { label: actionLabel, type: 'filter', payload: actionPayload } }
       : {}),
     priority: dropped && Math.abs(change.pct) > 20 ? 10 : 20,
+    localized: {
+      titleKey: 'insights.profit_trend.title' as LocalizationKey,
+      titleParams: { direction: change.direction },
+      messageKey: 'insights.profit_trend.message' as LocalizationKey,
+      messageParams: {
+        direction: change.direction,
+        changePct: change.pct,
+        thisProfit,
+        lastProfit,
+        ...(actionPayload ? { categoryName: actionLabel!.replace('Review ', '') } : {}),
+      },
+    },
   };
 };
 
@@ -472,6 +568,17 @@ const spendingAnomaly = async (userId: string, _currency = 'USD'): Promise<Insig
       payload: { categoryId: top.categoryId, type: 'EXPENSE' },
     },
     priority: severity === 'critical' ? 5 : 12,
+    localized: {
+      titleKey: 'insights.spending_anomaly.title' as LocalizationKey,
+      titleParams: { categoryName: top.name },
+      messageKey: 'insights.spending_anomaly.message' as LocalizationKey,
+      messageParams: {
+        categoryName: top.name,
+        changePct: top.pct,
+        currentAmount: top.total,
+        baselineAvg: top.baseline,
+      },
+    },
   };
 };
 

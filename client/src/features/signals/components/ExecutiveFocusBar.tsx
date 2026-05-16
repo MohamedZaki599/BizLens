@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { AlertCircle, AlertTriangle, Info } from 'lucide-react';
-import { useT } from '@/lib/i18n';
+import { useT, arPlural } from '@/lib/i18n';
+import { useUiStore } from '@/store/ui-store';
 import type { FinancialSignalDto, SignalSeverity } from '../types';
 
 interface ExecutiveFocusBarProps {
@@ -38,6 +39,7 @@ function getHighestSeverity(signals: FinancialSignalDto[]): SignalSeverity {
 export const ExecutiveFocusBar = ({ signals }: ExecutiveFocusBarProps) => {
   const t = useT();
   const navigate = useNavigate();
+  const language = useUiStore((s) => s.language);
 
   const actionableSignals = signals.filter(
     (s) => s.status === 'NEW' || (s.severity === 'CRITICAL' && s.status !== 'RESOLVED' && s.status !== 'SNOOZED'),
@@ -88,7 +90,14 @@ export const ExecutiveFocusBar = ({ signals }: ExecutiveFocusBarProps) => {
           )}
 
           <span className="text-sm text-ink-muted truncate">
-            {t('signal.focusBar.needsAttention')}
+            {language === 'ar'
+              ? arPlural(awaitingReviewCount, {
+                  one: 'إشارة تتطلب انتباهك',
+                  two: 'إشارتان تتطلبان انتباهك',
+                  few: 'إشارات تتطلب انتباهك',
+                  many: 'إشارة تتطلب انتباهك',
+                })
+              : `${awaitingReviewCount} ${t('signal.focusBar.needsAttention')}`}
           </span>
         </div>
       </div>

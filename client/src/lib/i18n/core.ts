@@ -3,6 +3,7 @@ import { useUiStore } from '@/store/ui-store';
 import { financialTermsEn, financialTermsAr } from './terminology/financial';
 import { signalMessagesEn, signalMessagesAr } from './messages/signals';
 import { onboardingEn, onboardingAr } from './messages/onboarding';
+import { localizationKeysEn, localizationKeysAr } from './messages/localization-keys';
 
 type Dict = Record<string, string>;
 
@@ -293,6 +294,7 @@ const en: Dict = {
   ...financialTermsEn,
   ...signalMessagesEn,
   ...onboardingEn,
+  ...localizationKeysEn,
 };
 
 const ar: Dict = {
@@ -416,11 +418,11 @@ const ar: Dict = {
   'common.cancel': 'إلغاء',
   'common.confirm': 'تأكيد',
   'common.save': 'حفظ',
-  'common.saving': 'يحفظ…',
+  'common.saving': 'جارٍ الحفظ…',
   'common.delete': 'حذف',
   'common.close': 'إغلاق',
   'common.add': 'إضافة',
-  'common.adding': 'يضيف…',
+  'common.adding': 'جارٍ الإضافة…',
   'common.loading': 'جارٍ التحميل…',
   'common.error': 'حدث خطأ ما.',
   'common.search': 'بحث…',
@@ -453,7 +455,7 @@ const ar: Dict = {
   'widgets.week.netForWeek': 'صافي',
   'widgets.week.transactions': 'معاملات',
 
-  'reminder.stale.title': 'مرّ {days} أيام منذ آخر معاملة سجّلتها.',
+  'reminder.stale.title': 'مرّ {days} من الأيام منذ آخر معاملة.',
   'reminder.stale.subtitle': 'حدّث بياناتك لتبقى الرؤى والتوقعات دقيقة.',
   'reminder.stale.cta': 'أضف الآن',
 
@@ -478,7 +480,7 @@ const ar: Dict = {
   'subscriptions.empty': 'لم يتم اكتشاف مصاريف متكررة بعد. استمر بالتسجيل وسنجدها.',
   'subscriptions.totalMonthly': 'الإجمالي الشهري',
   'subscriptions.totalAnnual': 'الإجمالي السنوي',
-  'subscriptions.months': '{count} أشهر',
+  'subscriptions.months': '{count} من الأشهر',
   'subscriptions.cancelHint': 'فكّر بالإلغاء إذا لم تستخدمه',
   'subscriptions.perMonth': '/شهر',
   'subscriptions.perYear': '/سنة',
@@ -522,7 +524,7 @@ const ar: Dict = {
   'import.skipDuplicates.label': 'تخطي التكرارات',
   'import.skipDuplicates.help':
     'تخطي الصفوف الموجودة مسبقًا بنفس الفئة والمبلغ واليوم.',
-  'import.duplicates': 'تم تخطي {count} صفوف مكررة.',
+  'import.duplicates': 'تم تخطي {count} من الصفوف المكررة.',
 
   'notifications.permission': 'فعّل إشعارات المتصفح للتنبيهات الحرجة.',
   'notifications.enable': 'تفعيل',
@@ -565,7 +567,7 @@ const ar: Dict = {
   'budgets.empty.cta': 'إضافة ميزانية',
   'budgets.totalCap': 'إجمالي السقف الشهري',
   'budgets.totalUsed': 'المستخدم حتى الآن',
-  'budgets.overBudgetCount': '{count} تجاوزت الميزانية',
+  'budgets.overBudgetCount': '{count} من الفئات تجاوزت الميزانية',
   'budgets.delete.title': 'إزالة ميزانية',
   'budgets.delete.description': 'سنوقف تتبع هذه الفئة مقابل السقف، لكن لن نغيّر أي معاملة.',
   'budgets.suggested': 'سقف مقترح بناءً على آخر ٣ أشهر',
@@ -582,6 +584,7 @@ const ar: Dict = {
   ...financialTermsAr,
   ...signalMessagesAr,
   ...onboardingAr,
+  ...localizationKeysAr,
 };
 
 const dictionaries: Record<Language, Dict> = { en, ar };

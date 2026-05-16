@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useSignalsQuery } from '../hooks/useSignalsQuery';
 import { SignalCard } from './SignalCard';
-import { useT } from '@/lib/i18n';
+import { useT, useTi, arPlural } from '@/lib/i18n';
+import { useUiStore } from '@/store/ui-store';
 import { useFormatCurrency } from '@/lib/format';
 import type { PrioritySignalViewModel } from '../types';
 import { Loader2, ArrowRight } from 'lucide-react';
@@ -11,7 +12,11 @@ import { Button } from '@/components/Button';
 const MAX_VISIBLE = 3;
 
 /** Group recurring expense signals into a single summary signal */
-function groupAndPrioritize(signals: PrioritySignalViewModel[]): PrioritySignalViewModel[] {
+function groupAndPrioritize(
+  signals: PrioritySignalViewModel[],
+  ti: (key: string, vars: Record<string, string | number>) => string,
+  language: 'en' | 'ar',
+): PrioritySignalViewModel[] {
   const sevMap = { CRITICAL: 3, WARNING: 2, INFO: 1, NONE: 0 };
   const sorted = [...signals].sort((a, b) => sevMap[b.severity] - sevMap[a.severity]);
 
@@ -21,11 +26,19 @@ function groupAndPrioritize(signals: PrioritySignalViewModel[]): PrioritySignalV
 
   if (recurring.length > 1) {
     const highest = recurring[0];
+    const recurringTitle = language === 'ar'
+      ? arPlural(recurring.length, {
+          one: 'إشارة مصروف متكرر',
+          two: 'إشارتا مصروف متكرر',
+          few: 'إشارات مصروفات متكررة',
+          many: 'إشارة لمصروفات متكررة',
+        })
+      : ti('signal.grouped.recurring.title', { count: recurring.length });
     const grouped: PrioritySignalViewModel = {
       ...highest,
       id: 'grouped-recurring',
-      title: `${recurring.length} recurring expense signals`,
-      explanation: `${recurring.length} recurring charges detected across your subscriptions. Review to identify unnecessary spend.`,
+      title: recurringTitle,
+      explanation: ti('signal.grouped.recurring.explanation', { count: recurring.length }),
       recommendedAction: highest.recommendedAction,
     };
     return [...nonRecurring.slice(0, MAX_VISIBLE - 1), grouped].slice(0, MAX_VISIBLE);
@@ -37,11 +50,19 @@ function groupAndPrioritize(signals: PrioritySignalViewModel[]): PrioritySignalV
 
   if (anomalies.length > 2) {
     const highest = anomalies[0];
+    const anomaliesTitle = language === 'ar'
+      ? arPlural(anomalies.length, {
+          one: 'انحراف في المصروفات',
+          two: 'انحرافان في المصروفات',
+          few: 'انحرافات في المصروفات',
+          many: 'انحرافًا في المصروفات',
+        })
+      : ti('signal.grouped.anomalies.title', { count: anomalies.length });
     const grouped: PrioritySignalViewModel = {
       ...highest,
       id: 'grouped-anomalies',
-      title: `${anomalies.length} expense anomalies`,
-      explanation: `Detected spending anomalies across ${anomalies.length} categories. The most critical requires immediate review.`,
+      title: anomaliesTitle,
+      explanation: ti('signal.grouped.anomalies.explanation', { count: anomalies.length }),
       recommendedAction: highest.recommendedAction,
     };
     return [...others, grouped].sort((a, b) => sevMap[b.severity] - sevMap[a.severity]).slice(0, MAX_VISIBLE);
@@ -52,7 +73,9 @@ function groupAndPrioritize(signals: PrioritySignalViewModel[]): PrioritySignalV
 
 export const DecisionQueue = () => {
   const t = useT();
+  const ti = useTi();
   const navigate = useNavigate();
+  const language = useUiStore((s) => s.language);
   const { data: signals, isLoading, isError } = useSignalsQuery('priority');
   const formatCurrency = useFormatCurrency();
 
@@ -84,7 +107,7 @@ export const DecisionQueue = () => {
     generatedAt: new Date(s.generatedAt),
   }));
 
-  const visible = groupAndPrioritize(prioritySignals);
+  const visible = groupAndPrioritize(prioritySignals, ti, language);
   const totalCount = signals.length;
 
   if (visible.length === 0) {
