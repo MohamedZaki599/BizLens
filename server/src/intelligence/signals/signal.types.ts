@@ -136,6 +136,8 @@ export interface OperationalInsight {
 export interface SignalGenerationContext {
   userId: string;
   generatedAt: Date;
+  /** User's preferred currency code (e.g. 'USD', 'SAR'). Used for monetary formatting in metadata. */
+  currency?: string;
 }
 
 /** A generator function that produces zero or more signals from a data snapshot. */

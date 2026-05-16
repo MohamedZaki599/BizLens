@@ -61,6 +61,12 @@ As a mobile user, I want the signal review overlays to be responsive and free of
 - **FR-005**: **Responsive Overlays**: All drawer and modal components MUST use flexible layouts (Flexbox/Grid) that prevent content overflow on screens down to 320px width.
 - **FR-006**: **Action Validation**: Every interactive button or link in the signal system MUST map to a functional route or handler; no placeholder actions allowed.
 - **FR-007**: **Assistant Prompt Hardening**: Remove all generic system prompts that lead to "I am an AI assistant" introductions in favor of "Signal Analyst" personas.
+- **FR-008**: **Dashboard Visual Hierarchy**: ExecutiveFocusBar + DecisionQueue MUST form the single dominant operational zone above the fold. Charts, stat cards, and passive analytics MUST use reduced visual weight (lower contrast, lighter borders, smaller type scale). Only one visually dominant section permitted above the fold.
+- **FR-009**: **Operational Language**: All user-facing text MUST use metric-based operational language. Remove vague AI language ("AI-powered", "smart insights", "intelligent recommendation") and replace with explainable business wording referencing specific metrics.
+- **FR-010**: **Full RTL Stabilization**: ALL shared components (tables, cards, dialogs, dropdowns, filters, pagination, tooltips, toasts, chart legends, KPI rows) MUST use CSS logical properties (ms-/me-/ps-/pe-/start/end) instead of physical direction properties (ml-/mr-/pl-/pr-/left/right).
+- **FR-011**: **Modal System Consistency**: All modal/dialog/sheet components (Add Transaction, Add Budget, Add Category, signal workspace) MUST use the shared Dialog primitive with consistent overlay, shadow, spacing, close behavior, focus trapping, and responsive behavior.
+- **FR-012**: **Accessibility Hardening**: All interactive elements MUST have hover, focus-visible, and active states. Touch targets MUST be minimum 44x44px. Keyboard navigation MUST support tab order, ESC dismiss, and focus restoration. Respect `prefers-reduced-motion`.
+- **FR-013**: **Responsive Verification**: All layouts MUST render without overflow, clipping, or broken alignment at viewports 320px, 375px, 768px, 1024px, and ultra-wide desktop.
 
 ### Key Entities
 
@@ -75,6 +81,17 @@ As a mobile user, I want the signal review overlays to be responsive and free of
 - **SC-002**: Assistant initial response contains at least 2 specific data points from the active signal in 90% of test cases.
 - **SC-003**: Zero layout "breakage" (overlapping text or clipped elements) reported in RTL mode during responsive testing (320px to 1920px).
 - **SC-004**: Zero interactive elements trigger a "no-op" or "placeholder" behavior in the signal review flow.
+- **SC-005**: Zero instances of vague AI language ("AI-powered", "smart insights", "intelligent") in user-facing strings.
+- **SC-006**: Zero physical direction CSS properties (ml-/mr-/pl-/pr-/left/right positioning) remaining in shared components.
+- **SC-007**: All modals use the shared Dialog primitive with identical overlay, shadow, and focus behavior.
+- **SC-008**: All interactive elements have minimum 44x44px touch targets and visible focus-visible states.
+- **SC-009**: Dashboard renders ExecutiveFocusBar + DecisionQueue as the single dominant zone with charts visually receded.
+
+## Clarifications
+
+### Session 2026-05-15
+
+- Q: Which dashboard element should be the single dominant primary signal zone? → A: ExecutiveFocusBar + DecisionQueue together form the primary operational zone; charts/stats become secondary with lower contrast and lighter visual weight.
 
 ## Assumptions
 

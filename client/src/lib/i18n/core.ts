@@ -54,7 +54,7 @@ const en: Dict = {
   'dashboard.margin': 'Margin',
   'dashboard.txnCount': 'Transactions',
   'dashboard.noInsights': 'Log a few transactions to unlock insights.',
-  'dashboard.insights.label': 'Smart insight',
+  'dashboard.insights.label': 'Operational insight',
   'dashboard.range.label': 'Time range',
   'dashboard.range.this_month': 'This month',
   'dashboard.range.last_month': 'Last month',
@@ -194,9 +194,9 @@ const en: Dict = {
   'subscriptions.perMonth': '/mo',
   'subscriptions.perYear': '/yr',
 
-  'assistant.title': 'Decision Assistant',
+  'assistant.title': 'Operational Insights',
   'assistant.subtitle':
-    'Plain-language summaries of what changed, what to look at first, and where to act.',
+    'What changed, what matters, and where to act.',
   'assistant.headline': "What you should know",
   'assistant.empty.title': 'Nothing to summarize yet',
   'assistant.empty.subtitle':
@@ -205,10 +205,6 @@ const en: Dict = {
   'assistant.priority.normal': 'Heads up',
   'assistant.refresh': 'Refresh',
   'assistant.generatedAt': 'Updated {time}',
-  'assistant.status.online': 'AI Assistant Online',
-  'assistant.clear': 'Clear history',
-  'assistant.input.placeholder': 'Ask your assistant anything...',
-  'assistant.disclaimer': 'BizLens AI can make mistakes. Please verify important financial decisions.',
 
   'budgets.title': 'Category Budgets',
   'budgets.subtitle': 'Set monthly caps per expense category.',
@@ -347,7 +343,7 @@ const ar: Dict = {
   'dashboard.margin': 'الهامش',
   'dashboard.txnCount': 'المعاملات',
   'dashboard.noInsights': 'سجّل بعض المعاملات لفتح الرؤى.',
-  'dashboard.insights.label': 'رؤية ذكية',
+  'dashboard.insights.label': 'رؤية تشغيلية',
   'dashboard.range.label': 'النطاق الزمني',
   'dashboard.range.this_month': 'هذا الشهر',
   'dashboard.range.last_month': 'الشهر الماضي',
@@ -487,9 +483,9 @@ const ar: Dict = {
   'subscriptions.perMonth': '/شهر',
   'subscriptions.perYear': '/سنة',
 
-  'assistant.title': 'المساعد الذكي',
+  'assistant.title': 'الرؤى التشغيلية',
   'assistant.subtitle':
-    'ملخصات بلغة بسيطة لما تغيّر وما يستحق المراجعة أولًا وأين يجب التحرك.',
+    'ما تغيّر، ما يهم، وأين يجب التحرك.',
   'assistant.headline': 'ما يجب أن تعرفه',
   'assistant.empty.title': 'لا شيء للتلخيص بعد',
   'assistant.empty.subtitle':
@@ -498,10 +494,6 @@ const ar: Dict = {
   'assistant.priority.normal': 'تنويه',
   'assistant.refresh': 'تحديث',
   'assistant.generatedAt': 'آخر تحديث {time}',
-  'assistant.status.online': 'المساعد الذكي متصل',
-  'assistant.clear': 'مسح السجل',
-  'assistant.input.placeholder': 'اسأل مساعدك أي شيء...',
-  'assistant.disclaimer': 'قد يخطئ ذكاء بيزلنز الاصطناعي. يرجى التحقق من القرارات المالية الهامة.',
 
   'budgets.title': 'ميزانيات الفئات',
   'budgets.subtitle': 'حدد سقفًا شهريًا لكل فئة مصروفات.',

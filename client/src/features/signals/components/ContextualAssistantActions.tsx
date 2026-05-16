@@ -11,7 +11,12 @@ interface ContextualAssistantActionsProps {
 export const ContextualAssistantActions = ({ actions, className }: ContextualAssistantActionsProps) => {
   const t = useT();
 
-  if (!actions || actions.length === 0) return null;
+  // Filter to only actions with valid handlers — FR-006: no placeholder actions allowed
+  const validActions = (actions || []).filter(
+    (action) => action && typeof action.onClick === 'function' && action.label,
+  );
+
+  if (validActions.length === 0) return null;
 
   return (
     <div className={cn("flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-outline/30", className)}>
@@ -19,12 +24,12 @@ export const ContextualAssistantActions = ({ actions, className }: ContextualAss
         <Sparkles size={14} />
         <span>{t('signal.card.askAi')}</span>
       </div>
-      {actions.map((action, idx) => (
+      {validActions.map((action, idx) => (
         <Button
           key={idx}
           variant="tertiary"
           size="sm"
-          className="h-7 text-xs rounded-full border border-brand-primary/20 text-ink hover:bg-brand-primary/5 hover:text-brand-primary hover:border-brand-primary/40 transition-colors"
+          className="min-h-[44px] text-xs rounded-full border border-brand-primary/20 text-ink hover:bg-brand-primary/5 hover:text-brand-primary hover:border-brand-primary/40 transition-colors"
           onClick={action.onClick}
         >
           {action.label}

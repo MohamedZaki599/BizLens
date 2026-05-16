@@ -164,7 +164,7 @@ export const QuickAddModal = ({ open, onClose, initialType = 'EXPENSE' }: QuickA
           })}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label={t('fields.amount')}
             type="number"
@@ -222,7 +222,7 @@ export const QuickAddModal = ({ open, onClose, initialType = 'EXPENSE' }: QuickA
           {...register('description')}
         />
 
-        <div className="flex items-center justify-end gap-2 pt-2">
+        <div className="flex items-center justify-end gap-2 pt-2 sticky bottom-0 bg-surface-lowest">
           <Button type="button" variant="tertiary" onClick={onClose} disabled={submitting}>
             {t('common.cancel')}
           </Button>

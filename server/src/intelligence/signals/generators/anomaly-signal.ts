@@ -47,6 +47,20 @@ export const generateAnomalySignals = (
           categoryName: anomaly.categoryName,
           currentAmount: anomaly.currentAmount,
           baselineAvg: anomaly.baselineAvg,
+          explainability: {
+            formula: '(currentAmount - baselineAvg) / baselineAvg * 100',
+            inputs: {
+              currentAmount: anomaly.currentAmount,
+              baselineAvg: anomaly.baselineAvg,
+              changePct: anomaly.changePct,
+            },
+            thresholdContext: `Exceeded ${anomalyWarning}% anomaly threshold (actual: ${Math.round(anomaly.changePct)}%)`,
+            reasoningChain: [
+              `${anomaly.categoryName} is ${Math.round(anomaly.changePct)}% above its 3-month average`,
+              `Current: ${anomaly.currentAmount}, 3-month avg: ${anomaly.baselineAvg}`,
+            ],
+            sourceEntities: [anomaly.categoryId],
+          },
         },
         ttlCategory: 'alert',
       }),
@@ -74,6 +88,22 @@ export const generateAnomalySignals = (
         metadata: {
           totalTransactions: staleResult.totalTransactions,
           lastTransactionAt: snapshot.lastTransactionAt?.toISOString() ?? null,
+          explainability: {
+            formula: 'today - lastTransactionDate (in days)',
+            inputs: {
+              daysSinceLastTransaction: staleResult.daysSinceLastTransaction,
+              totalTransactions: staleResult.totalTransactions,
+              staleDaysThreshold: staleDays,
+            },
+            thresholdContext: `No transactions for ${staleResult.daysSinceLastTransaction} days (threshold: ${staleDays} days)`,
+            reasoningChain: [
+              `Last transaction was ${staleResult.daysSinceLastTransaction} days ago`,
+              `Stale data threshold: ${staleDays} days, warning threshold: ${staleWarningDays} days`,
+              staleResult.severity === 'warning'
+                ? 'Data is approaching staleness — consider syncing'
+                : 'Data is stale — financial signals may be outdated',
+            ],
+          },
         },
         ttlCategory: 'alert',
       }),
@@ -101,6 +131,21 @@ export const generateAnomalySignals = (
           categoryId: rec.categoryId,
           categoryName: rec.categoryName,
           monthsDetected: rec.monthsDetected,
+          explainability: {
+            formula: 'averageAmount over monthsDetected months',
+            inputs: {
+              averageAmount: rec.averageAmount,
+              monthsDetected: rec.monthsDetected,
+              categoryId: rec.categoryId,
+            },
+            reasoningChain: [
+              `${rec.categoryName} has recurring expenses averaging ${rec.averageAmount} over ${rec.monthsDetected} months`,
+              rec.monthsDetected >= 4
+                ? 'High confidence: detected in 4+ consecutive months'
+                : `Moderate confidence: detected in ${rec.monthsDetected} months (needs 4+ for full confidence)`,
+            ],
+            sourceEntities: [rec.categoryId],
+          },
         },
         ttlCategory: 'analytical',
       }),

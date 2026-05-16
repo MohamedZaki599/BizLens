@@ -1,113 +1,141 @@
-# Tasks: Operational Signal & Assistant UX Refinement
+# Tasks: Final Real-World QA Stabilization Pass
 
 **Input**: Design documents from `/specs/001-improve-signal-assistant/`
-**Prerequisites**: plan.md ✅, spec.md ✅, research.md ✅, data-model.md ✅, contracts/assistant.api.md ✅, quickstart.md ✅
+**Prerequisites**: plan.md ✓, spec.md ✓
 
-**Mode**: FEATURE FREEZE — stabilization only. No new features, no new architecture, no new libraries unless already installed.
+**Tests**: Not applicable — this is a QA verification and fix pass, not feature development.
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+**Organization**: Tasks grouped by QA concern for sequential verification and fix cycles.
 
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (US1, US2, US3)
-- Exact file paths are included in every description
+- **[Story]**: Which QA concern this task belongs to
+- Include exact file paths in descriptions
 
 ---
 
-## Phase 1: Setup (Audit & Baseline)
+## Phase 1: Setup (Dev Server & Test Infrastructure)
 
-**Purpose**: Confirm the existing component primitives available before touching any story work. No code changes — read-only audit.
+**Purpose**: Start dev server and establish real browser testing baseline
 
-- [x] T001 Audit existing dialog/modal primitives in `client/src/components/` — confirm whether Radix UI Dialog or a custom primitive is already installed (check `client/package.json` and `client/src/components/`)
-- [x] T002 Audit i18n translation keys for RTL-affected strings in `client/src/lib/i18n/` — list all keys used in `SignalWorkspacePanel.tsx`, `ExecutiveFocusBar.tsx`, and `DashboardPage.tsx`
-- [x] T003 [P] Audit `client/src/features/signals/components/SignalWorkspacePanel.tsx` — document current layout issues: full-page sheet behavior, missing focus trap, missing body scroll lock, RTL x-offset calculation
-- [x] T004 [P] Audit `client/src/features/signals/components/ExecutiveFocusBar.tsx` — document broken CTA: `Button` has no `onClick`, no navigation, no loading state
+- [~] T001 Start the client dev server via `npm run dev` in client/ and verify it serves at localhost — confirm no build errors prevent rendering
+- [~] T002 [P] Start the server dev process via `npm run dev` in server/ and verify API responds — confirm backend is available for full-stack testing
 
 ---
 
-## Phase 2: Foundational (Blocking Prerequisites)
+## Phase 2: Foundational (Browser Rendering Baseline)
 
-**Purpose**: Shared fixes that all three user stories depend on. Must complete before story work begins.
+**Purpose**: Verify the app actually renders in a browser before detailed QA
 
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete.
+**⚠️ CRITICAL**: No QA work can begin until rendering is confirmed
 
-- [x] T005 Add `signalKey` query param support to the assistant API client in `client/src/features/dashboard/api/dashboard.api.ts` — add `assistant(signalKey?: string): Promise<AssistantDigest>` method that calls `GET /dashboard/assistant?signalKey=<key>` matching the contract in `specs/001-improve-signal-assistant/contracts/assistant.api.md`
-- [x] T006 Extend `useSignalWorkspace` Zustand store in `client/src/features/signals/hooks/useSignalWorkspace.ts` — add `bodyScrollLocked: boolean` state field and `lockBodyScroll()` / `unlockBodyScroll()` actions that toggle `document.body.style.overflow`
-- [x] T007 Verify `client/src/lib/i18n/` contains RTL locale (`ar`) entries for all signal workspace keys (`signal.workspace.*`, `signal.focusBar.*`) — add any missing keys as empty strings to unblock rendering
+- [x] T003 Verify DashboardPage renders without runtime errors at default viewport — check browser console for React errors, hydration mismatches, or missing imports in client/src/features/dashboard/pages/DashboardPage.tsx
+- [x] T004 [P] Verify AssistantPage renders without runtime errors — check for missing translation keys, undefined data access, or broken imports in client/src/pages/AssistantPage.tsx
 
-**Checkpoint**: Foundation ready — user story implementation can now begin.
-
----
-
-## Phase 3: User Story 1 — RTL Drawer & Action Visibility (Priority: P1) 🎯 MVP
-
-**Goal**: Bilingual Arabic users can open a signal detail panel that correctly mirrors layout, keeps action buttons pinned and visible, and works on mobile.
-
-**Independent Test**: Switch app language to Arabic (`ar`), click any signal card, verify: drawer slides from left, text is right-aligned, primary action button is visible without scrolling, ESC closes the panel, overlay click closes the panel.
-
-### Implementation for User Story 1
-
-- [x] T008 [US1] Replace full-page sheet with centered responsive modal in `client/src/features/signals/components/SignalWorkspacePanel.tsx` — change `fixed inset-y-0 end-0 w-full max-w-md` to a centered dialog layout: `fixed inset-0 flex items-center justify-center p-4` with an inner `w-full max-w-lg max-h-[90vh] flex flex-col rounded-2xl bg-surface shadow-2xl overflow-hidden`; keep AnimatePresence/motion but change animation from `x` slide to `scale` + `opacity` (initial: `{ opacity: 0, scale: 0.96 }`, animate: `{ opacity: 1, scale: 1 }`)
-- [x] T009 [US1] Add focus trap to `SignalWorkspacePanel` in `client/src/features/signals/components/SignalWorkspacePanel.tsx` — on modal open, use `useEffect` to find all focusable elements within the modal container ref and implement Tab/Shift+Tab cycling; set initial focus to the close button; restore focus to the trigger element on close
-- [x] T010 [US1] Add body scroll lock to `SignalWorkspacePanel` in `client/src/features/signals/components/SignalWorkspacePanel.tsx` — call `lockBodyScroll()` from the Zustand store (T006) in the `useEffect` that fires when `isOpen` becomes true; call `unlockBodyScroll()` on cleanup and on close
-- [x] T011 [US1] Fix RTL layout in `SignalWorkspacePanel` in `client/src/features/signals/components/SignalWorkspacePanel.tsx` — remove manual `slideFrom` / `x` offset logic; replace hardcoded `$` currency symbol in `signal.value.toLocaleString()` with `useFormatCurrency()` hook (already used in `DashboardPage.tsx`); replace `gap-2`, `gap-3`, `gap-4` with `gap-x-2`, `gap-x-3`, `gap-x-4` where inline; replace `p-6` header/footer padding with `px-6 py-4`; add `dir="auto"` to the signal title `<h2>` and description `<p>` elements
-- [x] T012 [US1] Fix icon direction in sticky footer of `SignalWorkspacePanel` in `client/src/features/signals/components/SignalWorkspacePanel.tsx` — the `<ArrowRight>` icon already has `rtl:rotate-180` but confirm it is inside a flex container that uses `justify-between`; add `aria-hidden="true"` to all decorative icons (`Check`, `Search`, `BellOff`, `ArrowRight`); add visible text labels to the `BellOff` snooze button (currently icon-only) using `<span className="sr-only">{t('signal.workspace.snooze')}</span>`
-- [x] T013 [US1] Add `role="dialog"`, `aria-modal="true"`, `aria-labelledby` pointing to the signal title `<h2>` id, and `aria-describedby` pointing to the description `<p>` id to the modal container `<motion.div>` in `client/src/features/signals/components/SignalWorkspacePanel.tsx`
-- [x] T014 [US1] Verify sticky footer remains visible on 320px viewport in `SignalWorkspacePanel` — the footer already uses `sticky bottom-0`; confirm the scrollable content area uses `flex-1 overflow-y-auto` and the outer container uses `flex flex-col` with a fixed max-height (`max-h-[90vh]`); add `min-h-0` to the scrollable content div to prevent flex overflow
-
-**Checkpoint**: US1 complete — RTL drawer works, buttons are visible, modal is accessible, body scroll is locked.
+**Checkpoint**: App renders — real QA testing can proceed
 
 ---
 
-## Phase 4: User Story 2 — Context-Aware AI Guidance (Priority: P2)
+## Phase 3: Real Responsive QA (US1) 🎯 MVP
 
-**Goal**: When a user opens the assistant while a signal is active, the assistant's first note is specific to that signal's data — no generic greetings.
+**Goal**: Verify actual rendering at 320px, 375px, 768px, 1024px, and ultra-wide. Fix real overflow, clipping, and wrapping issues discovered during browser testing.
 
-**Independent Test**: Open a signal in the workspace panel, then navigate to `/app/assistant`. Verify the first note in the digest references the signal name and at least one data point (amount or percentage). Verify no "How can I help you?" or "I am an AI" text appears anywhere.
+**Independent Test**: Resize browser to 320px width — verify no horizontal scrollbar appears on any page.
 
-### Implementation for User Story 2
+### Implementation for Responsive QA
 
-- [x] T015 [US2] Add `signalKey` prop to the assistant API query in `client/src/features/dashboard/api/dashboard.api.ts` — the `assistant()` method added in T005 should accept `signalKey?: string` and append it as a query param when present
-- [x] T016 [US2] Create `useAssistantQuery` hook in `client/src/features/dashboard/hooks/useDashboardQuery.ts` (or a new file `client/src/features/dashboard/hooks/useAssistantQuery.ts`) — use TanStack Query `useQuery` with key `['assistant', signalKey]`, call `dashboardApi.assistant(signalKey)`, set `staleTime: 60_000`; accept optional `signalKey?: string` param
-- [x] T017 [US2] Read `activeSignalKey` from `useSignalWorkspace` store in the assistant page — locate the assistant page component (search `client/src/` for a route rendering the assistant digest) and pass `activeSignalKey` from the Zustand store to `useAssistantQuery`; if no assistant page exists yet, add the `signalKey` forwarding to wherever `GET /dashboard/assistant` is currently called
-- [x] T018 [US2] Audit the assistant page rendering for fake AI phrasing — search `client/src/` for strings containing "AI", "assistant", "How can I help", "I'm here to help", "chat" and replace with operational language: rename section headers to "Operational Insights" or "Signal Analysis"; remove any typing animation or chat-bubble UI; ensure notes render as a flat feed of `AssistantNote` cards with `title`, `message`, `metric`, and optional `action` button
-- [x] T019 [US2] Add `generatedAt` timestamp display to the assistant digest feed — wherever `AssistantDigest` is rendered, show `generatedAt` formatted as a relative time (e.g. "Updated 2 minutes ago") using `date-fns/formatDistanceToNow`; place it below the headline in muted text (`text-xs text-ink-muted`)
-- [x] T020 [US2] Validate `AssistantNote` action buttons are functional — for each note with an `action` field, ensure the rendered button calls `navigate(action.payload.route)` for `type: 'navigate'` actions and dispatches a filter update for `type: 'filter'` actions; remove or hide any action button where `action` is undefined (no placeholder buttons per FR-006)
+- [x] T005 [US1] Test DashboardPage at 320px viewport — verify ExecutiveFocusBar wraps correctly, range tabs don't create horizontal overflow, DecisionQueue cards are full-width, charts don't overflow their containers in client/src/features/dashboard/pages/DashboardPage.tsx
+- [x] T006 [US1] Test DashboardPage at 375px viewport — verify header layout, signal cards spacing, and recent transactions list don't clip text or overflow in client/src/features/dashboard/pages/DashboardPage.tsx
+- [x] T007 [P] [US1] Test AssistantPage at 320px viewport — verify NoteCard icon+content layout doesn't squeeze, headline text wraps with break-words, action buttons maintain 44px touch targets in client/src/pages/AssistantPage.tsx
+- [x] T008 [US1] Test SignalWorkspacePanel modal at 320px — verify dialog content scrolls independently, footer stays pinned, action buttons don't overflow, confidence indicator doesn't clip in client/src/features/signals/components/SignalWorkspacePanel.tsx
+- [x] T009 [P] [US1] Test QuickAddModal at 320px — verify form fields stack correctly (grid-cols-1), amount/date inputs don't overflow, category combobox dropdown doesn't clip, submit buttons stay visible in client/src/features/transactions/QuickAddModal.tsx
+- [x] T010 [US1] Test DecisionQueue and ExecutiveFocusBar at 768px tablet — verify grid transitions from 1-col to 2-col correctly, no awkward single-card rows, focus bar doesn't wrap mid-word in client/src/features/signals/components/DecisionQueue.tsx
 
-**Checkpoint**: US2 complete — assistant shows signal-specific data, no generic AI phrasing, all action buttons are functional.
-
----
-
-## Phase 5: User Story 3 — Responsive Overlays & Reliable Actions (Priority: P3)
-
-**Goal**: Mobile users get a layout that adapts to 320px width with no clipped content, and every interactive element performs a real action.
-
-**Independent Test**: Open Chrome DevTools at 320px width. Open the signal workspace panel. Verify no content is clipped, the primary action button is visible, and clicking it navigates correctly. Verify the `ExecutiveFocusBar` "Review Priority Signals" CTA navigates to `/app/assistant?filter=priority` or smooth-scrolls to `#priority-decision-queue`.
-
-### Implementation for User Story 3
-
-- [x] T021 [US3] Fix broken "Review Priority Signals" CTA in `client/src/features/signals/components/ExecutiveFocusBar.tsx` — add `useNavigate` from `react-router-dom` and `useSignalsQuery` is already imported; wire the `<Button>` `onClick` to `navigate('/app/assistant?filter=priority')` as primary behavior; add `aria-label={t('signal.focusBar.reviewCta')}` to the button; add `disabled={criticalCount === 0 && awaitingReviewCount === 0}` with appropriate muted styling when no signals need review
-- [x] T022 [US3] Add hover, focus-visible, and pressed states to the CTA button in `ExecutiveFocusBar.tsx` — ensure the `<Button>` component receives `className` additions for `focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2`; add `transition-opacity active:opacity-80` for pressed feedback; verify the button is keyboard-reachable (it is inside the normal DOM flow, so Tab should reach it)
-- [x] T023 [US3] Fix `OperationalGuidanceCard` broken `onAction` in `client/src/features/dashboard/pages/DashboardPage.tsx` — replace the empty `onAction={() => {/* navigate or scroll */}}` callback with `onAction={() => { const el = document.getElementById('priority-decision-queue'); if (el) el.scrollIntoView({ behavior: 'smooth' }); else navigate('/app/assistant'); }}` 
-- [x] T024 [US3] Add `id="priority-decision-queue"` to the `<DecisionQueue />` wrapper section in `client/src/features/dashboard/pages/DashboardPage.tsx` — wrap `<DecisionQueue />` in `<section id="priority-decision-queue">` so the scroll target exists
-- [x] T025 [US3] Audit `DecisionQueue` component in `client/src/features/signals/components/DecisionQueue.tsx` — verify all interactive elements have `min-h-[44px] min-w-[44px]` touch targets; add `focus-visible:ring-2` to any button missing it; verify no button has an empty or placeholder `onClick`
-- [x] T026 [US3] Fix mobile overflow in `ExecutiveFocusBar.tsx` — the stats section uses `hidden md:flex` for the middle two stats; on mobile only the critical count and the CTA button show; add `overflow-x-auto` to the outer flex container and `shrink-0` to each stat block to prevent wrapping/clipping on 320px; add `gap-3` instead of `gap-6` on mobile using `gap-3 md:gap-6`
-- [x] T027 [US3] Audit `SignalCard` component in `client/src/features/signals/components/SignalCard.tsx` — verify the card's action button (if any) has a real `onClick` handler; add `focus-visible:ring-2 focus-visible:ring-offset-2` to the card's interactive surface; ensure text does not overflow on 320px by adding `break-words` or `truncate` to title/description elements
-
-**Checkpoint**: US3 complete — CTA navigates correctly, mobile layout is stable, all buttons are functional.
+**Checkpoint**: Responsive rendering verified at all breakpoints — no overflow or clipping
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 4: Real RTL QA (US2)
 
-**Purpose**: RTL consistency pass, dashboard hierarchy cleanup, and accessibility hardening across all touched files.
+**Goal**: Verify actual Arabic-mode rendering in browser. Fix visual alignment, currency rendering, icon direction, and mixed-language issues discovered during real RTL testing.
 
-- [x] T028 [P] Dashboard hierarchy cleanup in `client/src/features/dashboard/pages/DashboardPage.tsx` — remove the `OperationalGuidanceCard` when signals exist (it currently renders even when `hasNoSignals` is false due to the `hasNoSignals &&` guard being correct — verify the guard is working); ensure `ExecutiveFocusBar` only renders when `signals.length > 0` (already gated); reduce visual noise by removing the `mt-12` top margin on the historical trends section to `mt-8`
-- [x] T029 [P] RTL spacing audit across signal components — in `client/src/features/signals/components/SignalCard.tsx`, `SignalSeverityBadge.tsx`, `SignalLifecycleBadge.tsx`: replace `ml-*` with `ms-*`, `mr-*` with `me-*`, `pl-*` with `ps-*`, `pr-*` with `pe-*`, `left-*` with `start-*`, `right-*` with `end-*` where these are used for inline spacing
-- [x] T030 [P] RTL currency alignment in `SignalWorkspacePanel.tsx` — the hardcoded `$` prefix on `signal.value.toLocaleString()` must be replaced with `useFormatCurrency()(signal.value)` (already imported in `DashboardPage.tsx`); add `dir="ltr"` and `className="tabular-nums"` to the value display `<div>` so numeric values always render LTR even in RTL context
-- [x] T031 [P] Keyboard navigation audit — verify Tab order in `DashboardPage.tsx` is logical: range tabs → ExecutiveFocusBar CTA → DecisionQueue cards → signal workspace trigger; add `tabIndex={0}` and `onKeyDown` (Enter/Space → click) to any non-button interactive element found during audit
-- [x] T032 Run quickstart.md verification steps — manually verify: (1) Arabic mode drawer slides correctly, (2) assistant shows signal-specific data, (3) mobile 320px layout has no clipped buttons; document any remaining issues as deferred debt in a comment block at the bottom of this file
+**Independent Test**: Switch app to Arabic, navigate all pages — verify no English-first visual rhythm, correct icon mirroring, proper currency alignment.
+
+### Implementation for RTL QA
+
+- [x] T011 [US2] Test DashboardPage in Arabic mode — verify header text right-aligned, range tabs flow RTL, signal cards mirror correctly, currency amounts render with correct dir="ltr" isolation in client/src/features/dashboard/pages/DashboardPage.tsx
+- [x] T012 [US2] Test AssistantPage in Arabic mode — verify NoteCard rail appears on right (start-0 in RTL), ArrowRight icons rotate 180°, priority badges align correctly, headline text is right-aligned in client/src/pages/AssistantPage.tsx
+- [x] T013 [P] [US2] Test SignalWorkspacePanel in Arabic mode — verify close button appears at top-start (left in RTL), action buttons in footer align correctly, severity badges and confidence indicators mirror properly in client/src/features/signals/components/SignalWorkspacePanel.tsx
+- [x] T014 [US2] Test chart legends and tooltips in Arabic mode — verify ExpenseDonutChart legend text aligns right, tooltip positions correctly relative to cursor, chart axis labels don't clip in client/src/features/dashboard/components/ExpenseDonutChart.tsx and ExpenseTrendChart.tsx
+- [x] T015 [P] [US2] Test QuickAddModal in Arabic mode — verify form labels right-aligned, combobox dropdown opens correctly, type toggle pills mirror, submit/cancel button order respects RTL in client/src/features/transactions/QuickAddModal.tsx
+
+**Checkpoint**: RTL rendering verified — Arabic-native UX confirmed
+
+---
+
+## Phase 5: Accessibility Reality Check (US3)
+
+**Goal**: Verify actual keyboard-only navigation works. Fix real focus trapping, tab order, and screen-reader issues discovered during keyboard testing.
+
+**Independent Test**: Unplug mouse, navigate entire app using only Tab/Shift+Tab/Enter/Escape — verify all interactive elements are reachable and operable.
+
+### Implementation for Accessibility QA
+
+- [x] T016 [US3] Test keyboard navigation on DashboardPage — verify Tab moves through range tabs → signal cards → chart sections → recent transactions in logical order, all buttons activate with Enter/Space in client/src/features/dashboard/pages/DashboardPage.tsx
+- [x] T017 [US3] Test keyboard navigation in SignalWorkspacePanel — verify focus is trapped inside modal when open, Tab cycles through action buttons, ESC closes and restores focus to trigger element in client/src/features/signals/components/SignalWorkspacePanel.tsx
+- [x] T018 [P] [US3] Test keyboard navigation in QuickAddModal — verify focus moves to first input on open, Tab cycles through type toggle → amount → date → category → description → buttons, ESC closes in client/src/features/transactions/QuickAddModal.tsx
+- [x] T019 [US3] Verify focus-visible states are actually visible in browser — check that focus-ring utility produces a visible ring on Button, Input, Select, Combobox, and tab buttons when focused via keyboard in client/src/components/Button.tsx and client/src/index.css
+- [x] T020 [P] [US3] Verify prefers-reduced-motion is respected — enable reduced-motion in OS/browser settings, confirm no animations play (dialog transitions, fade-ins, loading spinners should be instant) in client/src/index.css
+
+**Checkpoint**: Keyboard-only navigation works — all interactive elements reachable and operable
+
+---
+
+## Phase 6: Modal Interaction QA (US4)
+
+**Goal**: Verify actual modal behavior in browser — overlay clicks, scroll locking, internal scrolling, stacked modals, and mobile height behavior.
+
+**Independent Test**: Open SignalWorkspacePanel, scroll page behind it — verify body is scroll-locked. Click overlay — verify modal closes.
+
+### Implementation for Modal QA
+
+- [x] T021 [US4] Test SignalWorkspacePanel overlay behavior — verify clicking overlay closes modal, body scroll is locked when open, internal content scrolls independently, footer stays pinned at bottom in client/src/features/signals/components/SignalWorkspacePanel.tsx
+- [x] T022 [US4] Test QuickAddModal on mobile viewport (375px) — verify modal doesn't exceed 90dvh, form content scrolls if needed, submit button stays visible, keyboard doesn't push modal off-screen in client/src/features/transactions/QuickAddModal.tsx
+- [x] T023 [P] [US4] Test ConfirmDialog stacking safety — open a modal, trigger a confirm dialog from within it, verify both render correctly without z-index conflicts or overlay doubling in client/src/components/ConfirmDialog.tsx
+- [x] T024 [US4] Test focus restoration after modal close — open SignalWorkspacePanel from a signal card, close it, verify focus returns to the signal card that triggered it (not lost to body) in client/src/features/signals/components/SignalWorkspacePanel.tsx
+
+**Checkpoint**: Modal interactions verified — overlay, scroll lock, stacking, and focus restoration all work
+
+---
+
+## Phase 7: Operational Trust & Copy QA (US5)
+
+**Goal**: Audit all user-facing copy for remaining fake AI tone, vague intelligence wording, or unclear operational language. Every insight must feel measurable and explainable.
+
+**Independent Test**: Read every visible string on AssistantPage and DashboardPage — verify none contain "AI", "smart", "intelligent", "powered", or conversational personality.
+
+### Implementation for Trust QA
+
+- [x] T025 [US5] Audit all visible strings on AssistantPage in browser — verify headline, note titles, note messages, action labels, empty states all use operational language (not AI personality) in client/src/pages/AssistantPage.tsx
+- [x] T026 [US5] Audit all visible strings on DashboardPage in browser — verify section headings, signal card text, guidance cards, and empty states use metric-based language in client/src/features/dashboard/pages/DashboardPage.tsx
+- [x] T027 [P] [US5] Audit signal workspace panel copy — verify signal explanations, action labels, confidence descriptions, and contextual assistant actions use operational wording in client/src/features/signals/components/SignalWorkspacePanel.tsx and ContextualAssistantActions.tsx
+- [x] T028 [US5] Audit server-generated assistant notes — verify buildAssistantDigest() in server/src/modules/dashboard/assistant.service.ts produces headlines and messages that reference specific metrics, not vague summaries
+- [x] T029 [P] [US5] Audit onboarding and guidance copy — verify OperationalGuidanceCard, ActivationChecklist, and empty states in client/src/features/onboarding/ use clear operational language without marketing fluff
+
+**Checkpoint**: All user-facing copy is operational, measurable, and trustworthy
+
+---
+
+## Phase 8: Polish & Final Verification
+
+**Purpose**: Final cross-cutting verification and issue documentation
+
+- [x] T030 [P] Run TypeScript compilation check (`npx tsc --noEmit` in client/) — verify zero type errors after all QA fixes
+- [x] T031 [P] Run ESLint check (`npx eslint src/` in client/) — verify no new lint errors introduced during QA fixes
+- [x] T032 Test full user journey in Arabic at 375px — open dashboard → click signal → review workspace → navigate to assistant → add transaction → verify entire flow works without breaks
+- [x] T033 Test full user journey in English at 1024px — same flow as T032 but in English desktop — verify no regressions from RTL/responsive fixes
+- [x] T034 Document all unresolved issues, edge cases, and deferred technical debt — create a summary of what was found, what was fixed, and what remains as known limitations
 
 ---
 
@@ -115,125 +143,67 @@
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: No dependencies — start immediately, read-only
-- **Foundational (Phase 2)**: Depends on Phase 1 audit findings — BLOCKS all user stories
-- **US1 (Phase 3)**: Depends on Phase 2 (T006 body scroll lock store)
-- **US2 (Phase 4)**: Depends on Phase 2 (T005 assistant API method)
-- **US3 (Phase 5)**: Depends on Phase 2 completion; T023/T024 depend on each other
-- **Polish (Phase 6)**: Depends on all user stories being complete
-
-### User Story Dependencies
-
-- **US1 (P1)**: Depends on T006 (body scroll lock store) — otherwise independent
-- **US2 (P2)**: Depends on T005 (assistant API client) — otherwise independent of US1
-- **US3 (P3)**: Depends on T024 (scroll target ID) before T023 (scroll behavior) — otherwise independent
-
-### Within Each User Story
-
-- US1: T008 (modal layout) → T009 (focus trap) → T010 (scroll lock) → T011 (RTL) → T012 (icons) → T013 (aria) → T014 (viewport)
-- US2: T015 (API param) → T016 (query hook) → T017 (page wiring) → T018 (phrasing audit) → T019 (timestamp) → T020 (action validation)
-- US3: T024 (scroll target) → T023 (scroll behavior) | T021 (CTA nav) → T022 (CTA states) | T025–T027 (parallel audits)
+- **Setup (Phase 1)**: No dependencies — start immediately
+- **Foundational (Phase 2)**: Depends on Setup — BLOCKS all QA work
+- **Responsive QA (Phase 3)**: Depends on Foundational — app must render first
+- **RTL QA (Phase 4)**: Depends on Foundational — can run in parallel with Phase 3
+- **Accessibility QA (Phase 5)**: Depends on Foundational — can run in parallel with Phases 3/4
+- **Modal QA (Phase 6)**: Depends on Foundational — can run in parallel with Phases 3/4/5
+- **Trust QA (Phase 7)**: Depends on Foundational — can run in parallel with Phases 3-6
+- **Polish (Phase 8)**: Depends on all previous phases
 
 ### Parallel Opportunities
 
-- T003 and T004 (Phase 1 audits) can run in parallel
-- T029, T030, T031 (Phase 6 polish) can all run in parallel
-- T025, T026, T027 (US3 component audits) can run in parallel
-- US2 and US3 can begin in parallel once Phase 2 is complete
+- T001 and T002 can run in parallel (Phase 1)
+- T003 and T004 can run in parallel (Phase 2)
+- Phases 3, 4, 5, 6, 7 can all run in parallel after Phase 2
+- T007, T009 can run in parallel within Phase 3
+- T013, T015 can run in parallel within Phase 4
+- T018, T020 can run in parallel within Phase 5
+- T023 can run in parallel within Phase 6
+- T027, T029 can run in parallel within Phase 7
+- T030, T031 can run in parallel within Phase 8
 
----
-
-## Parallel Example: User Story 1
+### Critical Path
 
 ```
-# These US1 tasks touch different concerns and can overlap:
-T011 — RTL layout fixes (CSS/classes only)
-T012 — Icon direction + aria-hidden (markup only)
-T013 — ARIA attributes (markup only)
-
-# These must be sequential:
-T008 (modal layout) → T009 (focus trap needs modal ref) → T010 (scroll lock needs open state)
+Phase 1 → Phase 2 → Phase 3 → Phase 8
+                  ↘ Phase 4 ↗
+                  ↘ Phase 5 ↗
+                  ↘ Phase 6 ↗
+                  ↘ Phase 7 ↗
 ```
 
 ---
 
 ## Implementation Strategy
 
-### MVP First (User Story 1 Only)
+### MVP First (Responsive QA Only)
 
-1. Complete Phase 1: Audit (read-only, fast)
-2. Complete Phase 2: Foundational (T005–T007)
-3. Complete Phase 3: US1 (T008–T014) — RTL drawer + modal rebuild
-4. **STOP and VALIDATE**: Run quickstart.md step 1 (RTL drawer) and step 3 (mobile 320px)
-5. Ship US1 fix — this is the highest-trust signal for Arabic users
+1. Complete Phase 1: Dev server running
+2. Complete Phase 2: App renders
+3. Complete Phase 3: Responsive verified at all breakpoints
+4. **STOP and VALIDATE**: No overflow or clipping at 320px-ultrawide
+5. This alone confirms mobile-readiness
 
 ### Incremental Delivery
 
-1. Setup + Foundational → baseline stable
-2. US1 → RTL drawer fixed, modal accessible → validate → ship
-3. US2 → assistant shows signal data → validate → ship
-4. US3 → CTA works, mobile stable → validate → ship
-5. Polish → RTL spacing, dashboard cleanup → validate → ship
-
-### Single Developer Strategy
-
-Work sequentially: Phase 1 → Phase 2 → US1 → US2 → US3 → Polish.
-Each phase is independently testable before moving on.
-
----
-
-## Deferred Technical Debt
-
-> Items explicitly out of scope for this stabilization pass. Document here to avoid scope creep.
-
-- Full Radix UI Dialog migration (if not already installed) — evaluate after US1 ships
-- i18n completeness audit beyond signal workspace keys
-- `AssistantNote` kind `'signal-explanation'` is defined in the API contract but not yet in the `AssistantNote` type union in `server/src/modules/dashboard/assistant.service.ts` — add it in a follow-up
-- `SignalWorkspacePanel` currently re-fetches signal data on every open — add `staleTime` to `useSignalByKeyQuery` in a follow-up
-- `ExecutiveFocusBar` sticky positioning (`sticky top-0 z-20`) may conflict with app shell header on some viewports — evaluate after US3 ships
+1. Setup + Foundational → App running
+2. Responsive QA → Mobile-verified → Core confidence
+3. RTL QA → Arabic-native → International quality
+4. Accessibility QA → Keyboard-only works → Inclusive UX
+5. Modal QA → Interactions verified → Interaction confidence
+6. Trust QA → Copy audited → Operational credibility
+7. Polish → Final validation → Ship-ready
 
 ---
 
 ## Notes
 
-- [P] tasks = different files, no dependencies on incomplete tasks
-- [Story] label maps each task to its user story for traceability
-- NO new libraries unless already in `client/package.json`
-- NO new routes, no new API endpoints beyond the `signalKey` query param already defined in the contract
-- Commit after each phase checkpoint
-- Stop at each checkpoint to validate the story independently before proceeding
-
-
----
-
-## Phase 7: Second Stabilization Pass (Post-MVP)
-
-**Purpose**: Complete remaining UX credibility, RTL consistency, accessibility hardening, and operational trust improvements.
-
-- [x] T033 [P] Dashboard hierarchy cleanup — reduce `space-y-6` to `space-y-5` for tighter rhythm; demote historical trends heading from `text-xl font-bold` to `text-lg font-semibold text-ink-muted`; reduce section card border to `border-outline/20` in `client/src/features/dashboard/pages/DashboardPage.tsx`
-- [x] T034 [P] Assistant page trust repositioning — replace `Sparkles` icon with `Activity` icon; change headline section from `bg-primary/5 border-primary/15` to `bg-surface-high/50 border-outline/20`; change refresh button from `variant="ghost"` to `variant="secondary" size="sm"`; add `aria-label` to refresh button in `client/src/pages/AssistantPage.tsx`
-- [x] T035 [P] Assistant NoteCard action button touch target — add `min-h-[44px] px-1 -mx-1` to action button; add `rtl:rotate-180` to ArrowRight icon in `client/src/pages/AssistantPage.tsx`
-- [x] T036 [P] RTL currency fix in DecisionQueue — replace hardcoded `$${s.value.toLocaleString()}` with `formatCurrency(Number(s.value))` using `useFormatCurrency` hook; add `dir="ltr"` to SignalCard value display in `client/src/features/signals/components/DecisionQueue.tsx` and `client/src/features/signals/components/SignalCard.tsx`
-- [x] T037 [P] DecisionQueue "View All" button accessibility — add `min-h-[44px]`, `focus-visible:ring-2 focus-visible:ring-offset-2`, and `aria-hidden` to ArrowRight icon in `client/src/features/signals/components/DecisionQueue.tsx`
-- [x] T038 Verify TypeScript compilation passes with zero errors after all changes
-
----
-
-## Second Pass Verification
-
-**Completed stabilization areas:**
-- ✅ Dashboard hierarchy: reduced visual competition, demoted secondary sections
-- ✅ Assistant trust: removed Sparkles/AI iconography, neutral headline styling, operational tone
-- ✅ RTL currency: all hardcoded `$` replaced with `useFormatCurrency()`, `dir="ltr"` on numeric values
-- ✅ Touch targets: all action buttons meet 44px minimum
-- ✅ Focus states: `focus-visible:ring-2` on all interactive elements
-- ✅ Reduced motion: already handled globally in `index.css`
-- ✅ Modal consistency: all modals use shared Radix Dialog primitive
-- ✅ TypeScript: zero compilation errors
-
-**Deferred to next pass:**
-- Manual RTL viewport testing (requires running app)
-- Manual 320px responsive screenshots
-- Screen reader testing (requires assistive technology)
-- ExpenseTrendChart axis formatter still uses hardcoded `$` (chart library limitation — would need custom formatter prop)
-- i18n key audit for untranslated strings beyond signal workspace scope
+- [P] tasks = different files/concerns, no dependencies
+- [Story] label maps task to QA concern (US1-US5)
+- FEATURE FREEZE: fix ONLY real issues discovered during testing
+- Do NOT refactor, redesign, or add features
+- Do NOT claim "verified" without actual browser interaction
+- Document issues found even if not fixable in this pass
+- Each fix must be minimal and targeted — no cascading changes

@@ -355,6 +355,11 @@ const main = async () => {
   console.log(`\n🔐  All demo accounts use password:  Demo123!`);
 };
 
+// ─── Expected Signal States (validated by src/__tests__/seed-integrity.test.ts) ──
+// Freelancer: SPEND_SPIKE(Marketing, ~140%), PROFIT_TREND, EXPENSE_GROWTH
+// E-commerce: SPEND_SPIKE(Ads, ~70%), PROFIT_TREND, EXPENSE_GROWTH
+// Service Business: SPEND_SPIKE(Marketing, ~110%), PROFIT_TREND, EXPENSE_GROWTH
+
 main()
   .catch((err) => {
     // eslint-disable-next-line no-console

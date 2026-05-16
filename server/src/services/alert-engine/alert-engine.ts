@@ -23,6 +23,8 @@ import {
   shareOf,
   toSafeNumber,
 } from '../../utils/safe-math';
+import { signalEngine } from '../../intelligence/engine/signal-engine';
+import type { FinancialSignal } from '../../intelligence/signals/signal.types';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -106,7 +108,38 @@ const month = (d: Date): string => format(d, 'yyyy-MM');
 // ─── Rules ────────────────────────────────────────────────────────────────
 
 /** Spend spike: a single category's weekly spend > 50% above its 4-wk avg. */
-const ruleSpendSpike = async (userId: string, now: Date): Promise<DraftAlert[]> => {
+const ruleSpendSpike = async (userId: string, now: Date, currency = 'USD', signals?: FinancialSignal[]): Promise<DraftAlert[]> => {
+  // Signal-based path: use SPEND_SPIKE signals if available
+  const spikeSignals = signals?.filter((s) => s.key === 'SPEND_SPIKE');
+  if (spikeSignals && spikeSignals.length > 0) {
+    const drafts: DraftAlert[] = [];
+    for (const sig of spikeSignals) {
+      const categoryName = (sig.metadata.categoryName as string) ?? 'Unknown';
+      const changePct = (sig.metadata.changePct as number) ?? sig.value;
+      const currentAmount = (sig.metadata.currentAmount as number) ?? 0;
+      const baselineAvg = (sig.metadata.baselineAvg as number) ?? 0;
+      const categoryId = (sig.metadata.categoryId as string) ?? '';
+      const severity: AlertSeverity = changePct >= 100 ? 'CRITICAL' : 'WARNING';
+      drafts.push({
+        type: 'SPEND_SPIKE_CATEGORY',
+        severity,
+        title: `${categoryName} spending spiked`,
+        message: `Your ${categoryName} spending increased by ${formatPctChange(
+          changePct,
+        )} this week (${formatMoney(currentAmount, currency)} vs ~${formatMoney(baselineAvg, currency)} weekly average).`,
+        dedupeKey: `spend-spike:${categoryId}:${week(now)}`,
+        expiresAt: endOfWeek(now, { weekStartsOn: 1 }),
+        action: {
+          label: `Review ${categoryName}`,
+          type: 'filter',
+          payload: { categoryId, type: 'EXPENSE' },
+        },
+      });
+    }
+    return drafts;
+  }
+
+  // Fallback: DB query logic
   const thisStart = startOfWeek(now, { weekStartsOn: 1 });
   const thisEnd = endOfWeek(now, { weekStartsOn: 1 });
   const baseStart = startOfWeek(subWeeks(now, 4), { weekStartsOn: 1 });
@@ -134,7 +167,7 @@ const ruleSpendSpike = async (userId: string, now: Date): Promise<DraftAlert[]> 
       title: `${c.name} spending spiked`,
       message: `Your ${c.name} spending increased by ${formatPctChange(
         change.pct,
-      )} this week (${formatMoney(c.total)} vs ~${formatMoney(avg)} weekly average).`,
+      )} this week (${formatMoney(c.total, currency)} vs ~${formatMoney(avg, currency)} weekly average).`,
       dedupeKey: `spend-spike:${c.categoryId}:${week(now)}`,
       expiresAt: endOfWeek(now, { weekStartsOn: 1 }),
       action: {
@@ -148,7 +181,7 @@ const ruleSpendSpike = async (userId: string, now: Date): Promise<DraftAlert[]> 
 };
 
 /** Expenses exceed income for the current month — critical cashflow signal. */
-const ruleSpendExceedsIncome = async (userId: string, now: Date): Promise<DraftAlert | null> => {
+const ruleSpendExceedsIncome = async (userId: string, now: Date, currency = 'USD'): Promise<DraftAlert | null> => {
   const start = startOfMonth(now);
   const end = endOfMonth(now);
   const [inc, exp] = await Promise.all([
@@ -162,9 +195,9 @@ const ruleSpendExceedsIncome = async (userId: string, now: Date): Promise<DraftA
     type: 'EXPENSES_EXCEED_INCOME',
     severity: 'CRITICAL',
     title: 'Expenses exceed income',
-    message: `You're spending ${formatMoney(overBy)} more than you earn this month (${formatMoney(
-      exp,
-    )} out vs ${formatMoney(inc)} in).`,
+    message: `You're spending ${formatMoney(overBy, currency)} more than you earn this month (${formatMoney(
+      exp, currency,
+    )} out vs ${formatMoney(inc, currency)} in).`,
     dedupeKey: `spend-exceeds-income:${month(now)}`,
     expiresAt: endOfMonth(now),
     action: {
@@ -176,7 +209,30 @@ const ruleSpendExceedsIncome = async (userId: string, now: Date): Promise<DraftA
 };
 
 /** Profit dropped vs last month with a clear culprit category. */
-const ruleProfitDrop = async (userId: string, now: Date): Promise<DraftAlert | null> => {
+const ruleProfitDrop = async (userId: string, now: Date, currency = 'USD', signals?: FinancialSignal[]): Promise<DraftAlert | null> => {
+  // Signal-based path: use PROFIT_TREND signal if available with isDropping=true
+  const profitSignal = signals?.find(
+    (s) => s.key === 'PROFIT_TREND' && s.metadata.isDropping === true,
+  );
+  if (profitSignal) {
+    const pct = profitSignal.value;
+    const currentProfit = (profitSignal.metadata.currentProfit as number) ?? 0;
+    const previousProfit = (profitSignal.metadata.previousProfit as number) ?? 0;
+    if (Math.abs(pct) < 15) return null;
+    const severity: AlertSeverity = Math.abs(pct) >= 30 ? 'CRITICAL' : 'WARNING';
+    return {
+      type: 'PROFIT_DROP',
+      severity,
+      title: 'Profit dropped',
+      message: `Your profit is down ${formatPctChange(pct)} versus last month (${formatMoney(
+        currentProfit, currency,
+      )} vs ${formatMoney(previousProfit, currency)}) — review your top expenses.`,
+      dedupeKey: `profit-drop:${month(now)}`,
+      expiresAt: endOfMonth(now),
+    };
+  }
+
+  // Fallback: DB query logic
   const thisStart = startOfMonth(now);
   const thisEnd = endOfMonth(now);
   const lastStart = startOfMonth(subMonths(now, 1));
@@ -215,7 +271,7 @@ const ruleProfitDrop = async (userId: string, now: Date): Promise<DraftAlert | n
     message: culprit
       ? `Your profit is down ${formatPctChange(change.pct)} versus last month, mainly because ${
           culprit.name
-        } expenses grew by ${formatMoney(culprit.growth)}.`
+        } expenses grew by ${formatMoney(culprit.growth, currency)}.`
       : `Your profit is down ${formatPctChange(change.pct)} versus last month — review your top expenses.`,
     dedupeKey: `profit-drop:${month(now)}`,
     expiresAt: endOfMonth(now),
@@ -233,6 +289,7 @@ const ruleProfitDrop = async (userId: string, now: Date): Promise<DraftAlert | n
 const ruleCategoryConcentration = async (
   userId: string,
   now: Date,
+  currency = 'USD',
 ): Promise<DraftAlert | null> => {
   const start = startOfMonth(now);
   const end = endOfMonth(now);
@@ -258,7 +315,28 @@ const ruleCategoryConcentration = async (
 };
 
 /** Weekly spend up >25% vs last week. */
-const ruleWeeklySpendIncrease = async (userId: string, now: Date): Promise<DraftAlert | null> => {
+const ruleWeeklySpendIncrease = async (userId: string, now: Date, currency = 'USD', signals?: FinancialSignal[]): Promise<DraftAlert | null> => {
+  // Signal-based path: use WEEKLY_SPEND_CHANGE signal if available with severity >= 'warning'
+  const weeklySignal = signals?.find(
+    (s) => s.key === 'WEEKLY_SPEND_CHANGE' && (s.severity === 'warning' || s.severity === 'critical'),
+  );
+  if (weeklySignal) {
+    const thisWeek = (weeklySignal.metadata.thisWeek as number) ?? 0;
+    const lastWeek = (weeklySignal.metadata.lastWeek as number) ?? 0;
+    const changePct = (weeklySignal.metadata.changePct as number) ?? weeklySignal.value;
+    return {
+      type: 'WEEKLY_SPEND_INCREASE',
+      severity: changePct >= 50 ? 'WARNING' : 'INFO',
+      title: 'Weekly spending up',
+      message: `Your spending is ${formatPctChange(changePct)} higher this week (${formatMoney(
+        thisWeek, currency,
+      )} vs ${formatMoney(lastWeek, currency)} last week).`,
+      dedupeKey: `weekly-spend-up:${week(now)}`,
+      expiresAt: endOfWeek(now, { weekStartsOn: 1 }),
+    };
+  }
+
+  // Fallback: DB query logic
   const thisStart = startOfWeek(now, { weekStartsOn: 1 });
   const thisEnd = endOfWeek(now, { weekStartsOn: 1 });
   const lastStart = startOfWeek(subWeeks(now, 1), { weekStartsOn: 1 });
@@ -274,8 +352,8 @@ const ruleWeeklySpendIncrease = async (userId: string, now: Date): Promise<Draft
     severity: change.pct >= 50 ? 'WARNING' : 'INFO',
     title: 'Weekly spending up',
     message: `Your spending is ${formatPctChange(change.pct)} higher this week (${formatMoney(
-      thisExp,
-    )} vs ${formatMoney(lastExp)} last week).`,
+      thisExp, currency,
+    )} vs ${formatMoney(lastExp, currency)} last week).`,
     dedupeKey: `weekly-spend-up:${week(now)}`,
     expiresAt: endOfWeek(now, { weekStartsOn: 1 }),
   };
@@ -319,7 +397,30 @@ const ruleStaleData = async (userId: string, now: Date): Promise<DraftAlert | nu
  * Forecast: if the daily spend rate continues, project month-end and warn when
  * the run-rate exceeds last month's expense by ≥ 15%.
  */
-const ruleForecastOverspend = async (userId: string, now: Date): Promise<DraftAlert | null> => {
+const ruleForecastOverspend = async (userId: string, now: Date, currency = 'USD', signals?: FinancialSignal[]): Promise<DraftAlert | null> => {
+  // Signal-based path: use PROJECTED_EXPENSE signal if available with isOverspending=true
+  const forecastSignal = signals?.find(
+    (s) => s.key === 'PROJECTED_EXPENSE' && s.metadata.isOverspending === true,
+  );
+  if (forecastSignal) {
+    const vsLastMonth = (forecastSignal.metadata.vsLastMonth as number) ?? forecastSignal.value;
+    const projected = (forecastSignal.metadata.projected as number) ?? forecastSignal.value;
+    const dayOfMonth = Math.max(1, now.getDate());
+    // Only meaningful past the first week of the month.
+    if (dayOfMonth < 7) return null;
+    return {
+      type: 'FORECAST_OVERSPEND',
+      severity: vsLastMonth >= 40 ? 'WARNING' : 'INFO',
+      title: 'On track to overspend',
+      message: `If you continue at this rate, you'll spend about ${formatMoney(
+        projected, currency,
+      )} this month — ${formatPctChange(vsLastMonth)} versus last month.`,
+      dedupeKey: `forecast-overspend:${month(now)}:${Math.floor(dayOfMonth / 7)}`,
+      expiresAt: endOfMonth(now),
+    };
+  }
+
+  // Fallback: DB query logic
   const start = startOfMonth(now);
   const end = endOfMonth(now);
   const exp = await sumByType(userId, 'EXPENSE', start, now);
@@ -342,7 +443,7 @@ const ruleForecastOverspend = async (userId: string, now: Date): Promise<DraftAl
     severity: change.pct >= 40 ? 'WARNING' : 'INFO',
     title: 'On track to overspend',
     message: `If you continue at this rate, you'll spend about ${formatMoney(
-      projected,
+      projected, currency,
     )} this month — ${formatPctChange(change.pct)} versus last month.`,
     dedupeKey: `forecast-overspend:${month(now)}:${Math.floor(dayOfMonth / 7)}`,
     expiresAt: endOfMonth(now),
@@ -353,7 +454,7 @@ const ruleForecastOverspend = async (userId: string, now: Date): Promise<DraftAl
  * Recurring detection: same {category, amount±5%} appearing on similar days
  * for 3 consecutive months → likely subscription.
  */
-const ruleRecurringDetected = async (userId: string, now: Date): Promise<DraftAlert[]> => {
+const ruleRecurringDetected = async (userId: string, now: Date, currency = 'USD'): Promise<DraftAlert[]> => {
   const start = startOfMonth(subMonths(now, 3));
   const txns = await prisma.transaction.findMany({
     where: { userId, type: 'EXPENSE', date: { gte: start, lte: now } },
@@ -388,7 +489,7 @@ const ruleRecurringDetected = async (userId: string, now: Date): Promise<DraftAl
       type: 'RECURRING_DETECTED',
       severity: 'INFO',
       title: 'Recurring expense detected',
-      message: `${b.name} of about ${formatMoney(b.amount)} repeats monthly — looks like a subscription you can review.`,
+      message: `${b.name} of about ${formatMoney(b.amount, currency)} repeats monthly — looks like a subscription you can review.`,
       dedupeKey: `recurring:${b.categoryId}:${Math.round(b.amount)}`,
       expiresAt: endOfMonth(now),
       action: {
@@ -447,6 +548,25 @@ export const alertEngine = {
    *   - on a daily cron
    */
   async evaluate(userId: string, at: Date = new Date()): Promise<Alert[]> {
+    // Fetch user currency for monetary formatting
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { currency: true },
+    });
+    const currency = user?.currency ?? 'USD';
+
+    // Fetch signals from signal engine for signal-consuming rules
+    let signals: FinancialSignal[] = [];
+    try {
+      signals = await signalEngine.getSignals(userId);
+    } catch (err) {
+      logger.warn('alert-engine:signal-fetch-failed', {
+        userId,
+        message: err instanceof Error ? err.message : String(err),
+      });
+      // Continue with empty signals — rules will fall back to DB queries
+    }
+
     const [
       spike,
       exceeds,
@@ -457,14 +577,14 @@ export const alertEngine = {
       forecast,
       recurring,
     ] = await Promise.all([
-      ruleSpendSpike(userId, at),
-      ruleSpendExceedsIncome(userId, at),
-      ruleProfitDrop(userId, at),
-      ruleCategoryConcentration(userId, at),
-      ruleWeeklySpendIncrease(userId, at),
+      ruleSpendSpike(userId, at, currency, signals),
+      ruleSpendExceedsIncome(userId, at, currency),
+      ruleProfitDrop(userId, at, currency, signals),
+      ruleCategoryConcentration(userId, at, currency),
+      ruleWeeklySpendIncrease(userId, at, currency, signals),
       ruleStaleData(userId, at),
-      ruleForecastOverspend(userId, at),
-      ruleRecurringDetected(userId, at),
+      ruleForecastOverspend(userId, at, currency, signals),
+      ruleRecurringDetected(userId, at, currency),
     ]);
 
     const drafts: DraftAlert[] = [

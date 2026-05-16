@@ -78,10 +78,14 @@ export const signalEngine = {
       // Step 2: Load threshold config
       const thresholds = await getThresholdConfig(userMode);
 
+      // Step 2b: Fetch user currency for context-aware metadata
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { currency: true } });
+
       // Step 3: Generate signals
       const ctx: SignalGenerationContext = {
         userId,
         generatedAt: snapshot.collectedAt,
+        currency: user?.currency ?? 'USD',
       };
       const signals = runAllGenerators(snapshot, ctx, thresholds);
 

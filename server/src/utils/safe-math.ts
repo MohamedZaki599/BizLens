@@ -77,15 +77,34 @@ export const formatPctChange = (pct: number): string => {
   return `−${Math.abs(rounded)}%`;
 };
 
-export const formatMoney = (value: number, currency = 'USD'): string => {
+/**
+ * Format a monetary value with locale-aware currency symbol.
+ * Defaults to USD if no currency provided.
+ * Uses the appropriate locale for the currency to get correct symbol placement.
+ */
+export const formatMoney = (value: number, currency = 'USD', locale?: string): string => {
   const safe = toSafeNumber(value);
+  const resolvedLocale = locale ?? currencyLocaleMap[currency] ?? 'en-US';
   try {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(resolvedLocale, {
       style: 'currency',
       currency,
       maximumFractionDigits: 2,
     }).format(safe);
   } catch {
-    return `$${safe.toFixed(2)}`;
+    return `${currency} ${safe.toFixed(2)}`;
   }
+};
+
+/** Maps currency codes to their natural locale for correct symbol/placement. */
+const currencyLocaleMap: Record<string, string> = {
+  USD: 'en-US',
+  EUR: 'en-IE',
+  GBP: 'en-GB',
+  SAR: 'ar-SA',
+  EGP: 'ar-EG',
+  AED: 'ar-AE',
+  CAD: 'en-CA',
+  AUD: 'en-AU',
+  INR: 'en-IN',
 };

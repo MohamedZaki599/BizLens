@@ -88,6 +88,7 @@ export const DialogContent = forwardRef<
       <DialogOverlay />
       <RadixDialog.Content
         ref={ref}
+        dir={props.dir}
         className={cn(
           // Centering layer
           'fixed inset-0 z-50 flex items-center justify-center p-4',
@@ -101,7 +102,10 @@ export const DialogContent = forwardRef<
             // Panel
             'relative w-full bg-surface-lowest border border-outline/10',
             'rounded-2xl shadow-ambient',
-            'max-h-[90vh] flex flex-col',
+            // Responsive: use dvh for mobile browsers, fallback to vh
+            'max-h-[90dvh] flex flex-col',
+            // Ensure usable on 320px viewports
+            'min-w-0',
             // Animation
             'dialog-content-animate',
             // Size
@@ -183,7 +187,7 @@ interface DialogBodyProps {
 }
 
 export const DialogBody = ({ className, children }: DialogBodyProps) => (
-  <div className={cn('px-6 pb-6 pt-2 overflow-y-auto flex-1', className)}>
+  <div className={cn('px-6 pb-6 pt-2 overflow-y-auto flex-1 min-h-0', className)}>
     {children}
   </div>
 );
@@ -198,7 +202,12 @@ interface DialogFooterProps {
 export const DialogFooter = ({ className, children }: DialogFooterProps) => (
   <div
     className={cn(
-      'flex items-center justify-end gap-2 px-6 py-4 border-t border-outline/10 shrink-0',
+      'flex items-center justify-end gap-2 px-6 py-4',
+      'border-t border-outline/10',
+      // Sticky footer: always visible regardless of content length (FR-002)
+      'sticky bottom-0 bg-surface-lowest shrink-0',
+      // Safe area padding for mobile devices
+      'pb-[max(1rem,env(safe-area-inset-bottom))]',
       className,
     )}
   >

@@ -23,26 +23,44 @@ import { isSignalKey } from '../../intelligence/signals/signal.types';
 /**
  * System prompt for the Signal Analyst persona.
  * Enforces a deterministic, evidence-based tone focused on operational clarity.
+ * FR-007: No generic "I am an AI assistant" introductions.
  */
 export const SIGNAL_ANALYST_PROMPT = `
-You are the BizLens Signal Analyst, a deterministic operational copilot for SMB owners.
-Your goal is to transform financial data into actionable operational clarity.
+You are the BizLens Signal Analyst. You deliver operational intelligence for SMB owners.
+
+IDENTITY:
+- You are a senior signal analyst, not a chatbot.
+- Never say "I am an AI", "How can I help", "Hello!", or any generic greeting.
+- Never introduce yourself. Start every response with the most critical data point.
+- Your first sentence must contain a number (dollar amount, percentage, or count).
 
 RULES:
-1. PERSONA: You are a senior business analyst. You are concise, objective, and evidence-based.
-2. SOURCE OF TRUTH: Use ONLY the provided AssistantContext. Never invent business facts or historical data.
-3. NO FILLER: Avoid generic greetings, motivational language, or "As an AI" disclaimers. Start directly with the analysis.
-4. NO SPECULATION: Do not provide generic financial advice or speculative "what-if" scenarios. Focus on what the data actually shows.
-5. OPERATIONAL FOCUS: Prioritize explaining "why" a signal triggered and what the immediate operational impact is.
-6. GUIDANCE: Guide the user's attention to the most critical anomalies or budget deviations.
+1. EVIDENCE ONLY: Use ONLY the provided AssistantContext. Never invent data, extrapolate beyond what is shown, or offer generic financial advice.
+2. LEAD WITH DATA: Open with the most urgent metric — e.g., "Marketing spend spiked 45% ($2,400) this week."
+3. CITE SPECIFICS: Every claim must reference at least one concrete data point (amount, percentage change, category name, time period).
+4. EXPLAIN DRIVERS: When a signal is active, explain what triggered it and which categories or transactions are responsible.
+5. NO FILLER: No motivational language, no "let me know if you need anything", no pleasantries. Every sentence must contain information.
+6. OPERATIONAL FRAMING: Frame insights as operational decisions — what changed, why it matters, what to do next.
 
 STRUCTURE:
-- If an activeSignal is provided, prioritize analyzing its drivers first.
-- Summarize the overall Business Health (burn rate, budget status).
-- Highlight critical anomalies from the topSignals list.
-- Keep responses under 150 words.
+- If an activeSignal is provided, lead with its analysis: state the anomaly, quantify it, name the driver.
+- Follow with Business Health summary: burn rate delta, any exceeded budgets.
+- Close with the single most actionable next step (one sentence).
+- Keep responses under 120 words. Prefer sentence fragments over full paragraphs.
 
-TONE: Professional, urgent but calm, focused on operational decision-making.
+ANTI-PATTERNS (never produce these):
+- "I'd be happy to help you understand your finances."
+- "Based on the data, it looks like..."
+- "Here's a summary of your financial health:"
+- "Let me break this down for you."
+- Any sentence without a data point or specific reference.
+
+GOOD EXAMPLES:
+- "Revenue trending down 12% vs last month. Primary driver: client churn in Q4 contracts."
+- "Burn rate: $8,200/mo (+18%). Marketing exceeded budget by $1,100. Cut or justify by Friday."
+- "3 subscriptions totaling $847/mo detected. Largest: AWS at $420. Review for unused capacity."
+
+TONE: Direct, calm, operationally urgent. Like a morning briefing from a CFO, not a chatbot conversation.
 `.trim();
 
 /**
@@ -86,6 +104,9 @@ export const formatAssistantContext = (ctx: AssistantContext): string => {
  * Each note is intentionally short and actionable; the client renders them as
  * a stacked summary card and uses the optional `action` to deep-link into the
  * filtered transaction view.
+ *
+ * Persona: Signal Analyst — no generic greetings, every note references
+ * specific data points (amounts, percentages, category names).
  */
 
 export type AssistantTone = 'positive' | 'neutral' | 'warning' | 'negative';
@@ -105,7 +126,8 @@ export interface AssistantNote {
     | 'expense-driver'
     | 'subscriptions'
     | 'stale-data'
-    | 'forecast';
+    | 'forecast'
+    | 'signal-explanation';
   title: string;
   message: string;
   metric?: string;
@@ -188,7 +210,7 @@ const orderNotes = (notes: AssistantNote[]): AssistantNote[] =>
     return TONE_WEIGHT[a.tone] - TONE_WEIGHT[b.tone];
   });
 
-const weeklyPulse = async (userId: string, now: Date): Promise<AssistantNote | null> => {
+const weeklyPulse = async (userId: string, now: Date, currency = 'USD'): Promise<AssistantNote | null> => {
   const thisStart = startOfWeek(now, { weekStartsOn: 1 });
   const thisEnd = endOfWeek(now, { weekStartsOn: 1 });
   const lastStart = startOfWeek(subWeeks(now, 1), { weekStartsOn: 1 });
@@ -220,28 +242,28 @@ const weeklyPulse = async (userId: string, now: Date): Promise<AssistantNote | n
 
   const message = change.hasComparison
     ? change.direction === 'flat'
-      ? `Profit this week is roughly flat at ${formatMoney(profit)}.`
+      ? `Profit this week is roughly flat at ${formatMoney(profit, currency)}.`
       : `You're ${change.direction === 'up' ? 'up' : 'down'} ${formatPctChange(
           change.pct,
         )} versus last week — profit ${
           profit >= 0 ? 'of' : 'down'
-        } ${formatMoney(Math.abs(profit))}.`
-    : `So far this week you're at ${formatMoney(profit)} profit (${formatMoney(
-        thisInc,
-      )} in, ${formatMoney(thisExp)} out).`;
+        } ${formatMoney(Math.abs(profit), currency)}.`
+    : `So far this week you're at ${formatMoney(profit, currency)} profit (${formatMoney(
+        thisInc, currency,
+      )} in, ${formatMoney(thisExp, currency)} out).`;
 
   return {
     id: 'weekly-pulse',
     kind: 'weekly-pulse',
     title: 'This week so far',
     message,
-    metric: change.hasComparison ? formatPctChange(change.pct) : formatMoney(profit),
+    metric: change.hasComparison ? formatPctChange(change.pct) : formatMoney(profit, currency),
     tone,
     priority: 'normal',
   };
 };
 
-const profitTrend = async (userId: string, now: Date): Promise<AssistantNote | null> => {
+const profitTrend = async (userId: string, now: Date, currency = 'USD'): Promise<AssistantNote | null> => {
   const thisStart = startOfMonth(now);
   const thisEnd = endOfMonth(now);
   const lastStart = startOfMonth(subMonths(now, 1));
@@ -265,8 +287,8 @@ const profitTrend = async (userId: string, now: Date): Promise<AssistantNote | n
       id: 'profit-baseline',
       kind: 'profit-trend',
       title: 'Profit this month',
-      message: `You're at ${formatMoney(profit)} profit so far this month — no prior month to compare against yet.`,
-      metric: formatMoney(profit),
+      message: `You're at ${formatMoney(profit, currency)} profit so far this month — no prior month to compare against yet.`,
+      metric: formatMoney(profit, currency),
       tone: profit >= 0 ? 'positive' : 'warning',
       priority: 'normal',
     };
@@ -279,8 +301,8 @@ const profitTrend = async (userId: string, now: Date): Promise<AssistantNote | n
     title: dropped ? 'Profit is sliding' : 'Profit is climbing',
     message: dropped
       ? `Profit is ${formatPctChange(change.pct)} versus last month (${formatMoney(
-          profit,
-        )} vs ${formatMoney(lastProfit)}). Worth a closer look.`
+          profit, currency,
+        )} vs ${formatMoney(lastProfit, currency)}). Worth a closer look.`
       : `Profit is ${formatPctChange(change.pct)} versus last month — keep what's working.`,
     metric: formatPctChange(change.pct),
     tone: dropped ? (Math.abs(change.pct) >= 25 ? 'negative' : 'warning') : 'positive',
@@ -288,7 +310,7 @@ const profitTrend = async (userId: string, now: Date): Promise<AssistantNote | n
   };
 };
 
-const expenseDriver = async (userId: string, now: Date): Promise<AssistantNote | null> => {
+const expenseDriver = async (userId: string, now: Date, currency = 'USD'): Promise<AssistantNote | null> => {
   const thisStart = startOfMonth(now);
   const thisEnd = endOfMonth(now);
   const lastStart = startOfMonth(subMonths(now, 1));
@@ -339,11 +361,11 @@ const expenseDriver = async (userId: string, now: Date): Promise<AssistantNote |
     kind: 'expense-driver',
     title: 'Biggest swing this month',
     message: change.hasComparison
-      ? `${cat.name} is up ${formatMoney(top.delta)} (${formatPctChange(
+      ? `${cat.name} is up ${formatMoney(top.delta, currency)} (${formatPctChange(
           change.pct,
         )}) compared with last month.`
-      : `${cat.name} is new this month and already at ${formatMoney(top.thisTotal)}.`,
-    metric: formatMoney(top.delta),
+      : `${cat.name} is new this month and already at ${formatMoney(top.thisTotal, currency)}.`,
+    metric: formatMoney(top.delta, currency),
     tone: 'warning',
     priority: 'high',
     action: {
@@ -354,7 +376,7 @@ const expenseDriver = async (userId: string, now: Date): Promise<AssistantNote |
   };
 };
 
-const subscriptionsNote = async (userId: string): Promise<AssistantNote | null> => {
+const subscriptionsNote = async (userId: string, currency = 'USD'): Promise<AssistantNote | null> => {
   const { subscriptions, totalMonthly, totalAnnual } = await detectSubscriptions(userId);
   if (subscriptions.length === 0) return null;
   const top = subscriptions[0];
@@ -364,16 +386,16 @@ const subscriptionsNote = async (userId: string): Promise<AssistantNote | null> 
     title: 'Recurring charges to review',
     message: `${subscriptions.length} subscription${
       subscriptions.length === 1 ? '' : 's'
-    } detected — about ${formatMoney(totalMonthly)} a month (${formatMoney(
-      totalAnnual,
+    } detected — about ${formatMoney(totalMonthly, currency)} a month (${formatMoney(
+      totalAnnual, currency,
     )} a year). Largest: ${top.name}.`,
-    metric: formatMoney(totalMonthly),
+    metric: formatMoney(totalMonthly, currency),
     tone: subscriptions.length >= 5 ? 'warning' : 'neutral',
     priority: 'normal',
     action: {
       label: 'Open subscriptions',
-      type: 'navigate',
-      payload: { route: '/app/subscriptions' },
+      type: 'filter',
+      payload: { type: 'EXPENSE', recurring: 'true' },
     },
   };
 };
@@ -404,7 +426,7 @@ const staleDataNote = async (userId: string, now: Date): Promise<AssistantNote |
   };
 };
 
-const forecastNote = async (userId: string, now: Date): Promise<AssistantNote | null> => {
+const forecastNote = async (userId: string, now: Date, currency = 'USD'): Promise<AssistantNote | null> => {
   const start = startOfMonth(now);
   const end = endOfMonth(now);
   const dayOfMonth = Math.max(1, now.getDate());
@@ -435,9 +457,9 @@ const forecastNote = async (userId: string, now: Date): Promise<AssistantNote | 
       kind: 'forecast',
       title: 'Heading for a loss',
       message: `On this pace you'll end the month down ${formatMoney(
-        Math.abs(projectedProfit),
+        Math.abs(projectedProfit), currency,
       )}. Trim non-essential expenses or chase outstanding income.`,
-      metric: formatMoney(projectedProfit),
+      metric: formatMoney(projectedProfit, currency),
       tone: 'negative',
       priority: 'high',
     };
@@ -448,7 +470,7 @@ const forecastNote = async (userId: string, now: Date): Promise<AssistantNote | 
       kind: 'forecast',
       title: 'Spending is accelerating',
       message: `If the rest of the month tracks today's pace, you'll spend ${formatMoney(
-        projectedExp,
+        projectedExp, currency,
       )} — ${formatPctChange(expChange.pct)} versus last month.`,
       metric: formatPctChange(expChange.pct),
       tone: 'warning',
@@ -459,10 +481,115 @@ const forecastNote = async (userId: string, now: Date): Promise<AssistantNote | 
     id: 'forecast-on-track',
     kind: 'forecast',
     title: 'On pace for the month',
-    message: `Projected ${formatMoney(projectedProfit)} profit this month at the current pace.`,
-    metric: formatMoney(projectedProfit),
+    message: `Projected ${formatMoney(projectedProfit, currency)} profit this month at the current pace.`,
+    metric: formatMoney(projectedProfit, currency),
     tone: 'positive',
     priority: 'normal',
+  };
+};
+
+/**
+ * Generates a focused signal-explanation note when a specific signalKey is provided.
+ * Fetches the signal and its transaction drivers to construct a data-aware insight
+ * with actionable deep-link to relevant transactions.
+ *
+ * Returns null if the signal is not found or has insufficient data.
+ */
+export const generateSignalInsight = async (
+  userId: string,
+  signalKey: string,
+): Promise<AssistantNote | null> => {
+  if (!isSignalKey(signalKey)) return null;
+
+  const signal = await signalEngine.getSignal(userId, signalKey);
+  if (!signal) return null;
+
+  // Fetch user currency for monetary formatting
+  const userRecord = await prisma.user.findUnique({ where: { id: userId }, select: { currency: true } });
+  const currency = userRecord?.currency ?? 'USD';
+
+  const explainability = signal.metadata?.explainability;
+  const inputs = explainability?.inputs ?? {};
+
+  // Derive a human-readable title from the signal key
+  const title = signalKey
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  // Extract data points for the message
+  const value = signal.value;
+  const pctChange = inputs.changePct != null
+    ? Number(inputs.changePct)
+    : inputs.pct != null
+      ? Number(inputs.pct)
+      : null;
+  const amount = inputs.amount != null
+    ? Number(inputs.amount)
+    : inputs.current != null
+      ? Number(inputs.current)
+      : value;
+  const period = inputs.period != null
+    ? String(inputs.period)
+    : 'this month';
+
+  // Determine tone from severity and trend
+  const tone: AssistantTone =
+    signal.severity === 'critical' || signal.severity === 'warning'
+      ? 'warning'
+      : signal.trend === 'down'
+        ? 'negative'
+        : signal.trend === 'up'
+          ? 'positive'
+          : 'neutral';
+
+  // Build metric string
+  const metric = pctChange != null
+    ? formatPctChange(pctChange)
+    : formatMoney(amount, currency);
+
+  // Build concise, data-aware message with at least 2 data points
+  const formattedAmount = formatMoney(amount, currency);
+  const pctStr = pctChange != null ? formatPctChange(pctChange) : null;
+  const message = pctStr
+    ? `${title} is at ${formattedAmount} (${pctStr}) ${period}. ${explainability?.reasoningChain?.[0] ?? 'Review transactions for details.'}`
+    : `${title} is at ${formattedAmount} ${period}. ${explainability?.reasoningChain?.[0] ?? 'Review transactions for details.'}`;
+
+  // Build action deep-link if we have a source category
+  let action: AssistantAction | undefined;
+  const categoryId = explainability?.sourceEntities?.[0];
+  if (categoryId) {
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: { id: true, name: true, type: true },
+    });
+    if (category) {
+      action = {
+        label: `Review ${category.name}`,
+        type: 'filter',
+        payload: { categoryId: category.id, type: category.type },
+      };
+    }
+  }
+
+  // Fallback action: filter by expense type if no specific category
+  if (!action) {
+    action = {
+      label: `Review transactions`,
+      type: 'filter',
+      payload: { type: 'EXPENSE' },
+    };
+  }
+
+  return {
+    id: `signal-explanation:${signalKey}`,
+    kind: 'signal-explanation',
+    title,
+    message,
+    metric,
+    tone,
+    priority: 'high',
+    action,
   };
 };
 
@@ -470,6 +597,10 @@ const forecastNote = async (userId: string, now: Date): Promise<AssistantNote | 
  * Deterministic context builder for the Assistant.
  * Aggregates signals, budget health, trends, and recent activity into a 
  * single type-safe contract.
+ *
+ * NOTE (T008 audit): aggregateByType() is used here for monthlyBurn and
+ * composition data — these are budget/composition metrics, NOT signal-equivalent
+ * computations. Signal data is fetched via signalEngine.getSignal() above.
  */
 export const buildAssistantContext = async (
   userId: string,
@@ -479,6 +610,10 @@ export const buildAssistantContext = async (
   const start = startOfMonth(now);
   const prevStart = startOfMonth(subMonths(now, 1));
   const prevEnd = endOfMonth(subMonths(now, 1));
+
+  // Fetch user currency
+  const userRecord = await prisma.user.findUnique({ where: { id: userId }, select: { currency: true } });
+  const currency = userRecord?.currency ?? 'USD';
 
   // 1. Fetch active signal if key provided
   let activeSignal: SignalInsight | undefined;
@@ -490,7 +625,7 @@ export const buildAssistantContext = async (
         title: sig.key.replace(/_/g, ' ').toLowerCase(),
         summary: sig.metadata?.explainability?.reasoningChain?.[0] || 'Operational anomaly detected',
         drivers: (sig.metadata?.explainability?.reasoningChain as string[]) || [],
-        metric: sig.value ? formatMoney(sig.value) : undefined,
+        metric: sig.value ? formatMoney(sig.value, currency) : undefined,
         trend: sig.trend.toUpperCase() as 'UP' | 'DOWN' | 'FLAT' | 'UNKNOWN',
       };
     }
@@ -555,6 +690,13 @@ export const buildAssistantDigest = async (
 ): Promise<AssistantDigest> => {
   const now = new Date();
 
+  // Fetch user currency for monetary formatting
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { currency: true },
+  });
+  const currency = user?.currency ?? 'USD';
+
   const txnCount = await prisma.transaction.count({
     where: { userId, date: { gte: subDays(now, 30) } },
   });
@@ -568,15 +710,15 @@ export const buildAssistantDigest = async (
   }
 
   const candidates = await Promise.all([
-    profitTrend(userId, now),
-    expenseDriver(userId, now),
-    forecastNote(userId, now),
-    weeklyPulse(userId, now),
-    subscriptionsNote(userId),
+    profitTrend(userId, now, currency),
+    expenseDriver(userId, now, currency),
+    forecastNote(userId, now, currency),
+    weeklyPulse(userId, now, currency),
+    subscriptionsNote(userId, currency),
     staleDataNote(userId, now),
   ]);
 
-  const notes = orderNotes(
+  let notes = orderNotes(
     candidates.filter((n): n is AssistantNote => n !== null).map((n) => ({
       ...n,
       // Bump priority for kinds that we always treat as decisions (overrides 'normal' if any slipped through).
@@ -584,7 +726,32 @@ export const buildAssistantDigest = async (
     })),
   ).slice(0, 6);
 
-  const headline = notes[0]?.message ?? "You're up to date — nothing critical to look at this week.";
+  // When signalKey is provided, prepend the signal-explanation note at index 0
+  if (signalKey) {
+    const signalNote = await generateSignalInsight(userId, signalKey);
+    if (signalNote) {
+      notes = [signalNote, ...notes.filter(n => n.id !== signalNote.id)];
+    }
+  }
+
+  // FR-007 / FR-009: Headline must reference specific metrics, never vague summaries.
+  // Priority: signal-explanation title+metric > top note title+metric > secondary note metric > fallback with data.
+  let headline: string;
+  if (signalKey && notes[0]?.kind === 'signal-explanation') {
+    headline = notes[0].metric
+      ? `${notes[0].title}: ${notes[0].metric}`
+      : notes[0].title;
+  } else if (notes[0]?.metric && notes[0]?.title) {
+    headline = `${notes[0].title} — ${notes[0].metric}`;
+  } else if (notes[0]?.title) {
+    // Even without a metric on the top note, find the first note with a metric to enrich the headline
+    const metricNote = notes.find(n => n.metric);
+    headline = metricNote
+      ? `${notes[0].title} — ${metricNote.metric}`
+      : `${notes[0].title} this period`;
+  } else {
+    headline = 'No actionable changes detected this period.';
+  }
 
   const context = await buildAssistantContext(userId, signalKey);
   context.businessHealth.topSignals = notes;
