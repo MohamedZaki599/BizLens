@@ -129,7 +129,7 @@ const totalsByCategory = async (
  * // week-over-week expense/income change that the WEEKLY_SPEND_CHANGE signal
  * // already provides. Kept for now because /insights has a different response format.
  */
-const weeklyComparison = async (userId: string, currency = 'USD'): Promise<Insight | null> => {
+const weeklyComparison = async (userId: string, _currency = 'USD'): Promise<Insight | null> => {
   const now = new Date();
   const thisStart = startOfWeek(now, { weekStartsOn: 1 });
   const thisEnd = endOfWeek(now, { weekStartsOn: 1 });

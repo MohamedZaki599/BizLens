@@ -34,13 +34,15 @@ function resolveClientI18nPath(...segments: string[]): string {
 function extractAllKeysFromFile(filePath: string): Set<string> {
   const source = fs.readFileSync(filePath, 'utf-8');
   const keys = new Set<string>();
-  const keyPattern = /^\s*['"]([a-zA-Z0-9_.{}\-]+)['"]\s*:/gm;
+  const keyPattern = /^\s*['"]([a-zA-Z0-9_.{}-]+)['"]\s*:/gm;
   let match: RegExpExecArray | null;
   while ((match = keyPattern.exec(source)) !== null) {
     keys.add(match[1]);
   }
   return keys;
 }
+// Used by discoverTranslationModules fallback path
+void extractAllKeysFromFile;
 
 /**
  * Parse import statements from core.ts to discover all spread translation modules.
@@ -95,7 +97,7 @@ function extractInlineDictKeys(coreSource: string, varName: 'en' | 'ar'): Set<st
     if (trimmed.startsWith('...') || trimmed.startsWith('//') || trimmed.startsWith('/*')) {
       continue;
     }
-    const keyMatch = /^['"]([a-zA-Z0-9_.{}\-]+)['"]\s*:/.exec(trimmed);
+    const keyMatch = /^['"]([a-zA-Z0-9_.{}-]+)['"]\s*:/.exec(trimmed);
     if (keyMatch) {
       keys.add(keyMatch[1]);
     }
@@ -148,7 +150,7 @@ function extractKeysFromNamedExport(filePath: string, exportName: string): Set<s
   if (!match) return new Set();
 
   const keys = new Set<string>();
-  const keyPattern = /['"]([a-zA-Z0-9_.{}\-]+)['"]\s*:/g;
+  const keyPattern = /['"]([a-zA-Z0-9_.{}-]+)['"]\s*:/g;
   let keyMatch: RegExpExecArray | null;
   while ((keyMatch = keyPattern.exec(match[1])) !== null) {
     keys.add(keyMatch[1]);

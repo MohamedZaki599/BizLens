@@ -184,6 +184,7 @@ describe('validatePayloadAgainstContract — invalid types', () => {
 
 describe('validatePayloadAgainstContract — unknown keys', () => {
   it('returns invalid for a key not in the schema', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const payload = {
       summaryKey: 'signals.nonexistent.summary' as any,
       summaryParams: { foo: 'bar' },
@@ -196,6 +197,7 @@ describe('validatePayloadAgainstContract — unknown keys', () => {
   });
 
   it('returns empty missingParams and extraParams for unknown key', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const payload = {
       summaryKey: 'unknown.key.here' as any,
       summaryParams: { anything: 123 },

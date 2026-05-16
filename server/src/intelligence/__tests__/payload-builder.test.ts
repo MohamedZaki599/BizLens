@@ -6,7 +6,6 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildLocalizedPayload } from '../localization/payload-builder';
 import { createSignal } from '../signals/signal.types';
-import type { FinancialSignal } from '../signals/signal.types';
 import { LOCALIZATION_KEYS } from '../localization/key-registry';
 
 describe('buildLocalizedPayload', () => {
