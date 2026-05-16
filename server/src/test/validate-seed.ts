@@ -218,6 +218,20 @@ export const validateSeed = async (): Promise<{ allPassed: boolean; results: Val
 // ─── CLI Entry Point ──────────────────────────────────────────────────────
 
 const main = async () => {
+  // Skip if DATABASE_URL is not set (CI without database)
+  if (!process.env.DATABASE_URL) {
+    console.log('⏭  Skipping seed validation — DATABASE_URL not set.\n');
+    return;
+  }
+
+  // Verify database connectivity before running validation
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+  } catch {
+    console.log('⏭  Skipping seed validation — database not reachable.\n');
+    return;
+  }
+
   console.log('🔍  Validating seed integrity…\n');
 
   const { allPassed, results } = await validateSeed();
@@ -250,6 +264,7 @@ const main = async () => {
 };
 
 // Only run if executed directly (not imported)
+// Skip when run by the test runner — this script requires a seeded database
 if (require.main === module) {
   main()
     .catch((err) => {

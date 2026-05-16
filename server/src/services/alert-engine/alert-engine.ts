@@ -329,7 +329,7 @@ const ruleProfitDrop = async (userId: string, now: Date, currency = 'USD', signa
 const ruleCategoryConcentration = async (
   userId: string,
   now: Date,
-  currency = 'USD',
+  _currency = 'USD',
 ): Promise<DraftAlert | null> => {
   const start = startOfMonth(now);
   const end = endOfMonth(now);

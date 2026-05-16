@@ -9,7 +9,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "node --import tsx --test",
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:rich": "tsx prisma/seed-rich-data.ts",
     "db:seed:validate": "tsx prisma/seed-rich-data.ts && tsx src/test/validate-seed.ts"

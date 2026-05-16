@@ -23,3 +23,4 @@ export {
 } from './i18n/formatters';
 export { financialTermsEn, financialTermsAr } from './i18n/terminology/financial';
 export { signalMessagesEn, signalMessagesAr } from './i18n/messages/signals';
+export { arPlural, type ArabicPluralForms } from './i18n/plural';

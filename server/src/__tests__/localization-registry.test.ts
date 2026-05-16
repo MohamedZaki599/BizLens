@@ -136,7 +136,7 @@ describe('Localization Registry Completeness', () => {
       for (const key of allKeys) {
         const parts = key.split('.');
         if (parts.length === 3) {
-          const [namespace, segment] = parts;
+          const [namespace, _segment] = parts;
           if (!segmentNamespaces.has(key)) {
             // Track full keys to ensure no exact duplicates
             segmentNamespaces.set(key, new Set());
