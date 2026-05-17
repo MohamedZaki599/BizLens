@@ -102,7 +102,7 @@ export const StatCard = ({
       {loading ? (
         <Skeleton className="h-9 w-32" />
       ) : (
-        <div className={cn('stat-value tabular-nums', toneText[tone])}>{fmt(value)}</div>
+        <div className={cn('stat-value tabular-nums', toneText[tone])} dir="ltr">{fmt(value)}</div>
       )}
       <div className="flex items-center justify-between gap-2 min-h-[20px]">
         {change ? <TrendChip change={change} positiveIsGood={positiveIsGood} /> : <span />}

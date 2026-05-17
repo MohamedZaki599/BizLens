@@ -661,9 +661,10 @@ export const generateSignalInsight = async (
   // Build concise, data-aware message with at least 2 data points
   const formattedAmount = formatMoney(amount, currency);
   const pctStr = pctChange != null ? formatPctChange(pctChange) : null;
+  // Use localized payload for message if available; fall back to data-only summary (no raw keys)
   const message = pctStr
-    ? `${title} is at ${formattedAmount} (${pctStr}) ${period}. ${explainability?.reasoningChain?.[0] ?? 'Review transactions for details.'}`
-    : `${title} is at ${formattedAmount} ${period}. ${explainability?.reasoningChain?.[0] ?? 'Review transactions for details.'}`;
+    ? `${title}: ${formattedAmount} (${pctStr}) ${period}`
+    : `${title}: ${formattedAmount} ${period}`;
 
   // Build action deep-link if we have a source category
   let action: AssistantAction | undefined;
@@ -743,8 +744,8 @@ export const buildAssistantContext = async (
       activeSignal = {
         key: sig.key,
         title: sig.key.replace(/_/g, ' ').toLowerCase(),
-        summary: sig.metadata?.explainability?.reasoningChain?.[0] || 'Operational anomaly detected',
-        drivers: (sig.metadata?.explainability?.reasoningChain as string[]) || [],
+        summary: sig.localized?.summaryKey || `signals.${sig.key.toLowerCase()}.summary`,
+        drivers: sig.localized?.reasoningKeys || [],
         metric: sig.value ? formatMoney(sig.value, currency) : undefined,
         trend: sig.trend.toUpperCase() as 'UP' | 'DOWN' | 'FLAT' | 'UNKNOWN',
       };

@@ -77,8 +77,15 @@ export interface AssistantNote {
   metric?: string;
   tone: AssistantTone;
   priority: AssistantPriority;
+  localized?: {
+    titleKey: string;
+    titleParams?: Record<string, string | number>;
+    messageKey: string;
+    messageParams?: Record<string, string | number>;
+  };
   action?: {
     label: string;
+    labelKey?: string;
     type: 'filter' | 'navigate';
     payload: Record<string, string>;
   };
@@ -87,6 +94,8 @@ export interface AssistantNote {
 export interface AssistantDigest {
   generatedAt: string;
   headline: string;
+  headlineKey?: string;
+  headlineParams?: Record<string, string | number>;
   notes: AssistantNote[];
 }
 

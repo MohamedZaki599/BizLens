@@ -208,3 +208,8 @@ export const useLocale = () => {
     isRtl: lang === 'ar',
   }), [lang]);
 };
+
+// ── Static aliases (for adapters/utilities outside React components) ──────
+
+/** Non-hook alias for formatCurrency — use in adapters/utilities outside React components. */
+export { formatCurrency as formatCurrencyStatic };

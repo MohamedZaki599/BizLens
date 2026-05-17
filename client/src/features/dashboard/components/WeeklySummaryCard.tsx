@@ -38,7 +38,7 @@ const Row = ({
     <div className="flex items-center justify-between py-2">
       <span className="text-xs text-ink-muted">{label}</span>
       <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold tabular-nums">{formatCurrency(value)}</span>
+        <span className="text-sm font-semibold tabular-nums" dir="ltr">{formatCurrency(value)}</span>
         <span className={cn('text-[10px] font-medium tabular-nums', cls)}>
           {hasComparison ? formatPctChange(pct) : '—'}
         </span>
@@ -72,7 +72,7 @@ export const WeeklySummaryCard = () => {
       </div>
 
       <div className="flex items-baseline gap-2">
-        <span className="font-display text-2xl font-semibold text-ink tabular-nums">
+        <span className="font-display text-2xl font-semibold text-ink tabular-nums" dir="ltr">
           {formatCurrency(data.totals.profit)}
         </span>
         <span className="text-[11px] text-ink-muted">

@@ -123,6 +123,10 @@ export const onboardingEn: Record<string, string> = {
   'assistant.prompt.anomaly': 'Any spending anomalies?',
   'assistant.prompt.forecast': 'What\'s my projected spend?',
 
+  'activation.expand': 'Expand',
+  'activation.collapse': 'Collapse',
+  'activation.dismiss': 'Dismiss',
+
   // ─── Activation Progress Tracker ────────────────────────────────────────
   'activation.tracker.label': '{completed} of {total} steps complete',
 
@@ -257,6 +261,10 @@ export const onboardingAr: Record<string, string> = {
   'assistant.prompt.profit': 'ما الذي يدفع ربحي؟',
   'assistant.prompt.anomaly': 'أي شذوذ في الإنفاق؟',
   'assistant.prompt.forecast': 'ما المتوقع في إنفاقي؟',
+
+  'activation.expand': 'توسيع',
+  'activation.collapse': 'طي',
+  'activation.dismiss': 'إغلاق',
 
   // ─── Activation Progress Tracker ────────────────────────────────────────
   'activation.tracker.label': '{completed} من {total} خطوات مكتملة',

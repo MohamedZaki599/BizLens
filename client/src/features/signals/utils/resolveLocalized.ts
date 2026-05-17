@@ -1,6 +1,12 @@
 import { t, ti } from '@/lib/i18n';
 import type { SignalLocalizedPayload } from '../types';
 
+/** Detects unresolved localization keys that leaked through translation. */
+const isRawKey = (str: string): boolean => /^[a-z]+(\.[a-z_]+){1,3}$/.test(str);
+
+/** Detects unresolved interpolation placeholders like {amount} or {ratioPct}. */
+const hasUnresolvedPlaceholders = (str: string): boolean => /\{[a-zA-Z_]+\}/.test(str);
+
 /**
  * Resolves a localized signal title to a rendered string.
  * Uses translation keys with interpolation when available.
@@ -16,7 +22,9 @@ export function resolveSignalTitle(
     const safeParams = localized.summaryParams && typeof localized.summaryParams === 'object'
       ? localized.summaryParams
       : {};
-    return ti(localized.summaryKey, safeParams);
+    const resolved = ti(localized.summaryKey, safeParams);
+    // Safety: if resolution returned a raw key or has unresolved placeholders, fall through
+    if (resolved && !isRawKey(resolved) && !hasUnresolvedPlaceholders(resolved)) return resolved;
   }
   if (fallbackTitle) {
     if (process.env.NODE_ENV === 'development') {
@@ -44,7 +52,9 @@ export function resolveSignalExplanation(
     const safeParams = localized.explanationParams && typeof localized.explanationParams === 'object'
       ? localized.explanationParams
       : {};
-    return ti(localized.explanationKey, safeParams);
+    const resolved = ti(localized.explanationKey, safeParams);
+    // Safety: if resolution returned a raw key or has unresolved placeholders, fall through
+    if (resolved && !isRawKey(resolved) && !hasUnresolvedPlaceholders(resolved)) return resolved;
   }
   if (fallbackDescription) {
     if (process.env.NODE_ENV === 'development') {

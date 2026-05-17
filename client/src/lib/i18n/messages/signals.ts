@@ -32,7 +32,7 @@ export const signalMessagesEn = {
 
   // Signal Card
   'signal.card.recommended': 'Recommended',
-  'signal.card.reviewCta': 'Review',
+  'signal.card.reviewCta': 'View details',
   'signal.card.askAi': 'Drill down:',
   'signal.card.explainImpact': 'Explain impact',
   'signal.card.showRelated': 'Show related',
@@ -60,6 +60,12 @@ export const signalMessagesEn = {
   'signal.workspace.adjustThreshold': 'Adjust Threshold',
   'signal.workspace.askWhy': 'Why this changed',
   'signal.workspace.explainImpact': 'View Impact',
+
+  // Contextual workspace action CTAs (resolved via actionKey)
+  'signal.workspace.action.viewTransactions': 'View transactions',
+  'signal.workspace.action.reviewCategory': 'Review category',
+  'signal.workspace.action.checkSubscriptions': 'Check subscriptions',
+  'signal.workspace.action.reviewForecast': 'Review forecast',
 
   // Severity labels
   'signal.severity.CRITICAL': 'Critical',
@@ -115,7 +121,7 @@ export const signalMessagesAr = {
 
   // Signal Card
   'signal.card.recommended': 'موصى به',
-  'signal.card.reviewCta': 'مراجعة',
+  'signal.card.reviewCta': 'عرض التفاصيل',
   'signal.card.askAi': 'تعمّق:',
   'signal.card.explainImpact': 'وضّح الأثر',
   'signal.card.showRelated': 'النشاط المرتبط',
@@ -143,6 +149,12 @@ export const signalMessagesAr = {
   'signal.workspace.adjustThreshold': 'تعديل الحد',
   'signal.workspace.askWhy': 'تحليل السبب',
   'signal.workspace.explainImpact': 'مراجعة الأثر التشغيلي',
+
+  // Contextual workspace action CTAs (resolved via actionKey)
+  'signal.workspace.action.viewTransactions': 'عرض المعاملات',
+  'signal.workspace.action.reviewCategory': 'مراجعة الفئة',
+  'signal.workspace.action.checkSubscriptions': 'مراجعة الاشتراكات',
+  'signal.workspace.action.reviewForecast': 'مراجعة التوقعات',
 
   // Severity labels
   'signal.severity.CRITICAL': 'أولوية عالية',

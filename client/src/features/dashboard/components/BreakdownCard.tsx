@@ -50,7 +50,7 @@ export const BreakdownCard = ({
               <p className="font-display text-xl font-semibold tracking-tight truncate">
                 {data.name}
               </p>
-              <p className="text-sm text-ink-muted tabular-nums">
+              <p className="text-sm text-ink-muted tabular-nums" dir="ltr">
                 {formatCurrency(data.total)} · {data.share}%
               </p>
             </div>
