@@ -20,8 +20,8 @@ const rows: Row[] = [
   { key: 'compare.row.forecast', bizlens: true, excel: 'partial', notion: false, qb: 'partial' },
   { key: 'compare.row.leak', bizlens: true, excel: false, notion: false, qb: false },
   { key: 'compare.row.fast', bizlens: true, excel: false, notion: 'partial', qb: false },
-  { key: 'compare.row.modes', bizlens: true, excel: false, notion: false, qb: false },
-  { key: 'compare.row.bilingual', bizlens: true, excel: 'partial', notion: 'partial', qb: false },
+  { key: 'compare.row.modes', bizlens: 'partial', excel: false, notion: false, qb: false },
+  { key: 'compare.row.bilingual', bizlens: 'partial', excel: 'partial', notion: 'partial', qb: false },
 ];
 
 const Mark = ({ value, language }: { value: Cell; language: 'en' | 'ar' }) => {
@@ -60,7 +60,7 @@ export const Compare = () => {
   return (
     <section
       id="compare"
-      className="relative py-24 md:py-32 bg-gradient-to-b from-transparent to-surface-low/40"
+      className="relative py-20 md:py-28 bg-gradient-to-b from-transparent to-surface-low/40"
     >
       <div className="max-w-6xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl">
@@ -70,6 +70,7 @@ export const Compare = () => {
           <p className="mt-3 text-lg text-ink-muted leading-relaxed">
             {t(language, 'compare.subtitle')}
           </p>
+          <p className="mt-2 text-sm text-ink-muted/70">{t(language, 'compare.framing')}</p>
         </div>
 
         <div className="mt-10 overflow-x-auto rounded-2xl border border-outline/30 bg-surface-lowest">
@@ -99,17 +100,17 @@ export const Compare = () => {
                   key={r.key}
                   className="border-b border-outline/20 last:border-b-0 hover:bg-surface-low/30 transition-colors"
                 >
-                  <td className="px-5 py-4 text-ink font-medium">{t(language, r.key)}</td>
-                  <td className="px-4 py-4 text-center bg-primary/[0.04]">
+                  <td className="px-5 py-5 text-ink font-medium">{t(language, r.key)}</td>
+                  <td className="px-4 py-5 text-center bg-primary/[0.04]">
                     <Mark value={r.bizlens} language={language} />
                   </td>
-                  <td className="px-4 py-4 text-center">
+                  <td className="px-4 py-5 text-center">
                     <Mark value={r.excel} language={language} />
                   </td>
-                  <td className="px-4 py-4 text-center">
+                  <td className="px-4 py-5 text-center">
                     <Mark value={r.notion} language={language} />
                   </td>
-                  <td className="px-4 py-4 text-center">
+                  <td className="px-4 py-5 text-center">
                     <Mark value={r.qb} language={language} />
                   </td>
                 </tr>

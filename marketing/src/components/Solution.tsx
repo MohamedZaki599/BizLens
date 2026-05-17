@@ -13,7 +13,7 @@ const steps = [
 export const Solution = () => {
   const { language } = useUi();
   return (
-    <section id="solution" className="relative py-24 md:py-32">
+    <section id="solution" className="relative py-20 md:py-28">
       <div className="max-w-6xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
