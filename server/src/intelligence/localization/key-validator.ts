@@ -110,3 +110,14 @@ export function validateParams(
 
   return { valid: issues.length === 0, issues };
 }
+
+/**
+ * Validates that a key exists in the provided registry of all known keys.
+ *
+ * @param key - The localization key to check
+ * @param allKeys - Flat array of all registered keys (from getAllKeys())
+ * @returns true if the key is found in the registry
+ */
+export function isRegisteredKey(key: string, allKeys: string[]): boolean {
+  return allKeys.includes(key);
+}

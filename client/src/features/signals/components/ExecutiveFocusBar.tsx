@@ -62,14 +62,14 @@ export const ExecutiveFocusBar = ({ signals }: ExecutiveFocusBarProps) => {
     : Info;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-xl bg-surface-high/60 border border-outline/15">
-      <div className="flex items-center gap-3 min-w-0">
+    <div className="flex flex-wrap items-center justify-between gap-3 px-4 rtl:px-5 py-3 rounded-xl bg-surface-high/60 border border-outline/15">
+      <div className="flex items-center gap-3 rtl:gap-4 min-w-0">
         {/* Primary severity icon — strong color only for highest severity */}
         <div className={`flex items-center justify-center w-7 h-7 rounded-lg ${primaryStyle.bg} ${primaryStyle.icon} shrink-0`}>
           <SeverityIcon size={primaryStyle.size} aria-hidden="true" />
         </div>
 
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-2 rtl:gap-3 min-w-0">
           {/* Primary count — highest severity gets strong treatment */}
           {criticalCount > 0 && (
             <span className={`text-sm tabular-nums font-semibold ${highestSeverity === 'CRITICAL' ? 'text-danger' : mutedStyle.icon}`}>

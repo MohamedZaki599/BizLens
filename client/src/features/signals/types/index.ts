@@ -2,6 +2,15 @@ export type SignalSeverity = 'NONE' | 'INFO' | 'WARNING' | 'CRITICAL';
 export type SignalTrend = 'UP' | 'DOWN' | 'FLAT' | 'UNKNOWN';
 export type SignalStatus = 'NEW' | 'REVIEWED' | 'INVESTIGATING' | 'SNOOZED' | 'RESOLVED';
 
+export interface SignalLocalizedPayload {
+  summaryKey?: string;
+  summaryParams?: Record<string, string | number>;
+  explanationKey?: string;
+  explanationParams?: Record<string, string | number>;
+  reasoningKeys?: string[];
+  reasoningParams?: Record<string, string | number>[];
+}
+
 export interface FinancialSignalDto {
   id: string;
   userId: string;
@@ -11,6 +20,7 @@ export interface FinancialSignalDto {
   trend: SignalTrend;
   confidence: number;
   metadata: Record<string, unknown>;
+  localized?: SignalLocalizedPayload;
   ttlCategory: string;
   status: SignalStatus;
   snoozedUntil: string | null;

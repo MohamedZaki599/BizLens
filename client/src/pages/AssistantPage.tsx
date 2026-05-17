@@ -84,7 +84,7 @@ const NoteCard = ({ note }: { note: AssistantNote }) => {
   return (
     <article
       className={cn(
-        'card relative overflow-hidden p-5 sm:p-6',
+        'card relative overflow-hidden p-5 sm:p-6 rtl:p-6 rtl:sm:p-7',
         note.priority === 'high' && 'ring-1 ring-primary/15 shadow-ambient',
       )}
     >
@@ -115,7 +115,7 @@ const NoteCard = ({ note }: { note: AssistantNote }) => {
                 : t('assistant.priority.normal')}
             </span>
           </div>
-          <p className="mt-1.5 text-sm text-ink-muted leading-relaxed break-words">{note.message}</p>
+          <p className="mt-1.5 text-sm text-ink-muted leading-relaxed break-words rtl:mt-2.5 rtl:leading-loose">{note.message}</p>
           {note.action && (
             <div className="mt-3">
               <button
@@ -180,11 +180,11 @@ export const AssistantPage = () => {
         />
       ) : (
         <>
-          <section className="card bg-surface-high/50 border-outline/20">
+          <section className="card bg-surface-high/50 border-outline/20 rtl:py-6">
             <p className="text-xs uppercase tracking-wide text-ink-muted font-medium">
               {t('assistant.headline')}
             </p>
-            <p className="font-display text-lg sm:text-xl font-semibold text-ink mt-1.5 leading-snug break-words">
+            <p className="font-display text-lg sm:text-xl font-semibold text-ink mt-1.5 leading-snug break-words rtl:leading-relaxed">
               {data.headline}
             </p>
             <p className="text-[11px] text-ink-muted mt-2">
@@ -194,7 +194,7 @@ export const AssistantPage = () => {
             </p>
           </section>
 
-          <div className="grid gap-3">
+          <div className="grid gap-3 rtl:gap-4">
             {data.notes.map((note) => (
               <NoteCard key={note.id} note={note} />
             ))}

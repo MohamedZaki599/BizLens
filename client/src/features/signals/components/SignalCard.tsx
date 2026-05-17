@@ -50,9 +50,9 @@ export const SignalCard = ({ signal, recommended = false }: SignalCardProps) => 
       )}
 
       {/* What changed */}
-      <div className="flex items-start justify-between gap-3 mb-2">
+      <div className="flex items-start justify-between gap-3 mb-2 rtl:mb-3">
         <h3 className={cn(
-          'font-display text-sm font-semibold leading-snug line-clamp-2 break-words transition-colors',
+          'font-display text-sm font-semibold leading-snug rtl:leading-relaxed line-clamp-2 break-words transition-colors',
           isResolved
             ? 'text-ink-muted'
             : 'text-ink group-hover:text-brand-primary',
@@ -64,7 +64,7 @@ export const SignalCard = ({ signal, recommended = false }: SignalCardProps) => 
 
       {/* Why it matters */}
       <p className={cn(
-        'text-xs leading-relaxed line-clamp-2 break-words mb-3',
+        'text-xs leading-relaxed rtl:leading-loose line-clamp-2 break-words mb-3 rtl:mb-4',
         isResolved ? 'text-ink-muted/70' : 'text-ink-muted',
       )}>
         {signal.explanation}

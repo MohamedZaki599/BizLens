@@ -208,3 +208,44 @@ html[dir='rtl'] .rtl\:rotate-180 {
 [data-theme='dark'] input[type='time'] {
   color-scheme: dark;
 }
+
+/* ── Arabic RTL Typography Rhythm ─────────────────────────────────────────── */
+/* Arabic script needs more vertical breathing room and different spacing      */
+/* rhythm than Latin text. These overrides improve readability without          */
+/* affecting the English layout.                                                */
+
+[dir="rtl"] {
+  --ar-body-line-height: 1.75;
+  --ar-heading-spacing: 0.75em;
+  --ar-paragraph-spacing: 1.25em;
+}
+
+/* Body text: enforce minimum 1.7 line-height for Arabic readability */
+[dir="rtl"] p,
+[dir="rtl"] li,
+[dir="rtl"] .text-sm,
+[dir="rtl"] .text-base,
+[dir="rtl"] .text-lg {
+  line-height: var(--ar-body-line-height, 1.75);
+}
+
+/* Headings: reset letter-spacing and increase bottom margin for Arabic */
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4 {
+  letter-spacing: 0;
+  margin-bottom: var(--ar-heading-spacing, 0.75em);
+}
+
+/* Paragraph spacing: more breathing room between blocks of Arabic text */
+[dir="rtl"] p + p,
+[dir="rtl"] .prose p {
+  margin-top: var(--ar-paragraph-spacing, 1.25em);
+}
+
+/* Small / caption text still needs adequate line-height for Arabic */
+[dir="rtl"] .text-xs {
+  line-height: 1.7;
+  letter-spacing: 0;
+}
