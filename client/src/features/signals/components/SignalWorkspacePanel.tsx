@@ -18,6 +18,7 @@ import {
   DialogBody,
   DialogFooter,
 } from '@/components/shared/ui/dialog';
+import { resolveSignalTitle, resolveSignalExplanation, resolveSignalReasoning } from '../utils/resolveLocalized';
 
 export const SignalWorkspacePanel = () => {
   const t = useT();
@@ -67,12 +68,21 @@ export const SignalWorkspacePanel = () => {
 
   const metadata = signal?.metadata as SignalMetadata | undefined;
 
-  // Extract reasoning from signal metadata
-  const reasoningChain: string[] = metadata?.explainability?.reasoningChain || [];
-  const description =
-    metadata?.description ||
-    metadata?.explainability?.thresholdContext ||
-    t('signal.defaultExplanation');
+  // Resolve localized fields with fallback to deprecated prose
+  const title = resolveSignalTitle(
+    signal?.localized,
+    metadata?.title,
+    signal?.key || '',
+  );
+  const description = resolveSignalExplanation(
+    signal?.localized,
+    (metadata?.description || metadata?.explainability?.thresholdContext) as string | undefined,
+    signal?.key || '',
+  );
+  const reasoningChain: string[] = resolveSignalReasoning(
+    signal?.localized,
+    metadata?.explainability?.reasoningChain,
+  );
   const actionLabel = metadata?.action || t('signal.workspace.reviewTransactions');
   const actionRoute = metadata?.payload?.route || '/app/transactions';
 
@@ -96,7 +106,7 @@ export const SignalWorkspacePanel = () => {
             {/* Title + Description (used for aria-labelledby/describedby by Radix) */}
             <div className="px-6 pb-2">
               <DialogTitle className="text-xl font-display font-semibold text-ink break-words" dir="auto">
-                {metadata?.title || signal.key.replace(/_/g, ' ')}
+                {title}
               </DialogTitle>
               {signal.value != null && (
                 <div
@@ -115,11 +125,11 @@ export const SignalWorkspacePanel = () => {
             <DialogBody className="min-h-0">
               {/* Operational reasoning — only if real data exists */}
               {reasoningChain.length > 0 && (
-                <section className="mb-4">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
+                <section className="mb-4 rtl:mb-6">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2 rtl:mb-3">
                     {t('signal.workspace.whyTitle')}
                   </h3>
-                  <ul className="space-y-1.5 text-sm text-ink">
+                  <ul className="space-y-1.5 rtl:space-y-2.5 text-sm text-ink">
                     {reasoningChain.map((reason, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <span
@@ -134,12 +144,12 @@ export const SignalWorkspacePanel = () => {
               )}
 
               {/* Confidence */}
-              <div className="text-xs text-ink-muted mb-4">
+              <div className="text-xs text-ink-muted mb-4 rtl:mb-6">
                 {t('signal.workspace.confidence')}: {Math.round(signal.confidence * 100)}%
               </div>
 
               {/* Contextual intelligence actions — embedded, not separate */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 rtl:gap-3">
                 <button
                   type="button"
                   onClick={() => {

@@ -8,6 +8,7 @@ import type { PrioritySignalViewModel } from '../types';
 import { Loader2, ArrowRight } from 'lucide-react';
 import { NoSignalsEmpty } from '@/features/onboarding';
 import { Button } from '@/components/Button';
+import { resolveSignalTitle, resolveSignalExplanation } from '../utils/resolveLocalized';
 
 const MAX_VISIBLE = 3;
 
@@ -99,8 +100,8 @@ export const DecisionQueue = () => {
   const prioritySignals: PrioritySignalViewModel[] = signals.map(s => ({
     ...s,
     formattedValue: s.value ? formatCurrency(Number(s.value)) : '',
-    title: s.metadata?.title || s.key.replace(/_/g, ' '),
-    explanation: s.metadata?.description || t('signal.defaultExplanation'),
+    title: resolveSignalTitle(s.localized, s.metadata?.title as string | undefined, s.key),
+    explanation: resolveSignalExplanation(s.localized, s.metadata?.description as string | undefined, s.key),
     recommendedAction: s.metadata?.action || t('signal.defaultAction'),
     freshness: 'fresh' as const,
     isStale: false,
@@ -115,14 +116,14 @@ export const DecisionQueue = () => {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 rtl:space-y-4">
       {/* Attention guidance — recommended next review */}
       <div className="flex items-baseline justify-between gap-4">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-ink-muted">
+          <p className="text-xs font-medium uppercase tracking-wider rtl:tracking-normal text-ink-muted">
             {t('signal.queue.recommended')}
           </p>
-          <h2 className="text-lg font-semibold text-ink font-display mt-0.5">
+          <h2 className="text-lg font-semibold text-ink font-display mt-0.5 rtl:mt-1">
             {t('signal.queue.title')}
           </h2>
         </div>
@@ -140,7 +141,7 @@ export const DecisionQueue = () => {
       </div>
 
       {/* Signal cards — first card is the recommended focal point */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 rtl:gap-4">
         {visible.map((signal, index) => (
           <SignalCard
             key={signal.id}

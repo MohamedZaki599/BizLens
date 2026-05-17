@@ -19,7 +19,7 @@ export const ContextualAssistantActions = ({ actions, className }: ContextualAss
   if (validActions.length === 0) return null;
 
   return (
-    <div className={cn("flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-outline/30", className)}>
+    <div className={cn("flex flex-wrap items-center gap-2 rtl:gap-3 mt-4 pt-4 border-t border-outline/30", className)}>
       <div className="flex items-center gap-1.5 text-xs font-medium text-brand-primary">
         <Sparkles size={14} />
         <span>{t('signal.card.askAi')}</span>

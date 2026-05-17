@@ -37,6 +37,12 @@ export const signalMessagesEn = {
   'signal.card.explainImpact': 'Explain impact',
   'signal.card.showRelated': 'Show related',
 
+  // Contextual signal card CTAs (used per signal type)
+  'signal.card.reviewSubscriptions': 'Review subscriptions',
+  'signal.card.analyzeSpending': 'Analyze spending',
+  'signal.card.openTransactions': 'Open transactions',
+  'signal.card.reviewCategory': 'Review category',
+
   // Workspace Panel
   'signal.workspace.loading': 'Loading workspace…',
   'signal.workspace.notFound': 'Signal not found',
@@ -89,11 +95,11 @@ export const signalMessagesAr = {
   'signal.status.RESOLVED': 'مستقرة',
 
   // Executive Focus Bar
-  'signal.focusBar.critical': 'حرجة',
+  'signal.focusBar.critical': 'أولوية عالية',
   'signal.focusBar.investigating': 'قيد المراجعة',
   'signal.focusBar.awaitingReview': 'بانتظار المراجعة',
   'signal.focusBar.reviewCta': 'راجع الإشارات',
-  'signal.focusBar.needsAttention': 'من الإشارات تتطلب انتباهك',
+  'signal.focusBar.needsAttention': 'إشارات تحتاج متابعتك',
 
   // Decision Queue
   'signal.queue.title': 'إشارات ذات أولوية',
@@ -109,10 +115,16 @@ export const signalMessagesAr = {
 
   // Signal Card
   'signal.card.recommended': 'موصى به',
-  'signal.card.reviewCta': 'راجع',
+  'signal.card.reviewCta': 'مراجعة',
   'signal.card.askAi': 'تعمّق:',
   'signal.card.explainImpact': 'وضّح الأثر',
-  'signal.card.showRelated': 'عرض المرتبطة',
+  'signal.card.showRelated': 'النشاط المرتبط',
+
+  // Contextual signal card CTAs (used per signal type)
+  'signal.card.reviewSubscriptions': 'مراجعة الاشتراكات',
+  'signal.card.analyzeSpending': 'تحليل الإنفاق',
+  'signal.card.openTransactions': 'فتح المعاملات',
+  'signal.card.reviewCategory': 'مراجعة الفئة',
 
   // Workspace Panel
   'signal.workspace.loading': 'جارٍ التحميل…',
@@ -127,32 +139,32 @@ export const signalMessagesAr = {
   'signal.workspace.investigate': 'مراجعة',
   'signal.workspace.snooze': 'مراقبة',
   'signal.workspace.confidence': 'درجة الثقة',
-  'signal.workspace.reviewTransactions': 'عرض المعاملات',
+  'signal.workspace.reviewTransactions': 'فتح المعاملات',
   'signal.workspace.adjustThreshold': 'تعديل الحد',
-  'signal.workspace.askWhy': 'لماذا تغيّر',
-  'signal.workspace.explainImpact': 'عرض الأثر',
+  'signal.workspace.askWhy': 'تحليل السبب',
+  'signal.workspace.explainImpact': 'مراجعة الأثر التشغيلي',
 
   // Severity labels
-  'signal.severity.CRITICAL': 'حرجة',
-  'signal.severity.WARNING': 'تحذير',
-  'signal.severity.INFO': 'معلومة',
-  'signal.severity.NONE': 'عادية',
+  'signal.severity.CRITICAL': 'أولوية عالية',
+  'signal.severity.WARNING': 'أولوية متوسطة',
+  'signal.severity.INFO': 'أولوية منخفضة',
+  'signal.severity.NONE': 'للاطلاع',
 
   // Default signal content
   'signal.defaultExplanation': 'رُصد انحراف تشغيلي.',
   'signal.defaultAction': 'عرض المعاملات',
 
   // Confidence levels
-  'signal.confidence.high': 'ثقة عالية',
+  'signal.confidence.high': 'ثقة مرتفعة',
   'signal.confidence.medium': 'ثقة متوسطة',
-  'signal.confidence.low': 'ثقة منخفضة',
+  'signal.confidence.low': 'مؤشرات محدودة',
 
   // Freshness
   'signal.freshness.updated': 'تحديث منذ {time}',
 
   // Grouped signal labels
   'signal.grouped.recurring.title': '{count} من إشارات المصروفات المتكررة',
-  'signal.grouped.recurring.explanation': 'رُصدت {count} من المصروفات المتكررة ضمن اشتراكاتك. راجعها لتقليص الإنفاق غير الضروري.',
+  'signal.grouped.recurring.explanation': 'ظهرت {count} مصروفات متكررة في اشتراكاتك. راجعها لتقليص الإنفاق غير الضروري.',
   'signal.grouped.anomalies.title': '{count} من الانحرافات في المصروفات',
-  'signal.grouped.anomalies.explanation': 'رُصدت انحرافات في الإنفاق عبر {count} من الفئات. الأشد أهمية يستدعي مراجعة فورية.',
+  'signal.grouped.anomalies.explanation': 'ظهرت انحرافات في الإنفاق ضمن {count} فئات. الأشد أهمية يستدعي مراجعة فورية.',
 } as const;

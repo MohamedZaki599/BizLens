@@ -462,7 +462,7 @@ const ar: Dict = {
   'insight.severity.info': 'رؤية',
   'insight.severity.success': 'خبر جيد',
   'insight.severity.warning': 'تنبيه',
-  'insight.severity.critical': 'إجراء مطلوب',
+  'insight.severity.critical': 'يحتاج مراجعة',
   'stat.noPriorData': 'لا توجد بيانات سابقة',
 
   'user.profile': 'الملف الشخصي',
@@ -473,25 +473,25 @@ const ar: Dict = {
   'nav.subscriptions': 'الاشتراكات',
   'nav.budgets': 'الميزانيات',
   'nav.import': 'استيراد',
-  'nav.assistant': 'المساعد',
+  'nav.assistant': 'الرؤى',
 
   'subscriptions.title': 'الاشتراكات',
   'subscriptions.subtitle': 'المصاريف المتكررة المكتشفة تلقائيًا.',
-  'subscriptions.empty': 'لم يتم اكتشاف مصاريف متكررة بعد. استمر بالتسجيل وسنجدها.',
+  'subscriptions.empty': 'لم تظهر مصاريف متكررة بعد. سجّل معاملاتك وسنتعرّف عليها.',
   'subscriptions.totalMonthly': 'الإجمالي الشهري',
   'subscriptions.totalAnnual': 'الإجمالي السنوي',
-  'subscriptions.months': '{count} من الأشهر',
+  'subscriptions.months': '{count} أشهر',
   'subscriptions.cancelHint': 'فكّر بالإلغاء إذا لم تستخدمه',
   'subscriptions.perMonth': '/شهر',
   'subscriptions.perYear': '/سنة',
 
   'assistant.title': 'الرؤى التشغيلية',
   'assistant.subtitle':
-    'ما تغيّر، ما يهم، وأين يجب التحرك.',
-  'assistant.headline': 'ما يجب أن تعرفه',
+    'ما تغيّر، لماذا يهم، وما الخطوة التالية.',
+  'assistant.headline': 'أبرز المستجدات',
   'assistant.empty.title': 'لا شيء للتلخيص بعد',
   'assistant.empty.subtitle':
-    'أضف بعض المعاملات وسيُبرز المساعد ما يهم أكثر.',
+    'أضف بعض المعاملات وستظهر الرؤى التشغيلية تلقائيًا.',
   'assistant.priority.high': 'يستحق انتباهك',
   'assistant.priority.normal': 'تنويه',
   'assistant.refresh': 'تحديث',
@@ -503,7 +503,7 @@ const ar: Dict = {
   'budgets.add': 'تحديد ميزانية',
   'budgets.used': '{pct}% مستخدم',
   'budgets.remaining': '{amount} متبقي',
-  'budgets.exceeded': 'تجاوزت الميزانية!',
+  'budgets.exceeded': 'تجاوزت الميزانية',
   'budgets.amount': 'الميزانية الشهرية',
 
   'charts.trend.title': 'الاتجاه خلال ١٢ شهرًا',
@@ -526,7 +526,7 @@ const ar: Dict = {
     'تخطي الصفوف الموجودة مسبقًا بنفس الفئة والمبلغ واليوم.',
   'import.duplicates': 'تم تخطي {count} من الصفوف المكررة.',
 
-  'notifications.permission': 'فعّل إشعارات المتصفح للتنبيهات الحرجة.',
+  'notifications.permission': 'فعّل إشعارات المتصفح للتنبيهات المهمة.',
   'notifications.enable': 'تفعيل',
   'notifications.enabled': 'الإشعارات مفعّلة',
 
@@ -591,14 +591,36 @@ const dictionaries: Record<Language, Dict> = { en, ar };
 
 export const t = (key: string, lang?: Language): string => {
   const language = lang ?? useUiStore.getState().language;
-  return dictionaries[language][key] ?? dictionaries.en[key] ?? key;
+  const resolved = dictionaries[language][key] ?? dictionaries.en[key];
+  if (resolved) return resolved;
+  // Key not found in any dictionary — prevent raw key leakage
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(`[i18n] Unresolved translation key: "${key}"`);
+  }
+  // If key looks like a namespace path (contains dots), suppress it in production
+  if (key.includes('.')) return '';
+  // Simple keys (e.g. signal key names) can render as-is
+  return key;
 };
 
-/** Interpolate `{key}` placeholders in translation strings. */
+/** Interpolate `{key}` placeholders in translation strings. Strips unresolved placeholders. */
 export const ti = (key: string, vars: Record<string, string | number>, lang?: Language): string => {
   let str = t(key, lang);
   for (const [k, v] of Object.entries(vars)) {
     str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
+  }
+  // Safety: strip any remaining unresolved placeholders
+  const remaining = str.match(/\{[a-zA-Z_]+\}/g);
+  if (remaining) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        `[i18n] Unresolved interpolation placeholders in "${key}":`,
+        remaining.join(', '),
+        '| Provided params:', Object.keys(vars),
+      );
+    }
+    // Strip unresolved placeholders in production to prevent UI leakage
+    str = str.replace(/\{[a-zA-Z_]+\}/g, '');
   }
   return str;
 };

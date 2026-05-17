@@ -215,3 +215,11 @@ export const LOCALIZATION_KEYS = {
  * Use this to type-check any key reference at compile time.
  */
 export type LocalizationKey = keyof typeof LOCALIZATION_KEYS;
+
+/**
+ * Returns a flat array of all registered localization key strings.
+ * Useful for runtime validation (e.g., checking if a key exists in the registry).
+ */
+export function getAllKeys(): string[] {
+  return Object.keys(LOCALIZATION_KEYS);
+}

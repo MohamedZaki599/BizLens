@@ -228,18 +228,18 @@ export const localizationKeysAr: Record<string, string> = {
 
   // ─── Assistant Note Titles & Messages ───────────────────────────────────
   'assistant.weekly_pulse.title': 'نبض الأسبوع',
-  'assistant.weekly_pulse.message': 'هذا الأسبوع: {income} دخل، {expense} إنفاق، صافي {netAmount}.',
+  'assistant.weekly_pulse.message': 'دخل الأسبوع {income}، المصروفات {expense}، والصافي {netAmount}.',
   'assistant.profit_trend.title': 'اتجاه الربح',
-  'assistant.profit_trend.message': 'الربح يتجه {direction} بنسبة {changePct}% هذه الفترة.',
-  'assistant.expense_driver.title': 'أكبر محرك للمصروفات',
-  'assistant.expense_driver.message': '{categoryName} تقود {sharePct}% من مصروفاتك.',
-  'assistant.subscriptions.title': 'تحديث الاشتراكات',
-  'assistant.subscriptions.message': '{count} مصروفات متكررة بإجمالي {totalAmount} شهريًا.',
-  'assistant.stale_data.title': 'تحذير حداثة البيانات',
-  'assistant.stale_data.message': 'لم تُسجَّل معاملات منذ {daysSince} يومًا.',
+  'assistant.profit_trend.message': 'الربح تحرّك {direction} بنسبة {changePct}% هذه الفترة.',
+  'assistant.expense_driver.title': 'أعلى فئة إنفاق',
+  'assistant.expense_driver.message': '{categoryName} تستحوذ على {sharePct}% من المصروفات.',
+  'assistant.subscriptions.title': 'الاشتراكات',
+  'assistant.subscriptions.message': '{count} اشتراكات بإجمالي {totalAmount} شهريًا.',
+  'assistant.stale_data.title': 'بيانات قديمة',
+  'assistant.stale_data.message': 'لا معاملات جديدة منذ {daysSince} يومًا.',
   'assistant.forecast.title': 'توقعات نهاية الشهر',
-  'assistant.forecast.message': 'ربح متوقع بقيمة {projectedAmount} بنهاية الشهر.',
-  'assistant.signal_explanation.title': 'شرح الإشارة',
+  'assistant.forecast.message': 'الربح المتوقع {projectedAmount} بنهاية الشهر.',
+  'assistant.signal_explanation.title': 'تحليل الإشارة',
   'assistant.signal_explanation.message': '{signalSummary}',
 
   // ─── Insight Titles & Messages ──────────────────────────────────────────
@@ -302,15 +302,15 @@ export const localizationKeysAr: Record<string, string> = {
   'reasoning.recurring_expense.confidence': 'ثقة التكرار: {confidenceLevel}.',
 
   // ─── Confidence Level Labels ────────────────────────────────────────────
-  'confidence.high.label': 'ثقة عالية',
+  'confidence.high.label': 'ثقة مرتفعة',
   'confidence.medium.label': 'ثقة متوسطة',
-  'confidence.low.label': 'ثقة منخفضة',
+  'confidence.low.label': 'مؤشرات محدودة',
   'confidence.none.label': 'لا توجد بيانات ثقة',
 
   // ─── Status Labels ──────────────────────────────────────────────────────
   'status.new.label': 'جديدة',
   'status.reviewed.label': 'رُوجعت',
-  'status.investigating.label': 'قيد التحقيق',
+  'status.investigating.label': 'قيد المراجعة',
   'status.snoozed.label': 'مؤجلة',
   'status.resolved.label': 'تم الحل',
 };
