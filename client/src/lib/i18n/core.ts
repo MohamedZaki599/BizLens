@@ -621,6 +621,8 @@ export const ti = (key: string, vars: Record<string, string | number>, lang?: La
     }
     // Strip unresolved placeholders in production to prevent UI leakage
     str = str.replace(/\{[a-zA-Z_]+\}/g, '');
+    // Strip orphaned punctuation left behind (e.g., dangling "%" after {ratioPct} removal)
+    str = str.replace(/\s+%(?!\w)/g, '').replace(/\s{2,}/g, ' ').trim();
   }
   return str;
 };

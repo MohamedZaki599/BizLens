@@ -86,11 +86,25 @@ const NoteCard = ({ note }: { note: AssistantNote }) => {
       navigate(note.action.payload.route);
       return;
     }
-    if (note.action.type === 'filter' && note.action.payload.categoryId) {
-      const params = new URLSearchParams();
-      params.set('categoryId', note.action.payload.categoryId);
-      if (note.action.payload.type) params.set('type', note.action.payload.type);
-      navigate(`/app/transactions?${params.toString()}`);
+    if (note.action.type === 'filter') {
+      // Recurring expenses → subscriptions page
+      if (note.action.payload.recurring === 'true') {
+        navigate('/app/subscriptions');
+        return;
+      }
+      // Category-specific filter → transactions with category
+      if (note.action.payload.categoryId) {
+        const params = new URLSearchParams();
+        params.set('categoryId', note.action.payload.categoryId);
+        if (note.action.payload.type) params.set('type', note.action.payload.type);
+        navigate(`/app/transactions?${params.toString()}`);
+        return;
+      }
+      // Type-only filter → transactions with type
+      if (note.action.payload.type) {
+        navigate(`/app/transactions?type=${note.action.payload.type}`);
+        return;
+      }
     }
   };
 

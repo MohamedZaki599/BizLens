@@ -23,7 +23,7 @@ export const localizationKeysEn: Record<string, string> = {
 
   'signals.burn_rate.summary': 'Daily burn rate is {dailyRate}',
   'signals.burn_rate.explanation': 'Averaging {dailyRate} per day in expenses over the current period.',
-  'signals.expense_ratio.summary': 'Expense-to-income ratio is {ratioPct}%',
+  'signals.expense_ratio.summary': 'Expense-to-income ratio: {expense} spent vs {income} earned',
   'signals.expense_ratio.explanation': 'Spending {expense} against income of {income}.',
   'signals.top_expense_category.summary': '{categoryName} is the top expense at {sharePct}%',
   'signals.top_expense_category.explanation': '{categoryName} accounts for {amount} of total spending.',
@@ -118,8 +118,8 @@ export const localizationKeysEn: Record<string, string> = {
 
   'reasoning.burn_rate.daily': 'Daily burn rate calculated at {dailyRate} from {totalExpense} over {days} days.',
   'reasoning.burn_rate.low_confidence': 'Fewer than {minDays} days of data — burn rate confidence is low.',
-  'reasoning.expense_ratio.exceeds': 'Expense ratio of {ratioPct}% exceeds the {threshold}% warning level.',
-  'reasoning.expense_ratio.below': 'Expense ratio of {ratioPct}% is within healthy bounds.',
+  'reasoning.expense_ratio.exceeds': 'Expenses ({expense}) exceed the warning threshold relative to income ({income}).',
+  'reasoning.expense_ratio.below': 'Expense ratio is within healthy bounds — {expense} against {income}.',
   'reasoning.top_expense_category.share': '{categoryName} holds {sharePct}% share of total expenses.',
   'reasoning.top_income_category.share': '{categoryName} holds {sharePct}% share of total income.',
   'reasoning.category_concentration.high': '{categoryName} at {concentrationPct}% exceeds the concentration threshold.',
@@ -177,7 +177,7 @@ export const localizationKeysAr: Record<string, string> = {
 
   'signals.burn_rate.summary': 'معدل الإنفاق اليومي {dailyRate}',
   'signals.burn_rate.explanation': 'متوسط {dailyRate} يوميًا في المصروفات خلال الفترة الحالية.',
-  'signals.expense_ratio.summary': 'نسبة المصروفات إلى الدخل {ratioPct}%',
+  'signals.expense_ratio.summary': 'نسبة المصروفات إلى الدخل: {expense} مقابل {income}',
   'signals.expense_ratio.explanation': 'إنفاق {expense} مقابل دخل {income}.',
   'signals.top_expense_category.summary': '{categoryName} هي أعلى فئة إنفاق بنسبة {sharePct}%',
   'signals.top_expense_category.explanation': '{categoryName} تمثل {amount} من إجمالي الإنفاق.',
@@ -272,8 +272,8 @@ export const localizationKeysAr: Record<string, string> = {
 
   'reasoning.burn_rate.daily': 'معدل الإنفاق اليومي {dailyRate} محسوب من {totalExpense} على {days} يومًا.',
   'reasoning.burn_rate.low_confidence': 'أقل من {minDays} يومًا من البيانات — ثقة معدل الإنفاق منخفضة.',
-  'reasoning.expense_ratio.exceeds': 'نسبة المصروفات {ratioPct}% تتجاوز مستوى التحذير {threshold}%.',
-  'reasoning.expense_ratio.below': 'نسبة المصروفات {ratioPct}% ضمن الحدود الصحية.',
+  'reasoning.expense_ratio.exceeds': 'المصروفات ({expense}) تتجاوز مستوى التحذير مقارنة بالدخل ({income}).',
+  'reasoning.expense_ratio.below': 'نسبة المصروفات ضمن الحدود الصحية — {expense} مقابل {income}.',
   'reasoning.top_expense_category.share': '{categoryName} تحتل {sharePct}% من إجمالي المصروفات.',
   'reasoning.top_income_category.share': '{categoryName} تحتل {sharePct}% من إجمالي الدخل.',
   'reasoning.category_concentration.high': '{categoryName} بنسبة {concentrationPct}% تتجاوز حد التركيز.',
