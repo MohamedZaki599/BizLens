@@ -62,7 +62,7 @@ export const MoneyLeakCard = () => {
           <p className="text-[10px] uppercase tracking-wide text-ink-muted">
             {t('widgets.leak.extra')}
           </p>
-          <p className="font-display text-lg font-semibold text-danger tabular-nums mt-0.5">
+          <p className="font-display text-lg font-semibold text-danger tabular-nums mt-0.5" dir="ltr">
             +{formatCurrency(data.extra)}
           </p>
         </div>
@@ -70,7 +70,7 @@ export const MoneyLeakCard = () => {
           <p className="text-[10px] uppercase tracking-wide text-ink-muted">
             {t('widgets.leak.annualized')}
           </p>
-          <p className="font-display text-lg font-semibold text-ink tabular-nums mt-0.5">
+          <p className="font-display text-lg font-semibold text-ink tabular-nums mt-0.5" dir="ltr">
             {formatCurrency(data.annualized)}
           </p>
         </div>

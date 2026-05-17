@@ -55,7 +55,7 @@ export const ForecastCard = () => {
           <p className="text-[10px] uppercase tracking-wide text-ink-muted">
             {t('widgets.forecast.income')}
           </p>
-          <p className="font-display text-base font-semibold text-secondary tabular-nums mt-0.5">
+          <p className="font-display text-base font-semibold text-secondary tabular-nums mt-0.5" dir="ltr">
             {formatCurrency(vm.projectedIncome)}
           </p>
         </div>
@@ -63,7 +63,7 @@ export const ForecastCard = () => {
           <p className="text-[10px] uppercase tracking-wide text-ink-muted">
             {t('widgets.forecast.expense')}
           </p>
-          <p className="font-display text-base font-semibold text-danger tabular-nums mt-0.5">
+          <p className="font-display text-base font-semibold text-danger tabular-nums mt-0.5" dir="ltr">
             {formatCurrency(vm.projectedExpense)}
           </p>
         </div>
@@ -76,6 +76,7 @@ export const ForecastCard = () => {
               'font-display text-base font-semibold tabular-nums mt-0.5',
               negative ? 'text-danger' : 'text-ink',
             )}
+            dir="ltr"
           >
             {formatCurrency(vm.projectedProfit)}
           </p>

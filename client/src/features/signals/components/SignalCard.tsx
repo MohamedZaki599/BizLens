@@ -5,6 +5,20 @@ import { SignalSeverityBadge } from './SignalSeverityBadge';
 import { useSignalWorkspace } from '../hooks/useSignalWorkspace';
 import { cn } from '@/lib/utils';
 
+/** Last-resort defense: humanize a signal key if raw localization key leaked through */
+const safeTitle = (title: string, signalKey: string): string => {
+  if (/^[a-z]+(\.[a-z_]+){1,3}$/.test(title)) {
+    return signalKey.replace(/_/g, ' ');
+  }
+  return title;
+};
+
+/** If explanation is a raw localization key, suppress it entirely */
+const safeExplanation = (text: string): string => {
+  if (/^[a-z]+(\.[a-z_]+){1,3}$/.test(text)) return '';
+  return text;
+};
+
 interface SignalCardProps {
   signal: PrioritySignalViewModel;
   /** Whether this is the top-priority recommended signal */
@@ -57,7 +71,7 @@ export const SignalCard = ({ signal, recommended = false }: SignalCardProps) => 
             ? 'text-ink-muted'
             : 'text-ink group-hover:text-brand-primary',
         )}>
-          {signal.title}
+          {safeTitle(signal.title, signal.key)}
         </h3>
         <SignalSeverityBadge severity={signal.severity} />
       </div>
@@ -67,7 +81,7 @@ export const SignalCard = ({ signal, recommended = false }: SignalCardProps) => 
         'text-xs leading-relaxed rtl:leading-loose line-clamp-2 break-words mb-3 rtl:mb-4',
         isResolved ? 'text-ink-muted/70' : 'text-ink-muted',
       )}>
-        {signal.explanation}
+        {safeExplanation(signal.explanation)}
       </p>
 
       {/* Metric + action */}

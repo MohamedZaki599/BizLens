@@ -82,8 +82,17 @@ export const SignalWorkspacePanel = () => {
   const reasoningChain: string[] = resolveSignalReasoning(
     signal?.localized,
     metadata?.explainability?.reasoningChain,
-  );
-  const actionLabel = metadata?.action || t('signal.workspace.reviewTransactions');
+  ).filter(entry => {
+    // Remove unresolved localization keys that slipped through
+    if (!entry || entry.trim() === '') return false;
+    if (/^[a-z]+(\.[a-z_]+){1,3}$/.test(entry)) return false;
+    // Remove entries with unresolved interpolation placeholders
+    if (/\{[a-zA-Z_]+\}/.test(entry)) return false;
+    return true;
+  });
+  const actionLabel = (signal?.localized as any)?.actionKey
+    ? t((signal?.localized as any).actionKey) || metadata?.action || t('signal.workspace.reviewTransactions')
+    : metadata?.action || t('signal.workspace.reviewTransactions');
   const actionRoute = metadata?.payload?.route || '/app/transactions';
 
   return (

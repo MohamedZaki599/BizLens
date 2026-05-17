@@ -4,9 +4,11 @@ import { SignalCard } from './SignalCard';
 import { Skeleton } from '@/components/Skeleton';
 import { AlertCircle } from 'lucide-react';
 import { useT } from '@/lib/i18n';
+import { useFormatCurrency } from '@/lib/format';
 
 export const DashboardPrioritySignalsSection = () => {
   const t = useT();
+  const formatCurrency = useFormatCurrency();
   const { data, isLoading, isError, isFetching } = useSignalsQuery('dashboard');
 
   if (isLoading) {
@@ -44,7 +46,10 @@ export const DashboardPrioritySignalsSection = () => {
 
   if (topSignals.length === 0) return null;
 
-  const viewModels = topSignals.map(s => mapSignalToPriorityVM(s, isFetching));
+  const viewModels = topSignals.map(s => {
+    const vm = mapSignalToPriorityVM(s, isFetching);
+    return { ...vm, formattedValue: s.value ? formatCurrency(Number(s.value)) : '' };
+  });
 
   return (
     <section className="mb-8 animate-fade-in">

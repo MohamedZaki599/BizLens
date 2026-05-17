@@ -63,9 +63,22 @@ const useFormatTime = () => {
 
 const NoteCard = ({ note }: { note: AssistantNote }) => {
   const t = useT();
+  const ti = useTi();
   const navigate = useNavigate();
   const Icon = toneIcon[note.tone];
   const tone = toneClasses[note.tone];
+
+  // T013: Resolve localized title/message with fallback to legacy prose
+  const resolvedTitle = note.localized?.titleKey
+    ? ti(note.localized.titleKey, note.localized.titleParams || {})
+    : note.title;
+  const resolvedMessage = note.localized?.messageKey
+    ? ti(note.localized.messageKey, note.localized.messageParams || {})
+    : note.message;
+
+  const isRawKey = (s: string) => /^[a-z]+(\.[a-z_]+){1,3}$/.test(s);
+  const title = (resolvedTitle && !isRawKey(resolvedTitle)) ? resolvedTitle : note.title;
+  const message = (resolvedMessage && !isRawKey(resolvedMessage)) ? resolvedMessage : note.message;
 
   const handleAction = () => {
     if (!note.action) return;
@@ -102,7 +115,7 @@ const NoteCard = ({ note }: { note: AssistantNote }) => {
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-baseline gap-2">
             <h3 className="font-display text-base font-semibold tracking-tight text-ink">
-              {note.title}
+              {title}
             </h3>
             {note.metric && (
               <span className={cn('text-xs font-medium tabular-nums', tone.metric)}>
@@ -115,14 +128,14 @@ const NoteCard = ({ note }: { note: AssistantNote }) => {
                 : t('assistant.priority.normal')}
             </span>
           </div>
-          <p className="mt-1.5 text-sm text-ink-muted leading-relaxed break-words rtl:mt-2.5 rtl:leading-loose">{note.message}</p>
+          <p className="mt-1.5 text-sm text-ink-muted leading-relaxed break-words rtl:mt-2.5 rtl:leading-loose">{message}</p>
           {note.action && (
             <div className="mt-3">
               <button
                 onClick={handleAction}
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline focus-ring rounded min-h-[44px] px-1 -mx-1"
               >
-                {note.action.label}
+                {note.action.labelKey ? t(note.action.labelKey) || note.action.label : note.action.label}
                 <ArrowRight size={12} aria-hidden className="rtl:rotate-180" />
               </button>
             </div>
@@ -185,7 +198,9 @@ export const AssistantPage = () => {
               {t('assistant.headline')}
             </p>
             <p className="font-display text-lg sm:text-xl font-semibold text-ink mt-1.5 leading-snug break-words rtl:leading-relaxed">
-              {data.headline}
+              {data.headlineKey
+                ? ti(data.headlineKey, data.headlineParams || {}) || data.headline
+                : data.headline}
             </p>
             <p className="text-[11px] text-ink-muted mt-2">
               {ti('assistant.generatedAt', {

@@ -9,6 +9,30 @@ import { HttpError } from '../../utils/http-error';
 
 // ─── Filter Schema ────────────────────────────────────────────────────────
 
+/**
+ * Sanitizes signal metadata for API responses.
+ * Strips raw reasoningChain (now localization keys) to prevent leaking
+ * unresolved keys to the frontend. Reasoning is available via localized.reasoningKeys.
+ */
+const sanitizeMetadata = (signal: FinancialSignal): Record<string, unknown> => {
+  const meta = { ...signal.metadata } as Record<string, unknown>;
+  const description = (meta.description as string) || buildMessage(signal);
+  
+  // Strip reasoningChain from explainability (contains localization keys, not prose)
+  if (meta.explainability) {
+    const exp = meta.explainability as Record<string, unknown>;
+    meta.explainability = {
+      formula: exp.formula,
+      inputs: exp.inputs,
+      thresholdContext: exp.thresholdContext,
+      sourceEntities: exp.sourceEntities,
+    };
+  }
+  
+  meta.description = description;
+  return meta;
+};
+
 const SignalFilterSchema = z.object({
   userMode: z.string().optional(),
   category: z.string().uuid().optional(),
@@ -243,3 +267,4 @@ export const updateSignal: RequestHandler = asyncHandler(async (req, res) => {
     },
   });
 });
+

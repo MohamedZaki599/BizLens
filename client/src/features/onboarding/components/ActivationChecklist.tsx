@@ -51,7 +51,7 @@ export const ActivationChecklist = () => {
               {t('activation.title')}
             </h3>
             <p className="text-xs text-ink-muted">
-              {completed} / {total} {t('activation.completed')}
+              {completed} / {total} {t('activation.completed')} · {percentage}%
             </p>
           </div>
         </div>
@@ -59,15 +59,15 @@ export const ActivationChecklist = () => {
         <div className="flex items-center gap-1">
           <button
             onClick={() => setCollapsed((c) => !c)}
-            className="h-8 w-8 rounded-lg hover:bg-surface-high flex items-center justify-center text-ink-muted transition-colors focus-ring"
-            aria-label={collapsed ? 'Expand' : 'Collapse'}
+            className="min-h-[44px] min-w-[44px] h-11 w-11 rounded-lg hover:bg-surface-high flex items-center justify-center text-ink-muted transition-colors focus-ring"
+            aria-label={collapsed ? t('activation.expand') : t('activation.collapse')}
           >
             {collapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
           </button>
           <button
             onClick={handleDismiss}
-            className="h-8 w-8 rounded-lg hover:bg-surface-high flex items-center justify-center text-ink-muted transition-colors focus-ring"
-            aria-label="Dismiss"
+            className="min-h-[44px] min-w-[44px] h-11 w-11 rounded-lg hover:bg-surface-high flex items-center justify-center text-ink-muted transition-colors focus-ring"
+            aria-label={t('activation.dismiss')}
           >
             <X size={16} />
           </button>
@@ -75,9 +75,9 @@ export const ActivationChecklist = () => {
       </div>
 
       {/* Progress bar */}
-      <div className="mt-4 h-1.5 rounded-full bg-surface-high overflow-hidden">
+      <div className="mt-4 h-2 rounded-full bg-surface-high overflow-hidden">
         <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-primary-container to-secondary"
+          className="h-full rounded-full bg-gradient-to-r rtl:bg-gradient-to-l from-primary-container to-secondary"
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
@@ -94,14 +94,14 @@ export const ActivationChecklist = () => {
             transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
             className="overflow-hidden"
           >
-            <div className="mt-4 space-y-1">
+            <div className="mt-4 space-y-1 rtl:space-y-2">
               {MILESTONE_CONFIG.map(({ id, icon: Icon, colorDone }) => {
                 const done = milestones[id];
                 return (
                   <div
                     key={id}
                     className={cn(
-                      'flex items-center gap-3 p-3 rounded-xl transition-colors duration-200',
+                      'flex items-center gap-3 rtl:gap-4 p-3 rounded-xl transition-colors duration-200',
                       done ? 'bg-surface-low/50' : 'bg-transparent',
                     )}
                   >

@@ -23,6 +23,7 @@ export { arPlural, type ArabicPluralForms } from './plural';
 export {
   formatCurrency,
   formatCurrencyCompact,
+  formatCurrencyStatic,
   formatNumber,
   formatNumberCompact,
   formatPercent,

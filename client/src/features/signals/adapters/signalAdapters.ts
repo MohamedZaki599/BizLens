@@ -1,5 +1,6 @@
 import type { FinancialSignalDto, MetricCardViewModel, ForecastViewModel, PrioritySignalViewModel } from '../types';
 import { getFreshnessStatus } from '../utils/freshness';
+import { resolveSignalTitle, resolveSignalExplanation } from '../utils/resolveLocalized';
 
 export const mapSignalToMetricCardVM = (
   signal: FinancialSignalDto,
@@ -33,7 +34,7 @@ export const mapSignalToMetricCardVM = (
     isStale: freshness === 'stale',
     label,
     value: signal.value,
-    caption: signal.metadata?.description || `Signal ${signal.key}`,
+    caption: resolveSignalExplanation(signal.localized, signal.metadata?.description as string | undefined, signal.key),
     change,
   };
 };
@@ -72,7 +73,7 @@ export const mapSignalToPriorityVM = (
   return {
     id: signal.id,
     key: signal.key,
-    formattedValue: signal.value ? `$${signal.value.toLocaleString()}` : '',
+    formattedValue: '',
     severity: signal.severity,
     trend: signal.trend,
     confidence: signal.confidence,
@@ -82,8 +83,8 @@ export const mapSignalToPriorityVM = (
     generatedAt,
     freshness,
     isStale: freshness === 'stale',
-    title: signal.metadata?.title || signal.key.replace(/_/g, ' '),
-    explanation: signal.metadata?.description || 'Operational signal detected.',
+    title: resolveSignalTitle(signal.localized, signal.metadata?.title as string | undefined, signal.key),
+    explanation: resolveSignalExplanation(signal.localized, signal.metadata?.description as string | undefined, signal.key),
     recommendedAction: signal.metadata?.recommendedAction || signal.metadata?.action || 'Review transaction details',
   };
 };
