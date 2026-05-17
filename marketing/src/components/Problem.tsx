@@ -15,7 +15,7 @@ export const Problem = () => {
   return (
     <section
       id="problem"
-      className="relative py-24 md:py-32 bg-gradient-to-b from-transparent to-surface-low/40"
+      className="relative py-20 md:py-28 bg-gradient-to-b from-transparent to-surface-low/40"
     >
       <div className="max-w-6xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl">

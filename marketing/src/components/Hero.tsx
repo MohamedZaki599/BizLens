@@ -29,6 +29,10 @@ export const Hero = () => {
             {t(language, 'hero.subtitle')}
           </p>
 
+          <p className="mt-3 text-sm text-ink-muted/80 tracking-wide">
+            {t(language, 'hero.clarification')}
+          </p>
+
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a
               href={siteConfig.links.register}
@@ -70,7 +74,7 @@ export const Hero = () => {
             </div>
           </div>
 
-          <div className="relative rounded-3xl bg-surface-lowest/90 backdrop-blur-xl border-t border-white/10 shadow-2xl p-6 animate-float">
+          <div className="relative rounded-3xl bg-surface-lowest/90 backdrop-blur-xl border border-outline/10 shadow-[0_25px_60px_-12px_rgba(0,0,0,0.3)] p-6 animate-float">
             {/* Insight strip */}
             <div className="rounded-2xl p-5 bg-gradient-to-br from-primary to-primary-container text-on-primary">
               <p className="text-[11px] uppercase tracking-[0.18em] opacity-70">

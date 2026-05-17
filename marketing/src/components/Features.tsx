@@ -33,7 +33,7 @@ void Palette;
 export const Features = () => {
   const { language } = useUi();
   return (
-    <section id="features" className="py-24 md:py-32">
+    <section id="features" className="py-20 md:py-28">
       <div className="max-w-6xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl">
           <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
@@ -42,11 +42,11 @@ export const Features = () => {
           <p className="mt-4 text-ink-muted text-lg">{t(language, 'features.subtitle')}</p>
         </div>
 
-        <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {ITEMS.map(({ icon: Icon, titleKey, bodyKey }) => (
+        <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {ITEMS.map(({ icon: Icon, titleKey, bodyKey }, idx) => (
             <div
               key={titleKey}
-              className="rounded-3xl p-6 bg-surface-lowest hover:-translate-y-0.5 transition-transform duration-300 ease-quintessential"
+              className={`rounded-3xl p-6 bg-surface-lowest hover:-translate-y-0.5 transition-transform duration-300 ease-quintessential ${idx < 2 ? 'border border-primary/15' : ''}`}
             >
               <span className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-container text-on-primary flex items-center justify-center">
                 <Icon size={18} strokeWidth={1.6} />
